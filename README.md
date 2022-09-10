@@ -1,2 +1,2 @@
 # xr-mass-composition
-Manage mass composition math operations and visualisation
+Manage mass-composition math operations and visualisation
