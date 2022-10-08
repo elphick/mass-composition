@@ -195,6 +195,8 @@ class MassComposition:
 
         """
         df = self._obj.to_dataframe()
+        if composition_only:
+            df = df[self.chem_vars]
 
         # Kudos: https://stackoverflow.com/questions/72125802/parallel-coordinate-plot-in-plotly-with-continuous-
         # and-categorical-data
@@ -236,12 +238,17 @@ class MassComposition:
 
         return fig
 
-    def plot_ternary(self, variables: List[str]) -> go.Figure:
+    def plot_ternary(self, variables: List[str], color: Optional[str] = None) -> go.Figure:
         """Plot a ternary diagram
+            variables: List of 3 components to plot
+            color: Optional color variable
 
         """
 
-        df = self._obj.to_dataframe()[variables]
-        fig = px.scatter_ternary(df, a=variables[0], b=variables[1], c=variables[2])
+        df = self._obj.to_dataframe()
+        if color:
+            fig = px.scatter_ternary(df, a=variables[0], b=variables[1], c=variables[2], color=color)
+        else:
+            fig = px.scatter_ternary(df, a=variables[0], b=variables[1], c=variables[2])
 
         return fig
