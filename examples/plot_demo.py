@@ -39,14 +39,21 @@ fig
 
 # %%
 #
+# Create an interactive parallel plot with only the components
+
+fig2 = xr_ds.mc.plot_parallel(composition_only=True)
+fig2
+
+# %%
+#
 # Create a parallel plot with color
 
-fig2 = xr_ds.mc.plot_parallel(color='group')
-fig2
+fig3 = xr_ds.mc.plot_parallel(color='group')
+fig3
 
 # %%
 #
 # Create a ternary diagram for 3 composition variables
 
-fig3 = xr_ds.mc.plot_ternary(variables=['Fe', 'SiO2', 'Al2O3'])
-fig3
+fig4 = xr_ds.mc.plot_ternary(variables=['Fe', 'SiO2', 'Al2O3'], color='group')
+fig4
