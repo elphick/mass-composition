@@ -1,0 +1,8 @@
+xr-mass-composition README
+==========================
+
+.. toctree::
+   :caption: readme:
+
+.. include:: ../../README.md
+   :parser: myst_parser.sphinx_
