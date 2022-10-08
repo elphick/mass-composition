@@ -9,4 +9,4 @@ When published (pending), the package will be pip-installable.
 
 ..  code-block::
 
-    pip install xr-mass-composition
+    pip install mass-composition-xarray

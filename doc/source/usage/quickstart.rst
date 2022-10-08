@@ -1,6 +1,14 @@
 Quick Start Guide
 =================
 
+Once you have xarray and mass-composition xarray installed in your environment, you will need the following imports.
+
+..  code-block:: python
+
+    import xarray as xr
+    import mcxarray.mcxarray
+
+
 It is possible that you already have your mass-composition data in a pandas DataFrame.
 
 If this is the case, provided some pre-requisites are met, we can create an xarray mass-composition Dataset.

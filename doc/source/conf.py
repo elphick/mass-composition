@@ -14,11 +14,11 @@ import os
 import sys
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 
-sys.path.insert(0, os.path.abspath('../xr-mass_composition'))
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'xr-mass-composition'
+project = 'mass-composition-xarray'
 copyright = '2022, Greg Elphick'
 author = 'Greg Elphick'
 

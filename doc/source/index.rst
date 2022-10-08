@@ -1,5 +1,5 @@
-Welcome to xr-mass-composition's documentation!
-===============================================
+Welcome to mass-composition-xarray documentation!
+=================================================
 
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_
