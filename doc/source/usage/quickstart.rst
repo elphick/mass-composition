@@ -11,7 +11,8 @@ Once you have xarray and mass-composition xarray installed in your environment, 
 
 It is possible that you already have your mass-composition data in a pandas DataFrame.
 
-If this is the case, provided some pre-requisites are met, we can create an xarray mass-composition Dataset.
+If this is the case, provided some pre-requisites are met, we can create an xarray mass-composition Dataset
+from your pandas DataFrame.
 
 DataFrame requirements:
 
@@ -31,7 +32,12 @@ It is then a simple case of standardising the composition symbols if desired.
 
     xr_ds = xr_ds.mc.convert_chem_to_symbols()
 
+Note the use of the mc accessor to access the mass-composition method called convert_chem_to_symbols.
 
-Note the use of the mc accessor to access the mass-composition method.
+We can calculate the weight average of the mass-composition by executing the following.
 
-For more examples, see the :doc:`/auto_examples/index`.
+..  code-block:: python
+
+    xr_ds.mc.aggregate()
+
+For examples that illustrate math operations and visualisation, see the :doc:`/auto_examples/index`.

@@ -6,14 +6,14 @@ Demonstrate splitting and math operations that preserve the mass balance of comp
 """
 
 # %%
-from copy import deepcopy
-from pathlib import Path
 
 import xarray as xr
 import xarray.tests
 import pandas as pd
 
 from mcxarray.data.sample_data import sample_data
+import mcxarray.mcxarray
+
 
 # %%
 #

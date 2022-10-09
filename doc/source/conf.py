@@ -13,6 +13,10 @@
 import os
 import sys
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
+from plotly.io._sg_scraper import plotly_sg_scraper
+import plotly.io as pio
+
+pio.renderers.default = 'sphinx_gallery'
 
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -37,7 +41,6 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',  # to document the
               ]
 
 autosummary_generate = True
-
 sphinx_gallery_conf = {
     'filename_pattern': r'\.py',
     'ignore_pattern': r'__init__\.py',
@@ -47,6 +50,7 @@ sphinx_gallery_conf = {
     #                                    'math_operations',
     #                                    'plot_demo']),
     'within_subsection_order': FileNameSortKey,
+    'image_scrapers': ('matplotlib', )
 }
 
 # Add any paths that contain templates here, relative to this directory.

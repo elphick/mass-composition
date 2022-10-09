@@ -1,12 +1,11 @@
 API Reference
 =============
 
-//.. automodule:: mcxarray
-//   :members:
+.. automodule:: mcxarray
+   :members:
 
 .. autosummary::
    :toctree: _autosummary
    :recursive:
-
 
     mcxarray

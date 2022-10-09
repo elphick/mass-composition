@@ -11,7 +11,7 @@ from mcxarray.utils.components import is_compositional
 
 @xr.register_dataset_accessor("mc")
 class MassComposition:
-    def __init__(self, xarray_obj):
+    def __init__(self, xarray_obj: xr.Dataset):
         self._obj = xarray_obj
         self._center = None
 
@@ -240,6 +240,7 @@ class MassComposition:
 
     def plot_ternary(self, variables: List[str], color: Optional[str] = None) -> go.Figure:
         """Plot a ternary diagram
+
             variables: List of 3 components to plot
             color: Optional color variable
 

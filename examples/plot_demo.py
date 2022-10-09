@@ -2,11 +2,10 @@
 Plot Demo
 =========
 
-Demonstrating the mass-composition view (plot) methods.
+Demonstrating the mass-composition plot methods.
 """
 
 import xarray as xr
-import xarray.tests
 import pandas as pd
 
 from mcxarray.data.sample_data import sample_data
@@ -55,5 +54,8 @@ fig3
 #
 # Create a ternary diagram for 3 composition variables
 
-fig4 = xr_ds.mc.plot_ternary(variables=['Fe', 'SiO2', 'Al2O3'], color='group')
+fig4 = xr_ds.mc.plot_ternary(variables=['SiO2', 'Al2O3', 'LOI'], color='group')
+# save the figure for use as the sphinx-gallery thumbnail
+fig4.write_image('../doc/source/_static/ternary.png')
+# sphinx_gallery_thumbnail_path = '_static/ternary.png'
 fig4
