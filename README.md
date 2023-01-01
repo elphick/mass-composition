@@ -1,4 +1,4 @@
-# mass-composition-xarray
+# mass-composition
 
 Manage mass-composition math operations and visualisation in xarray
 
