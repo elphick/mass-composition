@@ -110,7 +110,7 @@ def is_oxide(candidates: List[str], strict: bool = True) -> Union[List[str], Dic
 
 def is_compositional(candidates: List[str], strict: bool = True) -> Union[List[str], Dict[str, str]]:
     if strict:
-        comps = {str(o) for o in oxides()}.intersection(set(elements())).intersection(set(custom_components))
+        comps = {str(o) for o in oxides()}.union(set(elements())).union(set(custom_components))
         matches: list = list(set(candidates).intersection(comps))
     else:
         comp_map: Dict[str, str] = {**{str(o).lower(): str(o) for o in oxides()},

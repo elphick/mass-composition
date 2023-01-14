@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 
-def plot_parallel(data: pd.DataFrame, color: Optional[str] = None, composition_only: bool = False) -> go.Figure:
+def plot_parallel(data: pd.DataFrame, color: Optional[str] = None, title: Optional[str] = None) -> go.Figure:
     """Create an interactive parallel plot
 
     Useful to explore multi-dimensional data like mass-composition data
@@ -13,7 +13,7 @@ def plot_parallel(data: pd.DataFrame, color: Optional[str] = None, composition_o
     Args:
         data: Dataframe to plot
         color: Optional color variable
-        composition_only: if True will limit the plot to composition components only
+        title: Optional plot title
 
     Returns:
 
@@ -49,5 +49,7 @@ def plot_parallel(data: pd.DataFrame, color: Optional[str] = None, composition_o
         fig = go.Figure(data=go.Parcoords(dimensions=col_list))
     else:
         fig = go.Figure(data=go.Parcoords(dimensions=col_list, line=dict(color=data[color])))
+
+    fig.update_layout(title=title)
 
     return fig

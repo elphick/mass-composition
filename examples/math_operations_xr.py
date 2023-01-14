@@ -12,7 +12,6 @@ import xarray.tests
 import pandas as pd
 
 from mass_composition.data.sample_data import sample_data
-from mass_composition.mass_composition import MassComposition
 import mass_composition.mcxarray
 
 # %%
@@ -27,41 +26,41 @@ print(df_data.head())
 
 # %%
 #
-# Construct a MassComposition object and standardise the chemistry variables
+# Construct a Xarray Dataset and standardise the chemistry variables
 
-obj_mc: MassComposition = MassComposition(df_data)
-obj_mc.convert_chem_to_symbols()
-print(obj_mc)
+xr_ds: xr.Dataset = xr.Dataset(df_data)
+xr_ds = xr_ds.mc.convert_chem_to_symbols()
+print(xr_ds)
 
 # %%
 #
 # Split the original Dataset and return the complement of the split fraction.
 # Splitting does not modify the absolute grade of the input.
 
-obj_mc_split, obj_mc_comp = obj_mc.split(fraction=0.1)
-print(obj_mc_split)
+xr_ds_split, xr_ds_comp = xr_ds.mc.split(fraction=0.1)
+print(xr_ds_split)
 
 # %%
-print(obj_mc_comp)
+print(xr_ds_comp)
 
 # %%
 #
 # Add the split and complement parts using the mc.add method
 
-obj_mc_sum: MassComposition = obj_mc_split + obj_mc_comp
-print(obj_mc_sum)
+xr_ds_sum: xr.Dataset = xr_ds_split.mc.add(xr_ds_comp)
+print(xr_ds_sum)
 
 # %%
 #
 # Confirm the sum of the splits is materially equivalent to the starting object.
 
-xarray.tests.assert_allclose(obj_mc.data, obj_mc_sum.data)
+xarray.tests.assert_allclose(xr_ds, xr_ds_sum)
 
 # %%
 #
 # Add finally add and then subtract the split portion to the original object, and check the output.
 
-obj_mc_sum: MassComposition = obj_mc + obj_mc_split
-obj_mc_minus: MassComposition = obj_mc_sum - obj_mc_split
-xarray.tests.assert_allclose(obj_mc_minus.data, obj_mc.data)
-print(obj_mc_minus)
+xr_ds_sum: xr.Dataset = xr_ds.mc.add(xr_ds_split)
+xr_ds_minus: xr.Dataset = xr_ds_sum.mc.minus(xr_ds_split)
+xarray.tests.assert_allclose(xr_ds_minus, xr_ds)
+print(xr_ds_minus)

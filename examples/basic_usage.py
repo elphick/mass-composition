@@ -9,14 +9,14 @@ import xarray as xr
 import xarray.tests
 import pandas as pd
 
-from mcxarray.data.sample_data import sample_data
-import mcxarray.mcxarray
-
+from mass_composition.data.sample_data import sample_data
+from mass_composition.mass_composition import MassComposition
+import mass_composition.mcxarray
 
 # %%
 #
-# Create a mass-composition (mc) enabled Xarray Dataset
-# -----------------------------------------------------
+# Create a MassComposition object
+# -------------------------------
 #
 # We get some demo data in the form of a pandas DataFrame
 
@@ -25,39 +25,38 @@ print(df_data.head())
 
 # %%
 #
-# Construct a Xarray Dataset and standardise the chemistry variables
+# Construct a MassComposition object and standardise the chemistry variables
 
-xr_ds: xr.Dataset = xr.Dataset(df_data)
-xr_ds = xr_ds.mc.convert_chem_to_symbols()
-print(xr_ds)
+obj_mc: MassComposition = MassComposition(df_data)
+obj_mc.convert_chem_to_symbols()
+print(obj_mc)
 
 # %%
 #
 # Validate the round trip by converting composition to mass and back to composition
 
-xr_ds_mass = xr_ds.mc.composition_to_mass()
-xr_ds_chem = xr_ds_mass.mc.mass_to_composition()
+xr_ds_mass: xr.Dataset = obj_mc.data.mc.composition_to_mass()
+xr_ds_chem: xr.Dataset = xr_ds_mass.mc.mass_to_composition()
 
-xarray.tests.assert_allclose(xr_ds, xr_ds_chem)
+xarray.tests.assert_allclose(obj_mc.data, xr_ds_chem)
 
 # %%
 #
-# Demonstrate the mc aggregate function
-# -------------------------------------
+# Demonstrate the aggregate function
+# -----------------------------------
 #
 # i.e. weight average of the dataset, a.k.a. head grade
 
-print(xr_ds.mc.aggregate())
+print(obj_mc.aggregate())
 
 # %%
 #
 # Convert to a pandas DataFrame
 
-print(xr_ds.mc.aggregate().to_dataframe())
+print(obj_mc.aggregate().to_dataframe())
 
 # %%
 #
 # Aggregate by a group variable
 
-print(xr_ds.mc.aggregate(group_var='group').to_dataframe())
-
+print(obj_mc.aggregate(group_var='group').to_dataframe())
