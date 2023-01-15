@@ -92,9 +92,16 @@ class MassCompositionXR:
         # TODO: improve reference to DRY mass
         ds_mass: xr.Dataset = ds_chem * self._mc_obj.data[self._mc_obj.mass_vars[-1]] / 100
         # TODO: tweak unit attributes.
+
+        # manage the moisture - which is a wet basis
+        da_mass_h2o: xr.DataArray = self._mc_obj.data[self._mc_obj.moisture_var[0]] * self._mc_obj.data[
+            self._mc_obj.mass_vars[0]] / 100
+
         # insert into the rest of the dataset
         ds_res: xr.Dataset = self._mc_obj.data.copy()
         ds_res[self._mc_obj.chem_vars] = ds_mass
+        ds_res[self._mc_obj.moisture_var[0]] = da_mass_h2o
+
         return ds_res
 
     def mass_to_composition(self) -> xr.Dataset:
@@ -107,9 +114,15 @@ class MassCompositionXR:
         # select just the chem variables
         ds_mass: xr.Dataset = self._mc_obj.data[self._mc_obj.chem_vars]
         ds_chem: xr.Dataset = ds_mass / self._mc_obj.data[self._mc_obj.mass_vars[-1]] * 100
+
+        # manage the moisture - which is a wet basis
+        da_h2o: xr.DataArray = self._mc_obj.data[self._mc_obj.moisture_var[0]] / self._mc_obj.data[
+            self._mc_obj.mass_vars[0]] * 100
+
         # insert into the rest of the dataset
         ds_res: xr.Dataset = self._mc_obj.data.copy()
         ds_res[self._mc_obj.chem_vars] = ds_chem
+        ds_res[self._mc_obj.moisture_var[0]] = da_h2o
         return ds_res
 
     def split(self, fraction: float) -> tuple[xr.Dataset, xr.Dataset]:
@@ -166,5 +179,3 @@ class MassCompositionXR:
         for v in self.attr_vars:
             res[v] = self._obj[v]
         return res
-
-
