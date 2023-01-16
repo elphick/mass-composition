@@ -16,27 +16,31 @@ import xarray.tests
 import pandas as pd
 from plotly.graph_objs import Figure
 
-from flowsheet import Stream
+from flowsheet.stream import Stream
 from mass_composition.data.sample_data import sample_data
 import mass_composition.mcxarray
+from mass_composition.mass_composition import MassComposition
 
 from mass_composition.utils.components import is_compositional
 
 
 # %%
 #
-# Create a mass-composition (mc) enabled Xarray Dataset
-# -----------------------------------------------------
-#
+# Create a Stream object
+# ----------------------
+# #
 # We get some demo data in the form of a pandas DataFrame
 
 df_data: pd.DataFrame = pd.read_csv('../sample_data/iron_ore_sample_data.csv', index_col='index')
 print(df_data.shape)
 print(df_data.head())
 
-obj_stream: Stream = Stream.from_dataframe(df_data)
-obj_stream.name = 'stream 1'
+obj_stream: Stream = Stream.from_dataframe(df_data, name='stream 1')
 print(obj_stream)
+
+obj_mc: MassComposition = MassComposition(df_data)
+obj_stream_mc: Stream = Stream.from_mass_composition(obj_mc, name='stream from mc')
+print(obj_stream_mc)
 
 stream_1, stream_2 = obj_stream.split(fraction=0.6)
 print(stream_1)

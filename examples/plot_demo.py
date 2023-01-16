@@ -6,13 +6,11 @@ Demonstrating the mass-composition plot methods.
 """
 from pathlib import Path
 
-import xarray as xr
 import pandas as pd
 from plotly.graph_objs import Figure
 
 from mass_composition.data.sample_data import sample_data
 from mass_composition.mass_composition import MassComposition
-import mass_composition.mcxarray
 
 # %%
 #
@@ -29,7 +27,6 @@ print(df_data.head())
 # Construct a MassComposition object and standardise the chemistry variables
 
 obj_mc: MassComposition = MassComposition(df_data)
-obj_mc.convert_chem_to_symbols()
 print(obj_mc)
 
 # %%

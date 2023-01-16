@@ -23,21 +23,26 @@ def solve_mass_moisture(mass_wet: Optional[Union[pd.Series, xr.DataArray]] = Non
     vars_supplied: List[str] = [k for k, v in vars.items() if v is not None]
 
     if len(vars_supplied) == 3:
-        raise NotImplementedError('Over-specified - validation code to check the balance is coming soon...')
+        pass
+        # raise NotImplementedError('Over-specified - validation code to check the balance is coming soon...')
     elif len(vars_supplied) == 1:
         raise ValueError('Insufficient arguments supplied - at least 2 required.')
 
-    var_to_solve: str = [k for k, v in vars.items() if v is None][0]
+    var_to_solve: List[str] = [k for k, v in vars.items() if v is None]
 
-    if var_to_solve == 'mass_wet':
-        res: pd.Series = mass_dry / (1-moisture/100)
-        res.name = var_to_solve
-    elif var_to_solve == 'mass_dry':
-        res: pd.Series = mass_wet - (mass_wet * moisture / 100)
-        res.name = var_to_solve
-    elif var_to_solve == 'moisture':
-        res = (mass_wet - mass_dry) / mass_wet * 100
-        res.name = 'H2O'
+    res: Optional[pd.Series] = None
+    if var_to_solve:
+        var_to_solve: str = var_to_solve[0]
+
+        if var_to_solve == 'mass_wet':
+            res: pd.Series = mass_dry / (1 - moisture / 100)
+            res.name = var_to_solve
+        elif var_to_solve == 'mass_dry':
+            res: pd.Series = mass_wet - (mass_wet * moisture / 100)
+            res.name = var_to_solve
+        elif var_to_solve == 'moisture':
+            res = (mass_wet - mass_dry) / mass_wet * 100
+            res.name = 'H2O'
 
     return res
 
