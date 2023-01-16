@@ -56,8 +56,12 @@ class MassComposition:
 
         # Design Decision - make mass concrete and moisture part of the dependent property
         self._data_mass: xr.Dataset = xr.Dataset(pd.concat([mass_wet, mass_dry], axis='columns'))
-        self._data_chem: xr.Dataset = xr.Dataset(
-            data[input_variables['chemistry']].copy().rename(columns=input_variables['chemistry']))
+        # TODO: resolve how chem can be a dict or a list - try for consistency going forward
+        df_chem: pd.DataFrame = data[input_variables['chemistry']].copy()
+        if isinstance(input_variables['chemistry'], Dict):
+            df_chem.rename(columns=input_variables['chemistry'])
+        self._data_chem: xr.Dataset = xr.Dataset(df_chem)
+
         self._data_attrs: xr.Dataset = xr.Dataset(data[input_variables['attrs']].copy())
 
         # noinspection PyTypeChecker
@@ -176,7 +180,10 @@ class MassComposition:
 
         # report any remaining variables as attrs
         vars_known_dims: List[str] = [v for k, v in res.items() if (k != 'chemistry') and v is not None]
-        vars_known_dims.extend(list(res['chemistry'].keys()))
+        if isinstance(res['chemistry'], Dict):
+            vars_known_dims.extend(list(res['chemistry'].keys()))
+        else:
+            vars_known_dims.extend(list(res['chemistry']))
         vars_attrs: List[str] = list(set(list(variables)).difference(set(vars_known_dims)))
         res['attrs'] = vars_attrs
 

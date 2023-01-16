@@ -18,7 +18,6 @@ from plotly.graph_objs import Figure
 
 from flowsheet.stream import Stream
 from mass_composition.data.sample_data import sample_data
-import mass_composition.mcxarray
 from mass_composition.mass_composition import MassComposition
 
 from mass_composition.utils.components import is_compositional
