@@ -32,8 +32,8 @@ class Flowsheet(nx.DiGraph):
         chunks: List[pd.DataFrame] = []
         for n, nbrs in self.adj.items():
             for nbr, eattr in nbrs.items():
-                chunks.append(eattr['mc'].aggregate().to_dataframe())
-        rpt: pd.DataFrame = pd.concat(chunks, axis='index')
+                chunks.append(eattr['mc'].aggregate().to_dataframe().assign(stream=eattr['mc'].name))
+        rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('stream')
         return rpt
 
 
