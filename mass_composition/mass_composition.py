@@ -14,21 +14,25 @@ from mass_composition.utils.viz import plot_parallel
 
 
 class MassComposition:
+
     def __init__(self,
                  data: pd.DataFrame,
                  mass_wet_var: Optional[str] = None,
                  mass_dry_var: Optional[str] = None,
                  moisture_var: Optional[str] = None,
-                 chem_vars: Optional[List[str]] = None
-                 ):
+                 chem_vars: Optional[List[str]] = None,
+                 mass_units: Optional[str] = 'mass units'):
 
+        # TODO - try to kill the need to store these properties
         self.input_columns: List[str] = list(data.columns)
         self._mass_wet_var_in = mass_wet_var
         self._mass_dry_var_in = mass_dry_var
         self._moisture_var_in = moisture_var
         self._chem_vars_in = chem_vars
+        self.mass_units = mass_units
 
         input_variables: Dict = self._detect_var_types()
+        mass_var_map: Dict = {v: k for k, v in input_variables.items() if 'mass' in k}
 
         # # solve or validate the moisture balance
         if input_variables['mass_wet'] is not None:
@@ -55,31 +59,59 @@ class MassComposition:
         # create the xr object
 
         # Design Decision - make mass concrete and moisture part of the dependent property
-        self._data_mass: xr.Dataset = xr.Dataset(pd.concat([mass_wet, mass_dry], axis='columns'))
-        # TODO: resolve how chem can be a dict or a list - try for consistency going forward
-        df_chem: pd.DataFrame = data[input_variables['chemistry']].copy()
-        if isinstance(input_variables['chemistry'], Dict):
-            df_chem.rename(columns=input_variables['chemistry'])
-        self._data_chem: xr.Dataset = xr.Dataset(df_chem)
+        d_da_mass: Dict[str: xr.DataArray] = {}
+        for var_name, var_data in {'mass_wet': mass_wet, 'mass_dry': mass_dry}.items():
+            tmp_da: xr.DataArray = xr.DataArray(var_data, name=var_name,
+                                                attrs={'units': self.mass_units,
+                                                       'standard_name': ' '.join(var_name.split('_')[::-1]).title(),
+                                                       'mc_type': 'mass',
+                                                       'mc_col_orig': var_data.name})
+            d_da_mass[var_name] = tmp_da
 
-        self._data_attrs: xr.Dataset = xr.Dataset(data[input_variables['attrs']].copy())
+        self._data_mass: xr.Dataset = xr.Dataset(d_da_mass)
 
-        # noinspection PyTypeChecker
-        self.mass_wet_var: str = mass_wet.name
-        # noinspection PyTypeChecker
-        self.mass_dry_var: str = mass_dry.name
-        # noinspection PyTypeChecker
-        self.mass_vars: List[str] = [mass_wet.name, mass_dry.name]
-        self.chem_vars: List[str] = list(self._data_chem.to_dataframe().columns)
-        self.attr_vars: List[str] = list(self._data_attrs.to_dataframe().columns)
+        d_da_chem: Dict[str: xr.DataArray] = {}
+        for in_analyte, analyte in input_variables['chemistry'].items():
+            tmp_da: xr.DataArray = xr.DataArray(data[in_analyte], name=analyte,
+                                                attrs={'units': '%',
+                                                       'standard_name': analyte,
+                                                       'mc_type': 'chemistry',
+                                                       'mc_col_orig': in_analyte})
+            d_da_chem[analyte] = tmp_da
 
-        self.chemistry_var_map = input_variables['chemistry']  # {in: symbols}
+        self._data_chem: xr.Dataset = xr.Dataset(d_da_chem)
+
+        d_da_attrs: Dict[str: xr.DataArray] = {}
+        for var_attr in input_variables['attrs']:
+            tmp_da: xr.DataArray = xr.DataArray(data[var_attr], name=var_attr,
+                                                attrs={'standard_name': var_attr,
+                                                       'mc_type': 'attribute',
+                                                       'mc_col_orig': var_attr})
+            d_da_attrs[var_attr] = tmp_da
+
+        self._data_attrs: xr.Dataset = xr.Dataset(d_da_attrs)
+
+        # # noinspection PyTypeChecker
+        # self.mass_wet_var: str = mass_wet.name
+        # # noinspection PyTypeChecker
+        # self.mass_dry_var: str = mass_dry.name
+        # # noinspection PyTypeChecker
+        # self.mass_vars: List[str] = [mass_wet.name, mass_dry.name]
+        # self.chem_vars: List[str] = list(self._data_chem.to_dataframe().columns)
+        # self.attr_vars: List[str] = list(self._data_attrs.to_dataframe().columns)
+        #
+        # self.chemistry_var_map = input_variables['chemistry']  # {in: symbols}
 
     @property
     def data(self):
-        moisture: xr.DataArray = (self._data_mass[self.mass_wet_var] - self._data_mass[self.mass_dry_var]) / \
-                                 self._data_mass[self.mass_wet_var] * 100
-        moisture.name = 'H2O'
+
+        moisture: xr.DataArray = xr.DataArray((self._data_mass['mass_wet'] - self._data_mass['mass_dry']) /
+                                              self._data_mass['mass_wet'] * 100, name='H2O',
+                                              attrs={'units': '%',
+                                                     'standard_name': 'H2O',
+                                                     'mc_type': 'moisture',
+                                                     'mc_col_orig': 'H2O'}
+                                              )
 
         data: xr.Dataset = xr.merge([self._data_mass, moisture, self._data_chem, self._data_attrs])
         return data
@@ -107,26 +139,21 @@ class MassComposition:
     def aggregate(self, group_var: Optional[str] = None) -> xr.Dataset:
         """Calculate the weight average of this dataset.
         """
+
         if group_var is None:
 
-            xr_mass: xr.Dataset = composition_to_mass(mass_wet=self._data_mass[self.mass_wet_var],
-                                                      mass_dry=self._data_mass[self.mass_dry_var],
-                                                      composition=self._data_chem[self.chem_vars]).sum()
+            xr_mass: xr.Dataset = composition_to_mass(mc_ds=self.data).sum(keep_attrs=True)
 
         else:
 
-            xr_mass: xr.Dataset = composition_to_mass(mass_wet=self._data_mass[self.mass_wet_var],
-                                                      mass_dry=self._data_mass[self.mass_dry_var],
-                                                      composition=self._data_chem[self.chem_vars],
-                                                      attributes=self._data_attrs).groupby(group_var).sum()
+            xr_mass: xr.Dataset = composition_to_mass(mc_ds=self.data).groupby(group_var).sum(keep_attrs=True)
 
-        res: xr.Dataset = mass_to_composition(mass_wet=xr_mass[self.mass_wet_var],
-                                              mass_dry=xr_mass[self.mass_dry_var],
-                                              component_mass=xr_mass[self.chem_vars])
+        res: xr.Dataset = mass_to_composition(mc_ds=xr_mass)
 
         # If the Dataset is 0D add a placeholder index
         if len(res.dims) == 0:
             res = res.expand_dims('index')
+
         return res
 
     def _detect_var_types(self) -> Dict:

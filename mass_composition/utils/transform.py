@@ -3,64 +3,66 @@ Transformer functions to-from mass<->composition (metal/component mass)
 
 This is to simplify aggregation operations.
 """
-from typing import Optional
+from typing import Optional, List
 
 import xarray as xr
 
 
-def composition_to_mass(mass_dry: xr.DataArray,
-                        composition: xr.Dataset,
-                        mass_wet: Optional[xr.DataArray] = None,
-                        attributes: Optional[xr.Dataset] = None) -> xr.Dataset:
-    """Transform a xr Dataset from composition (wt%) to mass
+def get_chem_dataset(mc_ds: xr.Dataset) -> xr.Dataset:
+    chem_vars: List[str] = [str(n) for n, da in mc_ds.items() if da.attrs['mc_type'] == 'chemistry']
+    return mc_ds[chem_vars]
+
+
+def get_mass_dataset(mc_ds: xr.Dataset) -> xr.Dataset:
+    mass_vars: List[str] = [str(n) for n, da in mc_ds.items() if da.attrs['mc_type'] == 'mass']
+    return mc_ds[mass_vars]
+
+
+def get_attrs_dataset(mc_ds: xr.Dataset) -> xr.Dataset:
+    attr_vars: List[str] = [str(n) for n, da in mc_ds.items() if da.attrs['mc_type'] == 'attribute']
+    return mc_ds[attr_vars]
+
+
+def composition_to_mass(mc_ds: xr.Dataset) -> xr.Dataset:
+    """Transform a mc xr Dataset from composition (wt%) to mass
 
     Args:
-        mass_dry: Dry Mass must be supplied
-        composition: Composition xr.Dataset
-        mass_wet: If wet mass is provided, H2O is returned
-        attributes: Optional dataset of attribute (extra) variables.  Will not be converted, but simply appended.
+        mc_ds: a mc compliant xr.Dataset
 
     Returns:
         xr.Dataset of component mass
     """
 
-    if mass_wet is not None:
-        dsm: xr.Dataset = xr.merge([mass_wet, mass_dry])
-        dsm['H2O'] = mass_wet - mass_dry
-    else:
-        dsm: xr.DataArray = mass_dry
+    xr.set_options(keep_attrs=True)
 
-    dsm = xr.merge([dsm, composition.copy() * mass_dry / 100])
-    if attributes is not None:
-        dsm = xr.merge([dsm, attributes])
+    dsm: xr.Dataset = xr.merge([get_mass_dataset(mc_ds), get_chem_dataset(mc_ds) * mc_ds['mass_dry'] / 100,
+                                get_attrs_dataset(mc_ds)])
+    for name, da in dsm.items():
+        if da.attrs['mc_type'] == 'chemistry':
+            da.attrs['units'] = dsm['mass_wet'].attrs['units']
+
+    xr.set_options(keep_attrs='default')
 
     return dsm
 
 
-def mass_to_composition(mass_dry: xr.DataArray,
-                        component_mass: xr.Dataset,
-                        mass_wet: Optional[xr.DataArray] = None,
-                        attributes: Optional[xr.Dataset] = None) -> xr.Dataset:
+def mass_to_composition(mc_ds: xr.Dataset) -> xr.Dataset:
     """Transform a xr Dataset from mass to composition (wt%)
 
     Args:
-        mass_dry: Dry Mass must be supplied
-        component_mass: Mass of components xr.Dataset
-        mass_wet: If wet mass is provided, H2O is returned
-        attributes: Optional dataset of attribute (extra) variables.  Will not be converted, but simply appended.
+        mc_ds: a mc compliant xr.Dataset
 
     Returns:
         xr.Dataset of composition (wt%)
     """
 
-    if mass_wet is not None:
-        dsc: xr.Dataset = xr.merge([mass_wet, mass_dry])
-        dsc['H2O'] = (mass_wet - mass_dry) / mass_wet * 100
-    else:
-        dsc: xr.DataArray = mass_dry
+    xr.set_options(keep_attrs=True)
 
-    dsc = xr.merge([dsc, component_mass.copy() / mass_dry * 100])
-    if attributes is not None:
-        dsc = xr.merge([dsc, attributes])
+    dsc: xr.Dataset = xr.merge([get_mass_dataset(mc_ds), get_chem_dataset(mc_ds) / mc_ds['mass_dry'] * 100])
+    for name, da in dsc.items():
+        if da.attrs['mc_type'] == 'chemistry':
+            da.attrs['units'] = '%'
+
+    xr.set_options(keep_attrs='default')
 
     return dsc
