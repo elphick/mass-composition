@@ -11,8 +11,7 @@ import xarray as xr
 import xarray.tests
 import pandas as pd
 
-from mass_composition.data.sample_data import sample_data
-import mass_composition.mcxarray
+from elphick.mc.mass_composition.data.sample_data import sample_data
 
 # %%
 #

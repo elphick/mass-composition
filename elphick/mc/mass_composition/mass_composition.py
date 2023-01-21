@@ -7,12 +7,12 @@ import xarray as xr
 import plotly.graph_objects as go
 import plotly.express as px
 
-from mass_composition.utils import solve_mass_moisture
-from mass_composition.utils.components import is_compositional
-from mass_composition.utils.viz import plot_parallel
+from elphick.mc.mass_composition.utils import solve_mass_moisture
+from elphick.mc.mass_composition.utils.components import is_compositional
+from elphick.mc.mass_composition.utils.viz import plot_parallel
 
 # noinspection PyUnresolvedReferences
-import mass_composition.mcxarray  # keep this "unused" import - it helps
+import elphick.mc.mass_composition.mcxarray  # keep this "unused" import - it helps
 
 
 class MassComposition:
@@ -24,10 +24,16 @@ class MassComposition:
                  mass_dry_var: Optional[str] = None,
                  moisture_var: Optional[str] = None,
                  chem_vars: Optional[List[str]] = None,
-                 mass_units: Optional[str] = 'mass units'):
+                 mass_units: Optional[str] = 'mass units',
+                 in_node: Optional[Union[int, str]] = None,
+                 out_node: Optional[Union[int, str]] = None
+                 ):
 
         self._input_columns: List[str] = list(data.columns)
         self._mass_units = mass_units
+
+        self.in_node: Optional[Union[int, str]] = in_node
+        self.out_node: Optional[Union[int, str]] = out_node
 
         # TODO - try to kill the need to store these properties
         self._mass_wet_var_in = mass_wet_var

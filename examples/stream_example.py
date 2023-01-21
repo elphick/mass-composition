@@ -9,19 +9,12 @@ This is useful when multiple objects are managed within a system (or flowsheet)
 """
 
 # %%
-from typing import List, Dict
 
-import xarray as xr
-import xarray.tests
 import pandas as pd
 from plotly.graph_objs import Figure
 
 from flowsheet.stream import Stream
-from mass_composition.data.sample_data import sample_data
-from mass_composition.mass_composition import MassComposition
-
-from mass_composition.utils.components import is_compositional
-
+from elphick.mc.mass_composition import MassComposition
 
 # %%
 #

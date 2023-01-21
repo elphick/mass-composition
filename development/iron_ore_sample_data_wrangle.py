@@ -6,14 +6,9 @@ Demonstrate with some real data
 """
 
 # %%
-from typing import List, Dict
+from typing import List
 
-import xarray as xr
-import xarray.tests
 import pandas as pd
-
-from mass_composition.data.sample_data import sample_data
-import mass_composition.mcxarray
 
 # %%
 #
@@ -21,7 +16,7 @@ import mass_composition.mcxarray
 # -----------------------------------------------------
 #
 # We get some demo data in the form of a pandas DataFrame
-from mass_composition.utils.components import is_compositional
+from elphick.mc.mass_composition.utils.components import is_compositional
 
 df_data: pd.DataFrame = pd.read_csv('Met.csv')
 df_data.dropna(inplace=True)

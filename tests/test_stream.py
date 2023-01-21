@@ -3,7 +3,7 @@ import pytest
 
 from flowsheet import Stream
 # from fixtures import demo_data
-from mass_composition.data.sample_data import sample_data
+from elphick.mc.mass_composition.data.sample_data import sample_data
 
 
 @pytest.fixture()

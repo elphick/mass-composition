@@ -9,8 +9,8 @@ from pathlib import Path
 import pandas as pd
 from plotly.graph_objs import Figure
 
-from mass_composition.data.sample_data import sample_data
-from mass_composition.mass_composition import MassComposition
+from elphick.mc.mass_composition.data.sample_data import sample_data
+from elphick.mc.mass_composition import MassComposition
 
 # %%
 #
