@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 from enum import Enum
 from typing import Dict, Optional, Union
@@ -15,6 +16,8 @@ class CompositionContext(Enum):
 class MassCompositionXR:
     def __init__(self, xarray_obj: xr.Dataset):
         self._obj = xarray_obj
+
+        self._logger = logging.getLogger(name=self.__class__.__name__)
 
         self.mc_vars = self._obj.mc_vars_mass + self._obj.mc_vars_chem
 
@@ -61,6 +64,7 @@ class MassCompositionXR:
         self.log_to_history(f'Renamed to {new_name}')
 
     def log_to_history(self, msg: str):
+        self._logger.info(msg)
         self._obj.attrs['mc_history'].append(msg)
 
     def aggregate(self, group_var: Optional[str] = None,
