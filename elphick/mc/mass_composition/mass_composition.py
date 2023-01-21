@@ -1,11 +1,14 @@
+import logging
 from copy import deepcopy
-from typing import Dict, List, Optional, Union
+from pathlib import Path
+from typing import Dict, List, Optional, Union, Any, Set
 
 import pandas as pd
 import xarray as xr
 
 import plotly.graph_objects as go
 import plotly.express as px
+import yaml
 
 from elphick.mc.mass_composition.utils import solve_mass_moisture
 from elphick.mc.mass_composition.utils.components import is_compositional
@@ -25,15 +28,13 @@ class MassComposition:
                  moisture_var: Optional[str] = None,
                  chem_vars: Optional[List[str]] = None,
                  mass_units: Optional[str] = 'mass units',
-                 in_node: Optional[Union[int, str]] = None,
-                 out_node: Optional[Union[int, str]] = None
-                 ):
+                 dim_prefixes: Optional[List[str]] = None,
+                 config_file: Optional[Path] = None):
+
+        self._logger = logging.getLogger(name=self.__class__.__name__)
 
         self._input_columns: List[str] = list(data.columns)
         self._mass_units = mass_units
-
-        self.in_node: Optional[Union[int, str]] = in_node
-        self.out_node: Optional[Union[int, str]] = out_node
 
         # TODO - try to kill the need to store these properties
         self._mass_wet_var_in = mass_wet_var
@@ -41,7 +42,40 @@ class MassComposition:
         self._moisture_var_in = moisture_var
         self._chem_vars_in = chem_vars
 
+        if config_file is None:
+            config_file = Path(__file__).parent / './config/mc_config.yaml'
+        self.config = read_yaml(config_file)
+
         input_variables: Dict = self._detect_var_types()
+
+        # modify any index pairs that represent interval data by creating a single dimension and setting
+        # the edges as coordinates
+
+        index_vars: List = list(data.index.names)
+
+        d_dim_coords: Dict = {}
+        if dim_prefixes is not None:
+            for dim in dim_prefixes:
+                coord_vars = []
+                for iv in index_vars:
+                    if dim.lower() in iv.lower():
+                        coord_vars.append(iv)
+                if len(coord_vars) == 2:
+                    df_coords: pd.DataFrame = data.reset_index()[coord_vars]
+                    df_coords[dim] = df_coords.mean(axis='columns')
+                    # df_coords.set_index(coord_vars, inplace=True)
+                    d_dim_coords[dim] = {'coord_names': coord_vars,
+                                         'dim_var': df_coords}
+
+                    #
+                    # # now make a dim variable with coordinates of the interval edge pairs
+                    # # TODO: add a function to the config - using mean for now.  Need gmean for size...
+                    # interval_var: pd.Series = data[edge_vars].mean()
+                    # interval_dims[interval_var_name] = xr.DataArray(interval_var,
+                    #                                                 coords=[data[edge_vars[0]], data[edge_vars[1]]],
+                    #                                                 dims=[interval_var_name])
+                    # # drop the variables from the index
+                    # data.reset_index(edge_vars, inplace=True, drop=True)
 
         # # solve or validate the moisture balance
         if input_variables['mass_wet'] is not None:
@@ -101,6 +135,10 @@ class MassComposition:
         _data_attrs: xr.Dataset = xr.Dataset(d_da_attrs)
 
         _data: xr.Dataset = xr.merge([_data_mass, _data_chem, _data_attrs])
+
+        # add any interval dims
+        for dim, dim_def in d_dim_coords.items():
+            _data.expand_dims({dim: dim_def['dim_var'][dim]}).assign_coords({dim: dim_def['dim_var'][dim][dim_def['coord_names']]})
 
         d_column_attrs: Dict = {'mc_name': name,
                                 'mc_vars_mass': list(_data_mass.keys()),
@@ -277,8 +315,10 @@ class MassComposition:
 
         return res
 
-    def plot_parallel(self, color: Optional[str] = None, composition_only: bool = False,
-                      title: Optional[str] = None) -> go.Figure:
+    def plot_parallel(self, color: Optional[str] = None,
+                      composition_only: bool = False,
+                      title: Optional[str] = None,
+                      include_dims: Optional[Union[bool, List[str]]] = True) -> go.Figure:
         """Create an interactive parallel plot
 
         Useful to explore multidimensional data like mass-composition data
@@ -287,6 +327,7 @@ class MassComposition:
             color: Optional color variable
             composition_only: if True will limit the plot to composition components only
             title: Optional plot title
+            include_dims: Optional boolean or list of dimension to include in the plot.  True will show all dims.
 
         Returns:
 
@@ -294,6 +335,12 @@ class MassComposition:
         df = self.data.to_dataframe()
         if composition_only:
             df = df[self._data.mc_vars_chem]
+
+        if include_dims is True:
+            df.reset_index(inplace=True)
+        elif isinstance(include_dims, List):
+            for d in include_dims:
+                df.reset_index(d, inplace=True)
 
         if not title and hasattr(self, 'name'):
             title = self.name
@@ -330,3 +377,8 @@ class MassComposition:
         fig.update_layout(title=title)
 
         return fig
+
+
+def read_yaml(file_path):
+    with open(file_path, "r") as f:
+        return yaml.safe_load(f)
