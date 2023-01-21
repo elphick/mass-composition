@@ -28,7 +28,7 @@ print(df_data.head())
 #
 # Construct a MassComposition object first to create a compliant xarray object with the concrete property
 
-xr_ds: xr.Dataset = MassComposition(data=df_data, name='test')._data
+xr_ds: xr.Dataset = MassComposition(data=df_data, name='test').to_xarray()
 print(xr_ds.mc.data())
 
 # %%
@@ -65,25 +65,25 @@ print(xr_ds_wtd.mc.data())
 #
 # Convert to a pandas DataFrame
 
-xr_ds.mc.aggregate().mc.data()
-print(xr_ds.mc.aggregate().mc.to_dataframe(original_column_names=True))
+print(xr_ds.mc.aggregate(as_dataframe=True, original_column_names=False))
+print(xr_ds.mc.aggregate(as_dataframe=True, original_column_names=True))
 
 # %%
 #
 # Aggregate by a group variable
 
-print(xr_ds.mc.aggregate(group_var='group').mc.to_dataframe())
+print(xr_ds.mc.aggregate(group_var='group', as_dataframe=True))
 
 # %%
 #
-# Math operations - we'll go full circle again so we can check.
+# Math operations - we'll go full circle again, so we can check.
 
 xr_ds_added: xr.Dataset = xr_1.mc.add(xr_2)
 print(xr_ds_added.mc.data())
 
 xarray.tests.assert_allclose(xr_ds, xr_ds_added)
 
-xr_ds_add_sub: xr.Dataset = xr_ds.mc.add(xr_1).mc.subtract(xr_1)
+xr_ds_add_sub: xr.Dataset = xr_ds.mc.add(xr_1).mc.sub(xr_1)
 print(xr_ds_added.mc.data())
 
 xarray.tests.assert_allclose(xr_ds, xr_ds_add_sub)

@@ -9,30 +9,33 @@ import plotly.express as px
 
 from mass_composition.utils import solve_mass_moisture
 from mass_composition.utils.components import is_compositional
-from mass_composition.utils.transform import mass_to_composition, composition_to_mass
 from mass_composition.utils.viz import plot_parallel
+
+# noinspection PyUnresolvedReferences
+import mass_composition.mcxarray  # keep this "unused" import - it helps
 
 
 class MassComposition:
 
     def __init__(self,
                  data: pd.DataFrame,
+                 name: Optional[str] = 'unnamed',
                  mass_wet_var: Optional[str] = None,
                  mass_dry_var: Optional[str] = None,
                  moisture_var: Optional[str] = None,
                  chem_vars: Optional[List[str]] = None,
                  mass_units: Optional[str] = 'mass units'):
 
+        self._input_columns: List[str] = list(data.columns)
+        self._mass_units = mass_units
+
         # TODO - try to kill the need to store these properties
-        self.input_columns: List[str] = list(data.columns)
         self._mass_wet_var_in = mass_wet_var
         self._mass_dry_var_in = mass_dry_var
         self._moisture_var_in = moisture_var
         self._chem_vars_in = chem_vars
-        self.mass_units = mass_units
 
         input_variables: Dict = self._detect_var_types()
-        mass_var_map: Dict = {v: k for k, v in input_variables.items() if 'mass' in k}
 
         # # solve or validate the moisture balance
         if input_variables['mass_wet'] is not None:
@@ -56,19 +59,19 @@ class MassComposition:
         elif mass_dry is None:
             mass_dry = res
 
-        # create the xr object
+        # create the xr.Dataset
 
         # Design Decision - make mass concrete and moisture part of the dependent property
         d_da_mass: Dict[str: xr.DataArray] = {}
         for var_name, var_data in {'mass_wet': mass_wet, 'mass_dry': mass_dry}.items():
             tmp_da: xr.DataArray = xr.DataArray(var_data, name=var_name,
-                                                attrs={'units': self.mass_units,
+                                                attrs={'units': self._mass_units,
                                                        'standard_name': ' '.join(var_name.split('_')[::-1]).title(),
                                                        'mc_type': 'mass',
                                                        'mc_col_orig': var_data.name})
             d_da_mass[var_name] = tmp_da
 
-        self._data_mass: xr.Dataset = xr.Dataset(d_da_mass)
+        _data_mass: xr.Dataset = xr.Dataset(d_da_mass)
 
         d_da_chem: Dict[str: xr.DataArray] = {}
         for in_analyte, analyte in input_variables['chemistry'].items():
@@ -79,7 +82,7 @@ class MassComposition:
                                                        'mc_col_orig': in_analyte})
             d_da_chem[analyte] = tmp_da
 
-        self._data_chem: xr.Dataset = xr.Dataset(d_da_chem)
+        _data_chem: xr.Dataset = xr.Dataset(d_da_chem)
 
         d_da_attrs: Dict[str: xr.DataArray] = {}
         for var_attr in input_variables['attrs']:
@@ -89,70 +92,68 @@ class MassComposition:
                                                        'mc_col_orig': var_attr})
             d_da_attrs[var_attr] = tmp_da
 
-        self._data_attrs: xr.Dataset = xr.Dataset(d_da_attrs)
+        _data_attrs: xr.Dataset = xr.Dataset(d_da_attrs)
 
-        # # noinspection PyTypeChecker
-        # self.mass_wet_var: str = mass_wet.name
-        # # noinspection PyTypeChecker
-        # self.mass_dry_var: str = mass_dry.name
-        # # noinspection PyTypeChecker
-        # self.mass_vars: List[str] = [mass_wet.name, mass_dry.name]
-        # self.chem_vars: List[str] = list(self._data_chem.to_dataframe().columns)
-        # self.attr_vars: List[str] = list(self._data_attrs.to_dataframe().columns)
-        #
-        # self.chemistry_var_map = input_variables['chemistry']  # {in: symbols}
+        _data: xr.Dataset = xr.merge([_data_mass, _data_chem, _data_attrs])
+
+        d_column_attrs: Dict = {'mc_name': name,
+                                'mc_vars_mass': list(_data_mass.keys()),
+                                'mc_vars_chem': list(_data_chem.keys()),
+                                'mc_vars_attrs': list(_data_attrs.keys()),
+                                'mc_history': [f'Created with name: {name}']}
+
+        self._data = _data.assign_attrs(d_column_attrs)
 
     @property
-    def data(self):
+    def name(self) -> str:
+        return self._data.mc.name
 
-        moisture: xr.DataArray = xr.DataArray((self._data_mass['mass_wet'] - self._data_mass['mass_dry']) /
-                                              self._data_mass['mass_wet'] * 100, name='H2O',
+    @property
+    def data(self) -> xr.Dataset:
+
+        moisture: xr.DataArray = xr.DataArray((self._data['mass_wet'] - self._data['mass_dry']) /
+                                              self._data['mass_wet'] * 100, name='H2O',
                                               attrs={'units': '%',
                                                      'standard_name': 'H2O',
                                                      'mc_type': 'moisture',
                                                      'mc_col_orig': 'H2O'}
                                               )
 
-        data: xr.Dataset = xr.merge([self._data_mass, moisture, self._data_chem, self._data_attrs])
+        data: xr.Dataset = xr.merge(
+            [self._data[self._data.attrs['mc_vars_mass']], moisture, self._data[self._data.attrs['mc_vars_chem']],
+             self._data[self._data.attrs['mc_vars_attrs']]])
         return data
 
-    def as_mass(self) -> xr.Dataset:
-        """Mass and Composition converted to mass units
+    def to_xarray(self) -> xr.Dataset:
+        """Returns the mc compliant xr.Dataset
 
-        Used for math operations
         Returns:
 
         """
-        res: xr.Dataset = xr.merge([self._data_mass, self._data_chem * self._data_mass[self.mass_dry_var] / 100])
-        return res
+        return self._data
 
     def __str__(self) -> str:
-        res: str = '\n'
-        # res += f'mass_vars: {self.mass_vars}\n'
-        # res += f'moisture_var: {self.moisture_var}\n'
-        # res += f'chem_vars: {self.chem_vars}\n'
-        # res += f'attr_vars: {self.attr_vars}\n'
-        # res += '\n'
+        res: str = f'\n{self.name}\n'
         res += str(self.data)
         return res
 
-    def aggregate(self, group_var: Optional[str] = None) -> xr.Dataset:
-        """Calculate the weight average of this dataset.
+    def aggregate(self, group_var: Optional[str] = None,
+                  as_dataframe: bool = True,
+                  original_column_names: bool = False) -> Union[xr.Dataset, pd.DataFrame]:
+        """Calculate the weight average.
+
+        Args:
+            group_var: Optional grouping variable
+            as_dataframe: If True return a pd.DataFrame
+            original_column_names: If True, and as_dataframe is True, will return with the original column names.
+
+        Returns:
+
         """
 
-        if group_var is None:
-
-            xr_mass: xr.Dataset = composition_to_mass(mc_ds=self.data).sum(keep_attrs=True)
-
-        else:
-
-            xr_mass: xr.Dataset = composition_to_mass(mc_ds=self.data).groupby(group_var).sum(keep_attrs=True)
-
-        res: xr.Dataset = mass_to_composition(mc_ds=xr_mass)
-
-        # If the Dataset is 0D add a placeholder index
-        if len(res.dims) == 0:
-            res = res.expand_dims('index')
+        res: xr.Dataset = self._data.mc.aggregate(group_var=group_var,
+                                                  as_dataframe=as_dataframe,
+                                                  original_column_names=original_column_names)
 
         return res
 
@@ -161,7 +162,7 @@ class MassComposition:
         # TODO: migrate candidates to config file
         res: Dict = {}
 
-        variables = self.input_columns
+        variables = self._input_columns
 
         # detect the mass variables
         mass_wet_candidates: List[str] = [var for var in variables if var.lower() in ['mass_wet', 'wet_mass', 'wmt']]
@@ -226,11 +227,13 @@ class MassComposition:
             tuple of two datasets, the first with the mass fraction specified, the other the complement
         """
         out = deepcopy(self)
-        out._data_mass = out._data_mass * fraction
-        res = out
         comp = deepcopy(self)
-        comp._data_mass = comp._data_mass * (1 - fraction)
-        return res, comp
+
+        xr_ds_1, xr_ds_2 = self._data.mc.split(fraction=fraction)
+        out._data = xr_ds_1
+        comp._data = xr_ds_2
+
+        return out, comp
 
     def __add__(self, other: 'MassComposition') -> 'MassComposition':
         """Add two objects
@@ -243,15 +246,10 @@ class MassComposition:
         Returns:
 
         """
+        xr_sum: xr.Dataset = self._data.mc.add(other._data)
 
-        xr_component_mass: xr.Dataset = self.as_mass() + other.as_mass()
-
-        xr_composition: xr.Dataset = mass_to_composition(mass_wet=xr_component_mass[self.mass_wet_var],
-                                                         mass_dry=xr_component_mass[self.mass_dry_var],
-                                                         component_mass=xr_component_mass[self.chem_vars],
-                                                         attributes=self._data_attrs)
-
-        res: MassComposition = MassComposition(data=xr_composition.to_dataframe())
+        res = deepcopy(self)
+        res._data = xr_sum
 
         return res
 
@@ -266,14 +264,10 @@ class MassComposition:
 
         """
 
-        xr_component_mass: xr.Dataset = self.as_mass() - other.as_mass()
+        xr_sum: xr.Dataset = self._data.mc.sub(other._data)
 
-        xr_composition: xr.Dataset = mass_to_composition(mass_wet=xr_component_mass[self.mass_wet_var],
-                                                         mass_dry=xr_component_mass[self.mass_dry_var],
-                                                         component_mass=xr_component_mass[self.chem_vars],
-                                                         attributes=self._data_attrs)
-
-        res: MassComposition = MassComposition(data=xr_composition.to_dataframe())
+        res = deepcopy(self)
+        res._data = xr_sum
 
         return res
 
@@ -281,7 +275,7 @@ class MassComposition:
                       title: Optional[str] = None) -> go.Figure:
         """Create an interactive parallel plot
 
-        Useful to explore multi-dimensional data like mass-composition data
+        Useful to explore multidimensional data like mass-composition data
 
         Args:
             color: Optional color variable
@@ -293,7 +287,7 @@ class MassComposition:
         """
         df = self.data.to_dataframe()
         if composition_only:
-            df = df[self.chem_vars]
+            df = df[self._data.mc_vars_chem]
 
         if not title and hasattr(self, 'name'):
             title = self.name

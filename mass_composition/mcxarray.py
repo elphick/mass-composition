@@ -1,16 +1,9 @@
 from copy import deepcopy
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
 import pandas as pd
 import xarray as xr
-
-import plotly.graph_objects as go
-import plotly.express as px
-
-from mass_composition.mass_composition import MassComposition
-from mass_composition.utils.components import is_compositional
-from mass_composition.utils.viz import plot_parallel
 
 
 class CompositionContext(Enum):
@@ -23,7 +16,7 @@ class MassCompositionXR:
     def __init__(self, xarray_obj: xr.Dataset):
         self._obj = xarray_obj
 
-        self.mc_vars = self._obj.mc_mass_vars + self._obj.mc_chem_vars
+        self.mc_vars = self._obj.mc_vars_mass + self._obj.mc_vars_chem
 
     @property
     def name(self):
@@ -44,14 +37,14 @@ class MassCompositionXR:
                                               )
 
         data: xr.Dataset = xr.merge(
-            [self._obj[self._obj.mc_mass_vars], moisture, self._obj[self._obj.mc_chem_vars],
-             self._obj[self._obj.mc_attr_vars]])
+            [self._obj[self._obj.mc_vars_mass], moisture, self._obj[self._obj.mc_vars_chem],
+             self._obj[self._obj.mc_vars_attrs]])
         return data
 
     @property
     def composition_context(self) -> CompositionContext:
 
-        units = [da.attrs['units'] for _, da in self._obj[self._obj.mc_chem_vars].items()]
+        units = [da.attrs['units'] for _, da in self._obj[self._obj.mc_vars_chem].items()]
         if len(set(units)) == 1:
             if units[0] == '%':
                 res = CompositionContext.RELATIVE
@@ -70,7 +63,20 @@ class MassCompositionXR:
     def log_to_history(self, msg: str):
         self._obj.attrs['mc_history'].append(msg)
 
-    def aggregate(self, group_var: Optional[str] = None) -> xr.Dataset:
+    def aggregate(self, group_var: Optional[str] = None,
+                  as_dataframe: bool = False,
+                  original_column_names: bool = False) -> Union[xr.Dataset, pd.DataFrame]:
+        """Calculate the weight average of this dataset.
+
+        Args:
+            group_var: Optional grouping variable
+            as_dataframe: If True return a pd.DataFrame
+            original_column_names: If True, and as_dataframe is True, will return with the original column names.
+
+        Returns:
+
+        """
+        pass
         """Calculate the weight average of this dataset.
 
         attr vars will be dropped in this operation
@@ -79,7 +85,7 @@ class MassCompositionXR:
 
         if group_var is None:
             xr_ds_base = self._obj[self.mc_vars]
-            xr_ds_base.attrs['mc_attr_vars'] = []
+            xr_ds_base.attrs['mc_vars_attrs'] = []
             res: xr.Dataset = xr_ds_base.mc.composition_to_mass().sum(keep_attrs=True).mc.mass_to_composition()
             res.mc.rename(f'Aggregate of {self.name}')
 
@@ -92,6 +98,10 @@ class MassCompositionXR:
         # If the Dataset is 0D add a placeholder index
         if len(res.dims) == 0:
             res = res.expand_dims('index')
+
+        if as_dataframe:
+            res: pd.DataFrame = self.to_dataframe(original_column_names=original_column_names,
+                                                  ds=res)
 
         return res
 
@@ -107,7 +117,7 @@ class MassCompositionXR:
         xr.set_options(keep_attrs=True)
 
         dsm: xr.Dataset = self._obj.copy()
-        dsm[self._obj.mc_chem_vars] = dsm[self._obj.mc_chem_vars] * self._obj['mass_dry'] / 100
+        dsm[self._obj.mc_vars_chem] = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
 
         for da in dsm.values():
             if da.attrs['mc_type'] == 'chemistry':
@@ -131,7 +141,7 @@ class MassCompositionXR:
         xr.set_options(keep_attrs=True)
 
         dsc: xr.Dataset = self._obj.copy()
-        dsc[self._obj.mc_chem_vars] = dsc[self._obj.mc_chem_vars] / self._obj['mass_dry'] * 100
+        dsc[self._obj.mc_vars_chem] = dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100
 
         for da in dsc.values():
             if da.attrs['mc_type'] == 'chemistry':
@@ -156,13 +166,13 @@ class MassCompositionXR:
         xr.set_options(keep_attrs=True)
 
         out = deepcopy(self)
-        out._obj[self._obj.mc_mass_vars] = out._obj[self._obj.mc_mass_vars] * fraction
+        out._obj[self._obj.mc_vars_mass] = out._obj[self._obj.mc_vars_mass] * fraction
         out.log_to_history(f'Split from object [{self.name}] @ fraction: {fraction}')
         out.rename(f'({fraction} * {self.name})')
         res = out._obj
 
         comp = deepcopy(self)
-        comp._obj[self._obj.mc_mass_vars] = comp._obj[self._obj.mc_mass_vars] * (1 - fraction)
+        comp._obj[self._obj.mc_vars_mass] = comp._obj[self._obj.mc_vars_mass] * (1 - fraction)
         comp.log_to_history(f'Split from object [{self.name}] @ 1 - fraction {fraction}: {1 - fraction}')
         comp.rename(f'({1 - fraction} * {self.name})')
 
@@ -190,26 +200,13 @@ class MassCompositionXR:
 
         res: xr.Dataset = xr_self + xr_other
 
-        # update attrs
-        res.attrs.update(self._obj.attrs)
-        da: xr.DataArray
-        for new_da, da in zip(res.values(), xr_self.values()):
-            new_da.attrs.update(da.attrs)
-
-        # merge in the attr vars
-        res = xr.merge([res, self._obj[self._obj.mc_attr_vars]])
-
-        res.mc.log_to_history(f'Object called {other.mc.name} has been added.')
-        res.mc.rename(f'({self.name} + {other.mc.name})')
-
-        # convert back to relative composition
-        res = res.mc.mass_to_composition()
+        res = self._math_post_process(other, res, xr_self, 'added')
 
         xr.set_options(keep_attrs='default')
 
         return res
 
-    def subtract(self, other: xr.Dataset) -> xr.Dataset:
+    def sub(self, other: xr.Dataset) -> xr.Dataset:
         """Subtract the supplied object from self
 
         Perform the subtraction with the mass-composition variables only and then append any attribute variables.
@@ -228,35 +225,36 @@ class MassCompositionXR:
 
         res: xr.Dataset = xr_self - xr_other
 
+        res = self._math_post_process(other, res, xr_self, 'subtracted')
+
+        xr.set_options(keep_attrs='default')
+
+        return res
+
+    def _math_post_process(self, other, res, xr_self, operator_string):
         # update attrs
         res.attrs.update(self._obj.attrs)
         da: xr.DataArray
         for new_da, da in zip(res.values(), xr_self.values()):
             new_da.attrs.update(da.attrs)
-
         # merge in the attr vars
-        res = xr.merge([res, self._obj[self._obj.mc_attr_vars]])
-
-        res.mc.log_to_history(f'Object called {other.mc.name} has been subtracted.')
+        res = xr.merge([res, self._obj[self._obj.mc_vars_attrs]])
+        res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
         res.mc.rename(f'({self.name} - {other.mc.name})')
-
         # convert back to relative composition
         res = res.mc.mass_to_composition()
-
-        xr.set_options(keep_attrs='default')
-
         return res
 
     def column_map(self):
         res: Dict = {var: da.attrs['mc_col_orig'] for var, da in self._obj.items()}
         return res
 
-    def to_dataframe(self, original_column_names: bool = False):
-        df: pd.DataFrame = self._obj.mc.data().to_dataframe()
+    def to_dataframe(self, original_column_names: bool = False, ds: Optional[xr.Dataset] = None) -> pd.DataFrame:
+
+        if ds is None:
+            ds = self._obj.mc.data()
+
+        df: pd.DataFrame = ds.to_dataframe()
         if original_column_names:
             df.rename(columns=self.column_map(), inplace=True)
         return df
-
-    @classmethod
-    def from_mass_composition(cls, obj_mc: MassComposition) -> 'MassCompositionXR':
-        return cls(xarray_obj=obj_mc._data)
