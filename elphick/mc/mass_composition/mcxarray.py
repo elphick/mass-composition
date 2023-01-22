@@ -82,12 +82,6 @@ class MassCompositionXR:
         Returns:
 
         """
-        pass
-        """Calculate the weight average of this dataset.
-
-        attr vars will be dropped in this operation
-        TODO: consider how to add back in aggregated attr vars, categorical/continuous
-        """
 
         if group_var is None:
             xr_ds_base = self._obj[self.mc_vars]
@@ -97,8 +91,17 @@ class MassCompositionXR:
 
         else:
             xr_ds_base = self._obj[self.mc_vars + [group_var]]
-            res: xr.Dataset = xr_ds_base.mc.composition_to_mass().groupby(group_var).sum(
-                keep_attrs=True).mc.mass_to_composition()
+            if group_var not in xr_ds_base.dims:
+                res: xr.Dataset = xr_ds_base.mc.composition_to_mass().groupby(group_var).sum(
+                    keep_attrs=True).mc.mass_to_composition()
+            elif group_var in xr_ds_base.dims:
+                # sum across all dims other than the one of interest...
+                other_dims = [gv for gv in xr_ds_base.dims if gv != group_var]
+                res: xr.Dataset = xr_ds_base.mc.composition_to_mass().sum(other_dims,
+                                                                          keep_attrs=True).mc.mass_to_composition()
+            else:
+                raise KeyError(f'{group_var} not found in dataset')
+
             res.mc.rename(f'Aggregate of {self.name} with group {group_var}')
 
         ds_moisture = solve_mass_moisture(mass_wet=res[res.mc_vars_mass[0]],
