@@ -6,6 +6,8 @@ from typing import Dict, Optional, Union
 import pandas as pd
 import xarray as xr
 
+from elphick.mc.mass_composition.utils import solve_mass_moisture
+
 
 class CompositionContext(Enum):
     ABSOLUTE = 'mass'
@@ -98,6 +100,15 @@ class MassCompositionXR:
             res: xr.Dataset = xr_ds_base.mc.composition_to_mass().groupby(group_var).sum(
                 keep_attrs=True).mc.mass_to_composition()
             res.mc.rename(f'Aggregate of {self.name} with group {group_var}')
+
+        ds_moisture = solve_mass_moisture(mass_wet=res[res.mc_vars_mass[0]],
+                                          mass_dry=res[res.mc_vars_mass[1]]).to_dataset()
+        ds_moisture['H2O'].attrs = {'units': '%',
+                                    'standard_name': 'H2O',
+                                    'mc_type': 'moisture',
+                                    'mc_col_orig': 'H2O'}
+
+        res: xr.Dataset = xr.merge([res[res.mc_vars_mass], ds_moisture, res[res.mc_vars_chem]])
 
         # If the Dataset is 0D add a placeholder index
         if len(res.dims) == 0:
