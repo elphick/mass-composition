@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import List
 
 import pandas as pd
+from matplotlib import pyplot as plt
 from plotly.graph_objs import Figure
 
 from elphick.mc.mass_composition.data.sample_data import sample_data
@@ -35,15 +36,18 @@ logging.basicConfig(level=logging.INFO,
 # -------------------------------
 #
 # We get some demo data in the form of a pandas DataFrame
+# We create this object as 1D based on the pandas index
 
 df_data: pd.DataFrame = pd.read_csv('../sample_data/iron_ore_sample_data.csv', index_col='index')
-df_data = df_data.reset_index().set_index(['index', 'DHID'])
 print(df_data.head())
 
 obj_mc: MassComposition = MassComposition(df_data,
                                           name='Drill program',
                                           mass_units='kg')
 print(obj_mc)
+
+print(obj_mc.aggregate())
+print(obj_mc.aggregate('DHID'))
 
 # %%
 #
@@ -54,21 +58,39 @@ print(obj_mc)
 
 # %%
 #
-# Our dataset is one dimension - the single dimension is 'DHID'.
-# The dimensions (in xarray lingo) map to the indexes in a pandas DataFrame.  Since we indexed our DataFrame by
-# the DHID variable, it has become a dimension in our xarray dataset.
-#
-# It follows then that in order to manage our intervals as a second dimension we'll need to add them to the index.
+# We will now make a 2D dataset using DHID and the interval.
+# We will first create a mean interval variable.  Then we will set the dataframe index to both variables before
+# constructing the object.
 
 print(df_data.columns)
 
-dim_cols: List[str] = ['index', 'DHID', 'interval_from', 'interval_to']
-df_data = df_data.reset_index().set_index(dim_cols)
+df_data['interval'] = df_data[['interval_from', 'interval_to']].mean(axis='columns')
+df_data['DHID'] = df_data['DHID'].astype('category')
+code, dh_id = pd.factorize(df_data['DHID'])
+df_data['DH'] = code
+df_data = df_data.reset_index().set_index(['DH', 'interval'])
 
-obj_mc: MassComposition = MassComposition(df_data,
-                                          name='Drill program',
-                                          mass_units='kg',
-                                          dim_prefixes=['interval'])
-print(obj_mc)
+obj_mc_2d: MassComposition = MassComposition(df_data,
+                                             name='Drill program',
+                                             mass_units='kg')
+# obj_mc_2d._data.assign(hole_id=dh_id)
+print(obj_mc_2d)
+print(obj_mc_2d.aggregate())
+print(obj_mc_2d.aggregate('DHID'))
 
-pass
+# %%
+#
+# View some plots
+#
+# First confirm the parallel plot still works
+# TODO: work on the display order
+# TODO - fails for DH (integer)
+# fig: Figure = obj_mc_2d.plot_parallel(color='Fe')
+# fig.show()
+
+# now plot using the xarray data - take advantage of the multi-dim nature of the package
+
+obj_mc_2d.data['Fe'].plot()
+plt.show()
+
+print('done')

@@ -34,21 +34,21 @@ print(obj_mc)
 # Create an interactive parallel plot
 
 fig: Figure = obj_mc.plot_parallel()
-fig.show()
+fig
 
 # %%
 #
 # Create an interactive parallel plot with only the components
 
 fig2 = obj_mc.plot_parallel(composition_only=True)
-fig2.show()
+fig2
 
 # %%
 #
 # Create a parallel plot with color
 
 fig3 = obj_mc.plot_parallel(color='group')
-fig3.show()
+fig3
 
 # %%
 #
@@ -58,6 +58,5 @@ fig4 = obj_mc.plot_ternary(variables=['SiO2', 'Al2O3', 'LOI'], color='group')
 # save the figure for use as the sphinx-gallery thumbnail
 fig4.write_image('../doc/source/_static/ternary.png')
 # sphinx_gallery_thumbnail_path = '_static/ternary.png'
-fig4.show()
+fig4
 
-print(Path(__file__).name, 'done')

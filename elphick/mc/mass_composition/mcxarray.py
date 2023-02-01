@@ -1,7 +1,7 @@
 import logging
 from copy import deepcopy
 from enum import Enum
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Iterable, List
 
 import pandas as pd
 import xarray as xr
@@ -22,6 +22,10 @@ class MassCompositionXR:
         self._logger = logging.getLogger(name=self.__class__.__name__)
 
         self.mc_vars = self._obj.mc_vars_mass + self._obj.mc_vars_chem
+        self.mc_vars_mass = self._obj.mc_vars_mass
+        self.mc_vars_chem = self._obj.mc_vars_chem
+        self._chem: xr.Dataset = self._obj[self.mc_vars_chem]
+        self._mass: xr.Dataset = self._obj[self.mc_vars_mass]
 
     @property
     def name(self):
@@ -70,12 +74,14 @@ class MassCompositionXR:
         self._obj.attrs['mc_history'].append(msg)
 
     def aggregate(self, group_var: Optional[str] = None,
+                  group_bins: Optional[Union[int, Iterable]] = None,
                   as_dataframe: bool = False,
                   original_column_names: bool = False) -> Union[xr.Dataset, pd.DataFrame]:
         """Calculate the weight average of this dataset.
 
         Args:
             group_var: Optional grouping variable
+            group_bins: Optional bins to apply to the group_var
             as_dataframe: If True return a pd.DataFrame
             original_column_names: If True, and as_dataframe is True, will return with the original column names.
 
@@ -84,21 +90,21 @@ class MassCompositionXR:
         """
 
         if group_var is None:
-            xr_ds_base = self._obj[self.mc_vars]
-            xr_ds_base.attrs['mc_vars_attrs'] = []
-            res: xr.Dataset = xr_ds_base.mc.composition_to_mass().sum(keep_attrs=True).mc.mass_to_composition()
-            res.mc.rename(f'Aggregate of {self.name}')
+            res = mc_aggregate(self._obj)
 
         else:
-            xr_ds_base = self._obj[self.mc_vars + [group_var]]
-            if group_var not in xr_ds_base.dims:
-                res: xr.Dataset = xr_ds_base.mc.composition_to_mass().groupby(group_var).sum(
-                    keep_attrs=True).mc.mass_to_composition()
-            elif group_var in xr_ds_base.dims:
+            if group_var not in self._obj.dims:
+                if group_bins is None:
+                    res = self._obj.groupby(group_var).map(mc_aggregate)
+                else:
+                    res = self._obj.groupby_bins(group_var, bins=group_bins).map(mc_aggregate)
+
+            elif group_var in self._obj.dims:
+                # TODO: consider a better way - maybe reset the index?
                 # sum across all dims other than the one of interest...
-                other_dims = [gv for gv in xr_ds_base.dims if gv != group_var]
-                res: xr.Dataset = xr_ds_base.mc.composition_to_mass().sum(other_dims,
-                                                                          keep_attrs=True).mc.mass_to_composition()
+                other_dims = [gv for gv in self._obj.dims if gv != group_var]
+                res: xr.Dataset = self.composition_to_mass().sum(other_dims,
+                                                                 keep_attrs=True).mc.mass_to_composition()
             else:
                 raise KeyError(f'{group_var} not found in dataset')
 
@@ -123,6 +129,43 @@ class MassCompositionXR:
 
         return res
 
+    def cumulate(self, direction: str) -> xr.Dataset:
+        """Cumulate along the dims
+
+        Expected use case in only for Datasets that have been reduced to 1D.
+
+        Args:
+            direction: 'ascending'|'descending'
+
+        Returns:
+
+        """
+
+        valid_dirs: List[str] = ['ascending', 'descending']
+        if direction not in valid_dirs:
+            raise KeyError(f'Invalid direction provided.  Valid arguments are: {valid_dirs}')
+
+        if len(self._obj.dims) > 1:
+            raise NotImplementedError('Datasets > 1D have not been tested.')
+
+        # convert to mass, then cumsum, then convert back to relative composition (grade)
+        mass: xr.Dataset = self.composition_to_mass()
+
+        index_var = list(mass.indexes)[0]
+        if direction == 'descending':
+            mass = mass.sortby(variables=index_var, ascending=False)
+
+        mass_cum: xr.Dataset = mass.cumsum(keep_attrs=True)
+        # put the coords back
+        mass_cum = mass_cum.assign_coords(**mass.coords)
+        res: xr.Dataset = mass_cum.mc.mass_to_composition()
+
+        if direction == 'descending':
+            # put back to ascending order
+            res = res.sortby(variables=index_var, ascending=True)
+
+        return res
+
     def composition_to_mass(self) -> xr.Dataset:
         """Transform composition to mass
 
@@ -135,7 +178,9 @@ class MassCompositionXR:
         xr.set_options(keep_attrs=True)
 
         dsm: xr.Dataset = self._obj.copy()
-        dsm[self._obj.mc_vars_chem] = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
+        dsm_chem: xr.DataArray = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
+
+        dsm[self._obj.mc_vars_chem] = (dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100)
 
         for da in dsm.values():
             if da.attrs['mc_type'] == 'chemistry':
@@ -159,7 +204,7 @@ class MassCompositionXR:
         xr.set_options(keep_attrs=True)
 
         dsc: xr.Dataset = self._obj.copy()
-        dsc[self._obj.mc_vars_chem] = dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100
+        dsc[self._obj.mc_vars_chem] = (dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100)
 
         for da in dsc.values():
             if da.attrs['mc_type'] == 'chemistry':
@@ -276,3 +321,22 @@ class MassCompositionXR:
         if original_column_names:
             df.rename(columns=self.column_map(), inplace=True)
         return df
+
+
+def mc_aggregate(xr_ds: xr.Dataset) -> xr.Dataset:
+    """A standalone function to aggregate
+
+    Sum the mass vars and weight average the chem vars by the mass_dry.
+
+    Args:
+        xr_ds: A MassComposition compliant xr.Dataset
+
+    Returns:
+
+    """
+    chem: xr.Dataset = xr_ds.mc._chem.weighted(weights=xr_ds.mc._mass['mass_dry']).mean(keep_attrs=True)
+    mass: xr.Dataset = xr_ds.mc._mass.sum(keep_attrs=True)
+    res: xr.Dataset = xr.merge([mass, chem])
+    res.attrs['mc_vars_attrs'] = []
+    res.mc.rename(f'Aggregate of {xr_ds.mc.name}')
+    return res

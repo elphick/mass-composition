@@ -19,8 +19,8 @@ def solve_mass_moisture(mass_wet: Optional[Union[pd.Series, xr.DataArray]] = Non
         A series for the argument that was not supplied
     """
 
-    vars: Dict = deepcopy(locals())
-    vars_supplied: List[str] = [k for k, v in vars.items() if v is not None]
+    _vars: Dict = deepcopy(locals())
+    vars_supplied: List[str] = [k for k, v in _vars.items() if v is not None]
 
     if len(vars_supplied) == 3:
         pass
@@ -28,7 +28,7 @@ def solve_mass_moisture(mass_wet: Optional[Union[pd.Series, xr.DataArray]] = Non
     elif len(vars_supplied) == 1:
         raise ValueError('Insufficient arguments supplied - at least 2 required.')
 
-    var_to_solve: List[str] = [k for k, v in vars.items() if v is None]
+    var_to_solve: List[str] = [k for k, v in _vars.items() if v is None]
 
     res: Optional[pd.Series] = None
     if var_to_solve:
@@ -57,14 +57,14 @@ if __name__ == '__main__':
 
     res_1: pd.Series = solve_mass_moisture(mass_wet=wet, mass_dry=dry, moisture=None)
 
-    moisture: pd.Series = res_1.copy()
+    h20: pd.Series = res_1.copy()
 
-    dry_calc: pd.Series = solve_mass_moisture(mass_wet=wet, mass_dry=None, moisture=moisture)
-    wet_calc: pd.Series = solve_mass_moisture(mass_wet=None, mass_dry=dry, moisture=moisture)
+    dry_calc: pd.Series = solve_mass_moisture(mass_wet=wet, mass_dry=None, moisture=h20)
+    wet_calc: pd.Series = solve_mass_moisture(mass_wet=None, mass_dry=dry, moisture=h20)
 
     assert all(np.isclose(wet, wet_calc))
     assert all(np.isclose(dry, dry_calc))
 
     # These should fail
-    res_4: pd.Series = solve_mass_moisture(mass_wet=None, mass_dry=None, moisture=moisture)
-    res_5: pd.Series = solve_mass_moisture(mass_wet=wet, mass_dry=dry, moisture=moisture)
+    res_4: pd.Series = solve_mass_moisture(mass_wet=None, mass_dry=None, moisture=h20)
+    res_5: pd.Series = solve_mass_moisture(mass_wet=wet, mass_dry=dry, moisture=h20)

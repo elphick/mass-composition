@@ -1,8 +1,9 @@
 import logging
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Any, Set
+from typing import Dict, List, Optional, Union, Tuple, Iterable
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -26,127 +27,101 @@ class MassComposition:
                  mass_wet_var: Optional[str] = None,
                  mass_dry_var: Optional[str] = None,
                  moisture_var: Optional[str] = None,
-                 chem_vars: Optional[List[str]] = None,
+                 chem_vars: Optional[List[str]] = None,  # ignored for now
                  mass_units: Optional[str] = 'mass units',
-                 dim_prefixes: Optional[List[str]] = None,
                  config_file: Optional[Path] = None):
 
+        if sum(data.index.duplicated()) > 0:
+            raise KeyError('The data has duplicate indexes.')
+
+        data = data.copy()
         self._logger = logging.getLogger(name=self.__class__.__name__)
 
         self._input_columns: List[str] = list(data.columns)
         self._mass_units = mass_units
 
-        # TODO - try to kill the need to store these properties
-        self._mass_wet_var_in = mass_wet_var
-        self._mass_dry_var_in = mass_dry_var
-        self._moisture_var_in = moisture_var
-        self._chem_vars_in = chem_vars
+        var_args: Dict = {k: v for k, v in locals().items() if '_var' in k}
 
         if config_file is None:
             config_file = Path(__file__).parent / './config/mc_config.yaml'
         self.config = read_yaml(config_file)
 
-        input_variables: Dict = self._detect_var_types()
+        input_variables: Dict = self._detect_var_types(var_args=var_args, cols_data=list(data.columns))
 
-        # modify any index pairs that represent interval data by creating a single dimension and setting
-        # the edges as coordinates
+        # solve or validate the moisture balance
+        # TODO: this assumes 2 of the 3 vars are supplied - fix this
+        data, col_map = self._solve_mass_moisture(data, input_variables)
+        cols_mass = [self.config['vars']['mass_wet'], self.config['vars']['mass_dry']]
+        col_map = {**col_map, **{v: k for k, v in input_variables['chemistry'].items()}}
 
-        index_vars: List = list(data.index.names)
+        data.rename(columns=input_variables['chemistry'], inplace=True)
 
-        d_dim_coords: Dict = {}
-        if dim_prefixes is not None:
-            for dim in dim_prefixes:
-                coord_vars = []
-                for iv in index_vars:
-                    if dim.lower() in iv.lower():
-                        coord_vars.append(iv)
-                if len(coord_vars) == 2:
-                    df_coords: pd.DataFrame = data.reset_index()[coord_vars]
-                    df_coords[dim] = df_coords.mean(axis='columns')
-                    # df_coords.set_index(coord_vars, inplace=True)
-                    d_dim_coords[dim] = {'coord_names': coord_vars,
-                                         'dim_var': df_coords}
+        cols_chem = list(input_variables['chemistry'].values())
+        cols_attrs = input_variables['attrs']
 
-                    #
-                    # # now make a dim variable with coordinates of the interval edge pairs
-                    # # TODO: add a function to the config - using mean for now.  Need gmean for size...
-                    # interval_var: pd.Series = data[edge_vars].mean()
-                    # interval_dims[interval_var_name] = xr.DataArray(interval_var,
-                    #                                                 coords=[data[edge_vars[0]], data[edge_vars[1]]],
-                    #                                                 dims=[interval_var_name])
-                    # # drop the variables from the index
-                    # data.reset_index(edge_vars, inplace=True, drop=True)
+        data = data[cols_mass + cols_chem + cols_attrs]
 
-        # # solve or validate the moisture balance
-        if input_variables['mass_wet'] is not None:
-            mass_wet: Optional[pd.Series] = data[input_variables['mass_wet']]
-        else:
-            mass_wet = None
-        if input_variables['mass_dry'] is not None:
-            mass_dry: Optional[pd.Series] = data[input_variables['mass_dry']]
-        else:
-            mass_dry = None
-        if input_variables['moisture'] is not None:
-            moisture: Optional[pd.Series] = data[input_variables['moisture']]
-        else:
-            moisture = None
+        # create the xr.Dataset, dims from the index.
+        xr_ds: xr.Dataset = data.to_xarray()
+        # move the attrs to become coords
+        xr_ds = xr_ds.set_coords(cols_attrs)
 
-        res: pd.Series = solve_mass_moisture(mass_wet=mass_wet,
-                                             mass_dry=mass_dry,
-                                             moisture=moisture)
-        if mass_wet is None:
-            mass_wet = res
-        elif mass_dry is None:
-            mass_dry = res
+        # add the dataset attributes
+        ds_attrs: Dict = {'mc_name': name,
+                          'mc_vars_mass': cols_mass,
+                          'mc_vars_chem': cols_chem,
+                          'mc_vars_attrs': cols_attrs,
+                          'mc_history': [f'Created with name: {name}']}
+        xr_ds.attrs = ds_attrs
 
-        # create the xr.Dataset
+        # add the variable attributes
 
-        # Design Decision - make mass concrete and moisture part of the dependent property
-        d_da_mass: Dict[str: xr.DataArray] = {}
-        for var_name, var_data in {'mass_wet': mass_wet, 'mass_dry': mass_dry}.items():
-            tmp_da: xr.DataArray = xr.DataArray(var_data, name=var_name,
-                                                attrs={'units': self._mass_units,
-                                                       'standard_name': ' '.join(var_name.split('_')[::-1]).title(),
-                                                       'mc_type': 'mass',
-                                                       'mc_col_orig': var_data.name})
-            d_da_mass[var_name] = tmp_da
+        for var_name, var_data in {'mass_wet': xr_ds[cols_mass[0]], 'mass_dry': xr_ds[cols_mass[1]]}.items():
+            var_data.attrs = {'units': self._mass_units,
+                              'standard_name': ' '.join(var_name.split('_')[::-1]).title(),
+                              'mc_type': 'mass',
+                              'mc_col_orig': input_variables[var_name]}
 
-        _data_mass: xr.Dataset = xr.Dataset(d_da_mass)
-
-        d_da_chem: Dict[str: xr.DataArray] = {}
         for in_analyte, analyte in input_variables['chemistry'].items():
-            tmp_da: xr.DataArray = xr.DataArray(data[in_analyte], name=analyte,
-                                                attrs={'units': '%',
-                                                       'standard_name': analyte,
-                                                       'mc_type': 'chemistry',
-                                                       'mc_col_orig': in_analyte})
-            d_da_chem[analyte] = tmp_da
+            xr_ds[analyte].attrs = {'units': '%',
+                                    'standard_name': analyte,
+                                    'mc_type': 'chemistry',
+                                    'mc_col_orig': in_analyte}
 
-        _data_chem: xr.Dataset = xr.Dataset(d_da_chem)
-
-        d_da_attrs: Dict[str: xr.DataArray] = {}
         for var_attr in input_variables['attrs']:
-            tmp_da: xr.DataArray = xr.DataArray(data[var_attr], name=var_attr,
-                                                attrs={'standard_name': var_attr,
-                                                       'mc_type': 'attribute',
-                                                       'mc_col_orig': var_attr})
-            d_da_attrs[var_attr] = tmp_da
+            xr_ds[var_attr].attrs = {'standard_name': var_attr,
+                                     'mc_type': 'attribute',
+                                     'mc_col_orig': var_attr}
 
-        _data_attrs: xr.Dataset = xr.Dataset(d_da_attrs)
+        self._data = xr_ds
 
-        _data: xr.Dataset = xr.merge([_data_mass, _data_chem, _data_attrs])
+    @staticmethod
+    def _solve_mass_moisture(data, input_variables) -> Tuple[pd.DataFrame, Dict[str, str]]:
+        col_map: Dict[str, str] = {}
+        if input_variables['mass_wet'] is None:
+            col_map['mass_wet'] = 'mass_wet'
+            data['mass_wet'] = solve_mass_moisture(mass_dry=data[input_variables['mass_dry']],
+                                                   moisture=data[input_variables['moisture']])
+        else:
+            col_map['mass_wet'] = input_variables['mass_wet']
 
-        # add any interval dims
-        for dim, dim_def in d_dim_coords.items():
-            _data.expand_dims({dim: dim_def['dim_var'][dim]}).assign_coords({dim: dim_def['dim_var'][dim][dim_def['coord_names']]})
+        if input_variables['mass_dry'] is None:
+            col_map['mass_dry'] = 'mass_dry'
+            data['mass_dry'] = solve_mass_moisture(mass_wet=data[input_variables['mass_wet']],
+                                                   moisture=data[input_variables['moisture']])
+        else:
+            col_map['mass_dry'] = input_variables['mass_dry']
 
-        d_column_attrs: Dict = {'mc_name': name,
-                                'mc_vars_mass': list(_data_mass.keys()),
-                                'mc_vars_chem': list(_data_chem.keys()),
-                                'mc_vars_attrs': list(_data_attrs.keys()),
-                                'mc_history': [f'Created with name: {name}']}
+        if input_variables['moisture'] is None:
+            col_map['H2O'] = 'H2O'
+        else:
+            # drop the moisture column, since it is now redundant, work with mass, moisture is dependent property
+            data.drop(columns=input_variables['moisture'], inplace=True)
+            col_map['H2O'] = input_variables['moisture']
 
-        self._data = _data.assign_attrs(d_column_attrs)
+        data.rename(columns={v: k for k, v in col_map.items()}, inplace=True)
+
+        return data, col_map
 
     @property
     def name(self) -> str:
@@ -182,12 +157,14 @@ class MassComposition:
         return res
 
     def aggregate(self, group_var: Optional[str] = None,
+                  group_bins: Optional[Union[int, Iterable]] = None,
                   as_dataframe: bool = True,
                   original_column_names: bool = False) -> Union[xr.Dataset, pd.DataFrame]:
         """Calculate the weight average.
 
         Args:
             group_var: Optional grouping variable
+            group_bins: Optional bins to apply to the group_var
             as_dataframe: If True return a pd.DataFrame
             original_column_names: If True, and as_dataframe is True, will return with the original column names.
 
@@ -196,22 +173,65 @@ class MassComposition:
         """
 
         res: xr.Dataset = self._data.mc.aggregate(group_var=group_var,
+                                                  group_bins=group_bins,
                                                   as_dataframe=as_dataframe,
                                                   original_column_names=original_column_names)
 
         return res
 
-    def _detect_var_types(self) -> Dict:
+    def binned_mass_composition(self, cutoff_var: str,
+                                bin_width: float,
+                                cumulative: bool = True,
+                                direction: str = 'descending',
+                                as_dataframe=True,
+                                ) -> Union[xr.Dataset, pd.DataFrame]:
+        """A.K.A "The Grade-Tonnage" curve.
+
+        Mass and grade by bins for a cut-off variable.
+
+        Args:
+            cutoff_var: The variable that defines the bins
+            bin_width: The width of the bin
+            cumulative: If True, the results are cumulative weight averaged.
+            direction: 'ascending'|'descending', if cumulative is True, the direction of accumulation
+            as_dataframe: If True return a pd.DataFrame
+
+        Returns:
+
+        """
+
+        if cutoff_var not in list(self._data.variables):
+            raise KeyError(f'{cutoff_var} is not found in the data')
+
+        bins = np.arange(np.floor(min(self._data[cutoff_var].values)),
+                         np.ceil(max(self._data[cutoff_var].values)) + bin_width,
+                         bin_width)
+
+        res: xr.Dataset = self.aggregate(group_var=cutoff_var, group_bins=bins, as_dataframe=False)
+
+        if cumulative:
+            res = res.mc.data().mc.cumulate(direction=direction)
+
+        if as_dataframe:
+            res = res.mc.data().to_dataframe()
+        else:
+            res = res.mc.data()
+
+        return res
+
+    def _detect_var_types(self, var_args: Dict, cols_data: List[str]) -> Dict:
 
         # TODO: migrate candidates to config file
         res: Dict = {}
 
         variables = self._input_columns
+        self.check_cols_in_data_cols(cols=list(var_args.values()), cols_data=cols_data)
 
         # detect the mass variables
+
         mass_wet_candidates: List[str] = [var for var in variables if var.lower() in ['mass_wet', 'wet_mass', 'wmt']]
-        if self._mass_wet_var_in is not None:
-            res['mass_wet'] = self._mass_wet_var_in
+        if var_args['mass_wet_var'] is not None:
+            res['mass_wet'] = var_args['mass_wet_var']
         elif len(mass_wet_candidates) == 1:
             res['mass_wet'] = mass_wet_candidates[0]
         else:
@@ -219,8 +239,8 @@ class MassComposition:
             # raise IndexError('Mass wet variable not detected. Consider setting mass_wet_var.')
 
         mass_dry_candidates: List[str] = [var for var in variables if var.lower() in ['mass_dry', 'dry_mass', 'dmt']]
-        if self._mass_dry_var_in is not None:
-            res['mass_dry'] = self._mass_dry_var_in
+        if var_args['mass_dry_var'] is not None:
+            res['mass_dry'] = var_args['mass_dry_var']
         elif len(mass_dry_candidates) == 1:
             res['mass_dry'] = mass_dry_candidates[0]
         else:
@@ -230,8 +250,8 @@ class MassComposition:
         # detect the moisture variable
         # TODO: some regex work to broaden the matches
         moisture_candidates: List[str] = [var for var in variables if var.lower() in ['h2o', 'moisture']]
-        if self._moisture_var_in is not None:
-            res['moisture'] = self._moisture_var_in
+        if var_args['moisture_var'] is not None:
+            res['moisture'] = var_args['moisture_var']
         elif len(moisture_candidates) == 1:
             res['moisture'] = moisture_candidates[0]
         else:
@@ -243,8 +263,8 @@ class MassComposition:
         chemistry_var_candidates: Dict[str, str] = {k: v for k, v in
                                                     is_compositional(list(variables), strict=False).items() if
                                                     v not in ['H2O']}
-        if self._chem_vars_in is not None:
-            res['chemistry'] = self._chem_vars_in
+        if var_args['chem_vars'] is not None:
+            res['chemistry'] = var_args['chem_vars']
         elif len(chemistry_var_candidates.keys()) > 0:
             res['chemistry'] = chemistry_var_candidates
         else:
@@ -260,6 +280,14 @@ class MassComposition:
         res['attrs'] = vars_attrs
 
         return res
+
+    @staticmethod
+    def check_cols_in_data_cols(cols: List[str], cols_data: List[str]):
+        for col in cols:
+            if (col is not None) and (col not in cols_data):
+                msg: str = f"{col} not in the data columns: {cols_data}"
+                logging.error(msg)
+                raise IndexError(msg)
 
     def split(self, fraction: float) -> tuple['MassComposition', 'MassComposition']:
         """Split the object at the specified mass fraction.
@@ -315,6 +343,47 @@ class MassComposition:
 
         return res
 
+    def plot_bins(self,
+                  variables: List[str],
+                  cutoff_var: str,
+                  bin_width: float,
+                  cumulative: bool = True,
+                  direction: str = 'descending',
+                  ) -> go.Figure:
+        """Plot "The Grade-Tonnage" curve.
+
+        Mass and grade by bins for a cut-off variable.
+
+        Args:
+            variables: List of variables to include in the plot
+            cutoff_var: The variable that defines the bins
+            bin_width: The width of the bin
+            cumulative: If True, the results are cumulative weight averaged.
+            direction: 'ascending'|'descending', if cumulative is True, the direction of accumulation
+        """
+
+        bin_data: pd.DataFrame = self.binned_mass_composition(cutoff_var=cutoff_var,
+                                                              bin_width=bin_width,
+                                                              cumulative=cumulative,
+                                                              direction=direction,
+                                                              as_dataframe=True)
+
+        id_var: str = bin_data.index.name
+
+        df: pd.DataFrame = bin_data[variables].reset_index()
+        # convert the interval to the left edge TODO: make flexible
+        df[id_var] = df[id_var].apply(lambda x: x.left)
+        var_cutoff: str = id_var.replace('_bins', '_cut-off')
+        df.rename(columns={id_var: var_cutoff}, inplace=True)
+
+        df = df.melt(id_vars=[var_cutoff], var_name='component')
+
+        fig = px.line(df, x=var_cutoff, y='value', facet_row='component')
+        fig.update_yaxes(matches=None)
+        fig.update_layout(title=self.name)
+
+        return fig
+
     def plot_parallel(self, color: Optional[str] = None,
                       composition_only: bool = False,
                       title: Optional[str] = None,
@@ -348,7 +417,8 @@ class MassComposition:
         fig = plot_parallel(data=df, color=color, title=title)
         return fig
 
-    def plot_ternary(self, variables: List[str], color: Optional[str] = None, title: Optional[str] = None) -> go.Figure:
+    def plot_ternary(self, variables: List[str], color: Optional[str] = None,
+                     title: Optional[str] = None) -> go.Figure:
         """Plot a ternary diagram
 
             variables: List of 3 components to plot
@@ -381,4 +451,9 @@ class MassComposition:
 
 def read_yaml(file_path):
     with open(file_path, "r") as f:
-        return yaml.safe_load(f)
+        d_config: Dict = yaml.safe_load(f)
+        if 'MC' != list(d_config.keys())[0]:
+            msg: str = f'config file {file_path} is not a MassComposition config file - no MC key'
+            logging.error(msg)
+            raise KeyError(msg)
+        return d_config['MC']

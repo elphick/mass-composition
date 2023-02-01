@@ -1,8 +1,12 @@
 """
 To provide sample data
 """
+import random
+from typing import Optional, Iterable, List
 
 import pandas as pd
+
+from elphick.mc.mass_composition.utils.components import is_compositional
 
 
 def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,
@@ -21,7 +25,7 @@ def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,
     # mass_wet: pd.Series = pd.Series([100, 90, 110], name='wet_mass')
     # mass_dry: pd.Series = pd.Series([90, 80, 100], name='dry_mass')
     mass_wet: pd.Series = pd.Series([100., 90., 110.], name='wet_mass')
-    mass_dry: pd.Series = pd.Series([90., 80., 90.], name='dry_mass')
+    mass_dry: pd.Series = pd.Series([90., 80., 90.], name='mass_dry')
     chem: pd.DataFrame = pd.DataFrame.from_dict({'FE': [57., 59., 61.],
                                                  'SIO2': [5.2, 3.1, 2.2],
                                                  'al2o3': [3.0, 1.7, 0.9],
@@ -46,3 +50,32 @@ def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,
     res.index.name = 'index'
 
     return res
+
+
+def dh_intervals(n: int = 5,
+                 n_dh: int = 2,
+                 analytes: Optional[Iterable[str]] = ('Fe', 'Al2O3')) -> pd.DataFrame:
+    """Down-samples The drillhole data for testing
+
+    Args:
+        n: Number of samples
+        n_dh: The number of drill-holes included
+        analytes: the analytes to include
+    Returns:
+
+    """
+
+    df_data: pd.DataFrame = pd.read_csv('../sample_data/iron_ore_sample_data.csv', index_col='index')
+
+    drillholes: List[str] = []
+    for i in range(0, n_dh):
+        drillholes.append(random.choice(list(df_data['DHID'].unique())))
+
+    df_data = df_data.query('DHID in @drillholes').groupby('DHID').sample(5)
+
+    cols_to_drop = [col for col in is_compositional(df_data.columns) if (col not in analytes) and (col != 'H2O')]
+    df_data.drop(columns=cols_to_drop, inplace=True)
+
+    df_data.index.name = 'index'
+
+    return df_data

@@ -1,40 +1,8 @@
-INTERVALS:  # not used
-  - [interval_from, interval_to]
-  - [size_retained, size_passing]
-  - [sg_sink, sg_float]
-
-#    indices:
-#      provider: yfinance
-#      ticker_transform: null
-#      tickers:
-#        - ^AXJO
-#        - ^NDX
-#        - ^DJI
-#    stocks:
-#      provider: yfinance
-#      ticker_transform: '{}.AX'
-#      tickers:
-#        - BHP
-#        - RIO
-#        - CBA
-#    forex:
-#      provider: yfinance
-#      ticker_transform: 'USD{}=X'
-#      tickers:
-#        - AUD
-#        - CAD
-#    commodities:
-#      provider: nasdaq
-#      ticker_transform: null
-#      tickers:
-#        - LBMA/GOLD
-#        - LBMA/SILVER
-#        - OPEC/ORB
-#    inflation:
-#      provider: nasdaq
-#      ticker_transform: 'RATEINF/{}'
-#      tickers:
-#        - INFLATION_AUS
-#        - CPI_AUS
-#        - INFLATION_USA
-#        - CPI_USA
+MC:
+  vars:
+    mass_wet: mass_wet
+    mass_dry: mass_dry
+    moisture: H2O
+  units:
+    mass: mass_units
+    composition_rel: '%'

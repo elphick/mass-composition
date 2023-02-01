@@ -11,7 +11,10 @@ import xarray as xr
 import xarray.tests
 import pandas as pd
 
+from elphick.mc.mass_composition import MassComposition
 from elphick.mc.mass_composition.data.sample_data import sample_data
+# noinspection PyUnresolvedReferences
+from elphick.mc.mass_composition.mcxarray import MassCompositionXR
 
 # %%
 #
@@ -27,8 +30,8 @@ print(df_data.head())
 #
 # Construct a Xarray Dataset and standardise the chemistry variables
 
-xr_ds: xr.Dataset = xr.Dataset(df_data)
-xr_ds = xr_ds.mc.convert_chem_to_symbols()
+# noinspection PyProtectedMember
+xr_ds: xr.Dataset = MassComposition(df_data)._data
 print(xr_ds)
 
 # %%
@@ -60,6 +63,6 @@ xarray.tests.assert_allclose(xr_ds, xr_ds_sum)
 # Add finally add and then subtract the split portion to the original object, and check the output.
 
 xr_ds_sum: xr.Dataset = xr_ds.mc.add(xr_ds_split)
-xr_ds_minus: xr.Dataset = xr_ds_sum.mc.minus(xr_ds_split)
+xr_ds_minus: xr.Dataset = xr_ds_sum.mc.sub(xr_ds_split)
 xarray.tests.assert_allclose(xr_ds_minus, xr_ds)
 print(xr_ds_minus)
