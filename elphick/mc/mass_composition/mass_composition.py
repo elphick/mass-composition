@@ -34,7 +34,7 @@ class MassComposition:
         if sum(data.index.duplicated()) > 0:
             raise KeyError('The data has duplicate indexes.')
 
-        data = data.copy()
+        data: pd.DataFrame = data.copy()
         self._logger = logging.getLogger(name=self.__class__.__name__)
 
         self._input_columns: List[str] = list(data.columns)
@@ -45,6 +45,8 @@ class MassComposition:
         if config_file is None:
             config_file = Path(__file__).parent / './config/mc_config.yaml'
         self.config = read_yaml(config_file)
+
+        data = self._create_interval_indexes(data=data)
 
         input_variables: Dict = self._detect_var_types(var_args=var_args, cols_data=list(data.columns))
 
@@ -447,6 +449,34 @@ class MassComposition:
         fig.update_layout(title=title)
 
         return fig
+
+    def _create_interval_indexes(self, data: pd.DataFrame) -> pd.DataFrame:
+
+        for pair in self.config['intervals']['suffixes']:
+            print(pair)
+            suffix_candidates: Dict = {n: n.split('_')[-1].lower() for n in data.index.names}
+            suffixes: Dict = {k: v for k, v in suffix_candidates.items() if v in pair}
+            if suffixes:
+                indexes_orig: List = data.index.names
+                data = data.reset_index()
+                num_intervals: int = int(len(suffixes.keys()) / 2)
+                for i in range(0, num_intervals):
+                    keys = list(suffixes.keys())[i: i + 2]
+                    base_name: str = '_'.join(keys[0].split('_')[:-1])
+                    data[base_name] = pd.IntervalIndex.from_arrays(left=data[keys[0]],
+                                                                   right=data[keys[1]],
+                                                                   closed=self.config['intervals']['closed'])
+                    # verbose but need to preserve index order...
+                    new_indexes: List = []
+                    for index in indexes_orig:
+                        if index not in keys:
+                            new_indexes.append(index)
+                        if (index in keys) and (base_name not in new_indexes):
+                            new_indexes.append(base_name)
+                    data.set_index(new_indexes, inplace=True)
+                    data.drop(columns=keys, inplace=True)
+
+        return data
 
 
 def read_yaml(file_path):

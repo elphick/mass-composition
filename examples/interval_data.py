@@ -38,7 +38,7 @@ logging.basicConfig(level=logging.INFO,
 # We get some demo data in the form of a pandas DataFrame
 # We create this object as 1D based on the pandas index
 
-df_data: pd.DataFrame = pd.read_csv('../sample_data/iron_ore_sample_data.csv', index_col='index')
+df_data: pd.DataFrame = pd.read_csv('../sample_data/iron_ore_sample_data_A072391.csv', index_col='index')
 print(df_data.head())
 
 obj_mc: MassComposition = MassComposition(df_data,
@@ -56,6 +56,7 @@ print(obj_mc.aggregate('DHID'))
 # fig: Figure = obj_mc.plot_parallel(color='Fe')
 # fig.show()
 
+
 # %%
 #
 # We will now make a 2D dataset using DHID and the interval.
@@ -64,10 +65,25 @@ print(obj_mc.aggregate('DHID'))
 
 print(df_data.columns)
 
-df_data['interval'] = df_data[['interval_from', 'interval_to']].mean(axis='columns')
 df_data['DHID'] = df_data['DHID'].astype('category')
 code, dh_id = pd.factorize(df_data['DHID'])
 df_data['DH'] = code
+df_data = df_data.reset_index().set_index(['DH', 'interval_from', 'interval_to'])
+
+obj_mc_2d: MassComposition = MassComposition(df_data,
+                                             name='Drill program',
+                                             mass_units='kg')
+# obj_mc_2d._data.assign(hole_id=dh_id)
+print(obj_mc_2d)
+print(obj_mc_2d.aggregate())
+print(obj_mc_2d.aggregate('DHID'))
+
+# %%
+
+# create a pandas interval
+df_data['interval'] = pd.IntervalIndex.from_arrays(left=df_data['interval_from'], right=df_data['interval_to'],
+                                                   closed='left')
+
 df_data = df_data.reset_index().set_index(['DH', 'interval'])
 
 obj_mc_2d: MassComposition = MassComposition(df_data,

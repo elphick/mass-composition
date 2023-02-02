@@ -6,3 +6,9 @@ MC:
   units:
     mass: mass_units
     composition_rel: '%'
+  intervals:
+    closed: left
+    suffixes:
+      - [from, to]
+      - [retained, passing]
+      - [sink, float]

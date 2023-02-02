@@ -15,7 +15,7 @@ class CompositionContext(Enum):
 
 
 @xr.register_dataset_accessor("mc")
-class MassCompositionXR:
+class MassCompositionAccessor:
     def __init__(self, xarray_obj: xr.Dataset):
         self._obj = xarray_obj
 
@@ -334,7 +334,7 @@ def mc_aggregate(xr_ds: xr.Dataset) -> xr.Dataset:
     Returns:
 
     """
-    chem: xr.Dataset = xr_ds.mc._chem.weighted(weights=xr_ds.mc._mass['mass_dry']).mean(keep_attrs=True)
+    chem: xr.Dataset = xr_ds.mc._chem.weighted(weights=xr_ds.mc._mass['mass_dry'].fillna(0)).mean(keep_attrs=True)
     mass: xr.Dataset = xr_ds.mc._mass.sum(keep_attrs=True)
     res: xr.Dataset = xr.merge([mass, chem])
     res.attrs['mc_vars_attrs'] = []

@@ -35,7 +35,7 @@ from matplotlib import pyplot as plt
 import pvxarray
 import pyvista as pv
 
-from elphick.mc.mass_composition import MassComposition, MassCompositionXR
+from elphick.mc.mass_composition import MassComposition, MassCompositionAccessor
 
 plt.switch_backend('TkAgg')
 

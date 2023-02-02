@@ -14,7 +14,7 @@ import pandas as pd
 from elphick.mc.mass_composition import MassComposition
 from elphick.mc.mass_composition.data.sample_data import sample_data
 # noinspection PyUnresolvedReferences
-from elphick.mc.mass_composition.mcxarray import MassCompositionXR
+from elphick.mc.mass_composition.mcxarray import MassCompositionAccessor
 
 # %%
 #
