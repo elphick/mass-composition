@@ -39,6 +39,7 @@ myst-parser = "^0.18.0"
 #notebook = "^8.8.0"
 
 [tool.poetry.group.dev.dependencies]
+orca = "^1.8"  # for plotly thumbnails in docs
 
 
 [build-system]
