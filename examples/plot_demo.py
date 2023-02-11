@@ -40,7 +40,7 @@ fig
 #
 # Create an interactive parallel plot with only the components
 
-fig2 = obj_mc.plot_parallel(composition_only=True)
+fig2 = obj_mc.plot_parallel(var_subset=['mass_wet', 'H2O', 'Fe'])
 fig2
 
 # %%

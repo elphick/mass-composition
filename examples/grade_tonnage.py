@@ -12,6 +12,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import plotly
 
 from elphick.mc.mass_composition import MassComposition, sample_data
 import xarray as xr
@@ -27,9 +28,11 @@ filepath: Path = Path('../sample_data/iron_ore_sample_data_A072391.csv')
 name: str = filepath.stem.split('_')[-1]
 df_data: pd.DataFrame = pd.read_csv(filepath, index_col='index')
 df_data.drop(columns=['Na2O', 'CaO', 'MnO', 'TiO2', 'P', 'K2O', 'MgO'], inplace=True)
-print(df_data.shape)
-print(df_data.head())
 
+print(df_data.shape)
+df_data.head()
+
+# %%
 obj_mc: MassComposition = MassComposition(df_data, name=name)
 
 # %%
@@ -43,21 +46,31 @@ print(obj_mc.aggregate())
 print(obj_mc.aggregate(as_dataframe=False))
 
 res: xr.Dataset = obj_mc.binned_mass_composition(cutoff_var='Fe', bin_width=1.0, cumulative=True, as_dataframe=False)
-print(res)
+res
+
+# %%
+#
+# Tabular Grade bin data
+# ----------------------
 
 res: pd.DataFrame = obj_mc.binned_mass_composition(cutoff_var='Fe', bin_width=1.0, cumulative=True,
                                                    direction='ascending', as_dataframe=True)
-print(res)
+res
 
+# %%
 res: pd.DataFrame = obj_mc.binned_mass_composition(cutoff_var='Fe', bin_width=1.0, cumulative=True,
                                                    direction='descending', as_dataframe=True)
-print(res)
+res
+
+# %%
+#
+# Plot the Grade Bins
+# -------------------
 
 fig = obj_mc.plot_bins(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
                        cutoff_var='Fe',
                        bin_width=1.0,
                        cumulative=True,
                        direction='descending')
-fig.show()
-
-print('done')
+# noinspection PyTypeChecker
+plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery

@@ -1,6 +1,6 @@
 """
-Basic usage
-===========
+Basic usage XR
+==============
 
 A simple example demonstrating how to use mass-composition.
 """

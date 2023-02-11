@@ -1,6 +1,6 @@
 """
-Math Operations
-===============
+Math Operations XR
+==================
 
 Demonstrate splitting and math operations that preserve the mass balance of components.
 """
