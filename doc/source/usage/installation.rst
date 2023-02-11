@@ -5,8 +5,16 @@ Installation
    :maxdepth: 2
    :caption: Installation:
 
-When published (pending), the package will be pip-installable.
+For now, the package can be installed using pip from the github repository.
 
 ..  code-block::
 
-    pip install mass-composition-xarray
+    pip install git+https://github.com/Elphick/mass-composition
+
+
+When published to the pypi index (planned), the package will be pip-installable.
+
+..  code-block::
+
+    pip install mass-composition
+

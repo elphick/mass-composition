@@ -1,13 +1,12 @@
 Quick Start Guide
 =================
 
-Once you have xarray and mass-composition xarray installed in your environment, you will need the following imports.
+Once you have xarray and mass-composition installed in your environment, you will typically need the following imports.
 
 ..  code-block:: python
 
     import xarray as xr
-    import mcxarray.mcxarray
-
+    from elphick.mc.mass_composition import MassComposition
 
 It is possible that you already have your mass-composition data in a pandas DataFrame.
 
@@ -20,24 +19,29 @@ DataFrame requirements:
 - mass_wet column is optional
 - chemical elements/components/oxides will be automatically detected.
 
-If the DataFrame meets the above requirements, an xarray mass-composition Dataset can be created by:
+If the DataFrame meets the above requirements, a MassComposition object can be created by:
 
 ..  code-block:: python
 
-    xr_ds: xr.Dataset = xr.Dataset(df_data)
+    obj_mc: MassComposition = MassComposition(df_data)
 
-It is then a simple case of standardising the composition symbols if desired.
-
-..  code-block:: python
-
-    xr_ds = xr_ds.mc.convert_chem_to_symbols()
-
-Note the use of the mc accessor to access the mass-composition method called convert_chem_to_symbols.
-
-We can calculate the weight average of the mass-composition by executing the following.
+It is then trivial to calculate the weight average aggregate of the dataset.
 
 ..  code-block:: python
 
-    xr_ds.mc.aggregate()
+    obj_mc.aggregate()
+
+If you want to or need to go "under the hood" you can access the underlying xarray dataset.
+
+
+..  code-block:: python
+
+    xr_ds: xr.Dataset = obj_mc.data()
+
+The mc xarray accessor provides access to mass-composition properties and methods while working with the xarray dataset.
+
+..  code-block:: python
+
+    xr_ds_wtd: xr.Dataset = xr_ds.mc.aggregate()
 
 For examples that illustrate math operations and visualisation, see the :doc:`/auto_examples/index`.
