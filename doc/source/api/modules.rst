@@ -1,11 +1,13 @@
 API Reference
 =============
 
-.. automodule:: mcxarray
+.. automodule:: mass_composition
    :members:
 
 .. autosummary::
    :toctree: _autosummary
    :recursive:
 
+    mass_composition
     mcxarray
+
