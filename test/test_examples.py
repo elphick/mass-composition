@@ -11,7 +11,9 @@ def test_examples():
 
     import examples.iron_ore_assays
 
-    # import examples.interval_data
+    import examples.interval_data
+
+    import examples.grade_tonnage
 
     import examples.plot_demo
 
