@@ -24,6 +24,7 @@ class MassCompositionAccessor:
         self.mc_vars = self._obj.mc_vars_mass + self._obj.mc_vars_chem
         self.mc_vars_mass = self._obj.mc_vars_mass
         self.mc_vars_chem = self._obj.mc_vars_chem
+        self.mc_vars_attrs = self._obj.mc_vars_attrs
         self._chem: xr.Dataset = self._obj[self.mc_vars_chem]
         self._mass: xr.Dataset = self._obj[self.mc_vars_mass]
 
@@ -318,6 +319,11 @@ class MassCompositionAccessor:
             ds = self._obj.mc.data()
 
         df: pd.DataFrame = ds.to_dataframe()
+
+        # order with mass, chem then attr columns last
+        col_order: List[str] = self.mc_vars_mass + ['H2O'] + self.mc_vars_chem + self.mc_vars_attrs
+        df = df[[col for col in col_order if col in df.columns]]
+
         if original_column_names:
             df.rename(columns=self.column_map(), inplace=True)
         return df
