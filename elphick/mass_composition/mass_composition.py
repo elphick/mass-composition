@@ -472,7 +472,6 @@ class MassComposition:
     def _create_interval_indexes(self, data: pd.DataFrame) -> pd.DataFrame:
 
         for pair in self.config['intervals']['suffixes']:
-            print(pair)
             suffix_candidates: Dict = {n: n.split('_')[-1].lower() for n in data.index.names}
             suffixes: Dict = {k: v for k, v in suffix_candidates.items() if v in pair}
             if suffixes:
