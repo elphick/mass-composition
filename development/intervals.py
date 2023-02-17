@@ -15,17 +15,15 @@ import logging
 import time
 from datetime import timedelta
 from pathlib import Path
-from typing import List, Hashable, Union, Tuple, Type
+from typing import List, Hashable, Type
 
-import numpy as np
 import pandas as pd
 from pandas import IntervalIndex, Index, Interval
 from pandas._typing import IntervalClosedType, Dtype
 from pandas.core.arrays import IntervalArray
-from pandas.core.indexes.extension import ExtensionIndex
 from scipy.stats import gmean
 
-from elphick.mc.mass_composition import sample_data, MassComposition
+from elphick.mass_composition import sample_data, MassComposition
 
 
 class NamedInterval(Interval):

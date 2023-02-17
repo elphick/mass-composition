@@ -14,7 +14,7 @@ from IPython.core.display_functions import display
 
 from plotly.graph_objs import Figure
 
-from elphick.mc.mass_composition import MassComposition
+from elphick.mass_composition import MassComposition
 
 
 # %%

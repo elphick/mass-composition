@@ -10,11 +10,10 @@ They are useful in comparing deposits.
 """
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import plotly
 
-from elphick.mc.mass_composition import MassComposition, sample_data
+from elphick.mass_composition import MassComposition
 import xarray as xr
 
 # %%

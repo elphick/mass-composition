@@ -22,7 +22,7 @@ Finally, the corner record where M=0 & N=0 must also be appended.
 
 # %%
 
-from typing import List, Dict
+from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -31,10 +31,9 @@ import xarray as xr
 from matplotlib import pyplot as plt
 # noinspection PyUnresolvedReferences
 import pvxarray
-import pyvista as pv
 
-from elphick.mc.mass_composition import MassComposition, MassCompositionAccessor
-from elphick.mc.mass_composition.data.sample_data import dh_intervals
+from elphick.mass_composition import MassComposition
+from sample_data.sample_data import dh_intervals
 
 plt.switch_backend('TkAgg')
 

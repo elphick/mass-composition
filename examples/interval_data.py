@@ -17,8 +17,7 @@ import logging
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from plotly.graph_objects import Figure
-from elphick.mc.mass_composition import MassComposition
+from elphick.mass_composition import MassComposition
 
 # %%
 logging.basicConfig(level=logging.INFO,

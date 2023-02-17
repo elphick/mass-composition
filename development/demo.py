@@ -1,5 +1,5 @@
 from flowsheet import Stream
-from elphick.mc.mass_composition.data.sample_data import sample_data
+from sample_data.sample_data import sample_data
 
 
 obj_strm: Stream = Stream.from_dataframe(data=sample_data(), name='my_name')

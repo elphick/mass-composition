@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from elphick.mc.mass_composition.data.sample_data import sample_data
+from sample_data.sample_data import sample_data
 
 
 @pytest.fixture
