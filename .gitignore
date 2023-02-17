@@ -3,3 +3,4 @@
 /doc/source/api/_autosummary/
 poetry.lock
 /.python-version
+/.idea/
