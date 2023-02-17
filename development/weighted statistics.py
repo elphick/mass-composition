@@ -13,7 +13,7 @@ import pandas as pd
 from plotly.graph_objs import Figure
 import xarray as xr
 
-from elphick.mc.mass_composition import MassComposition
+from elphick.mass_composition import MassComposition
 
 # %%
 #

@@ -4,13 +4,12 @@ Plot Demo
 
 Demonstrating the mass-composition plot methods.
 """
-from pathlib import Path
 
 import pandas as pd
 from plotly.graph_objs import Figure
 
-from elphick.mc.mass_composition.data.sample_data import sample_data
-from elphick.mc.mass_composition import MassComposition
+from sample_data.sample_data import sample_data
+from elphick.mass_composition import MassComposition
 
 # %%
 #

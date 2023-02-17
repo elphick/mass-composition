@@ -24,7 +24,7 @@ To achieve this we will:
 
 # %%
 
-from typing import List, Dict
+from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -33,9 +33,8 @@ import xarray as xr
 from matplotlib import pyplot as plt
 # noinspection PyUnresolvedReferences
 import pvxarray
-import pyvista as pv
 
-from elphick.mc.mass_composition import MassComposition, MassCompositionAccessor
+from elphick.mass_composition import MassComposition
 
 plt.switch_backend('TkAgg')
 

@@ -1,9 +1,8 @@
 import pandas as pd
-import pytest
 
 # noinspection PyUnresolvedReferences
 from fixtures import demo_data
-from elphick.mc.mass_composition import MassComposition
+from elphick.mass_composition import MassComposition
 import xarray as xr
 
 

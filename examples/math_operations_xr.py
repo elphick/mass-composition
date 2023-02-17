@@ -11,10 +11,10 @@ import xarray as xr
 import xarray.tests
 import pandas as pd
 
-from elphick.mc.mass_composition import MassComposition
-from elphick.mc.mass_composition.data.sample_data import sample_data
+from elphick.mass_composition import MassComposition
+from sample_data.sample_data import sample_data
 # noinspection PyUnresolvedReferences
-from elphick.mc.mass_composition.mcxarray import MassCompositionAccessor
+from elphick.mass_composition.mcxarray import MassCompositionAccessor
 
 # %%
 #

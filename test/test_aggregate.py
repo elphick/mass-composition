@@ -2,7 +2,7 @@ import pandas as pd
 
 # noinspection PyUnresolvedReferences
 from fixtures import demo_data
-from elphick.mc.mass_composition import MassComposition
+from elphick.mass_composition import MassComposition
 
 
 def test_aggregation(demo_data):
