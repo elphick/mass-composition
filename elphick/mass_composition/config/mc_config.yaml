@@ -12,3 +12,6 @@ MC:
       - [from, to]
       - [retained, passing]
       - [sink, float]
+  components:
+    chemistry:
+      ignore: ['Y']  # ignore anything in this list when detecting chemistry components

@@ -6,7 +6,7 @@ from typing import Optional, Iterable, List
 
 import pandas as pd
 
-from elphick.mc.mass_composition.utils.components import is_compositional
+from elphick.mass_composition.utils.components import is_compositional
 
 
 def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,

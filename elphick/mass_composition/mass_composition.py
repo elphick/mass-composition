@@ -11,12 +11,12 @@ import plotly.graph_objects as go
 import plotly.express as px
 import yaml
 
-from elphick.mc.mass_composition.utils import solve_mass_moisture
-from elphick.mc.mass_composition.utils.components import is_compositional
-from elphick.mc.mass_composition.utils.viz import plot_parallel
+from elphick.mass_composition.utils import solve_mass_moisture
+from elphick.mass_composition.utils.components import is_compositional
+from elphick.mass_composition.utils.viz import plot_parallel
 
 # noinspection PyUnresolvedReferences
-import elphick.mc.mass_composition.mcxarray  # keep this "unused" import - it helps
+import elphick.mass_composition.mcxarray  # keep this "unused" import - it helps
 
 
 class MassComposition:
@@ -46,6 +46,7 @@ class MassComposition:
             config_file = Path(__file__).parent / './config/mc_config.yaml'
         self.config = read_yaml(config_file)
 
+        # if interval pairs are passed as indexes then create the proper interval index
         data = self._create_interval_indexes(data=data)
 
         input_variables: Dict = self._detect_var_types(var_args=var_args, cols_data=list(data.columns))
@@ -227,7 +228,7 @@ class MassComposition:
         res: Dict = {}
 
         variables = self._input_columns
-        self.check_cols_in_data_cols(cols=list(var_args.values()), cols_data=cols_data)
+        self._check_cols_in_data_cols(cols=list(var_args.values()), cols_data=cols_data)
 
         # detect the mass variables
 
@@ -262,9 +263,11 @@ class MassComposition:
             #                  'Consider setting var_moisture.')
 
         # detect the chemistry variable
+        chem_ignore: List[str] = ['H2O'] + self.config['components']['chemistry']['ignore']
+        chem_ignore = list(set(chem_ignore + [c.lower() for c in chem_ignore] + [c.upper() for c in chem_ignore]))
         chemistry_var_candidates: Dict[str, str] = {k: v for k, v in
                                                     is_compositional(list(variables), strict=False).items() if
-                                                    v not in ['H2O']}
+                                                    v not in chem_ignore}
         if var_args['chem_vars'] is not None:
             res['chemistry'] = var_args['chem_vars']
         elif len(chemistry_var_candidates.keys()) > 0:
@@ -284,7 +287,7 @@ class MassComposition:
         return res
 
     @staticmethod
-    def check_cols_in_data_cols(cols: List[str], cols_data: List[str]):
+    def _check_cols_in_data_cols(cols: List[str], cols_data: List[str]):
         for col in cols:
             if (col is not None) and (col not in cols_data):
                 msg: str = f"{col} not in the data columns: {cols_data}"
@@ -387,31 +390,47 @@ class MassComposition:
         return fig
 
     def plot_parallel(self, color: Optional[str] = None,
-                      composition_only: bool = False,
+                      var_subset: Optional[List[str]] = None,
                       title: Optional[str] = None,
-                      include_dims: Optional[Union[bool, List[str]]] = True) -> go.Figure:
+                      include_dims: Optional[Union[bool, List[str]]] = True,
+                      plot_interval_edges: bool = False) -> go.Figure:
         """Create an interactive parallel plot
 
         Useful to explore multidimensional data like mass-composition data
 
         Args:
             color: Optional color variable
-            composition_only: if True will limit the plot to composition components only
+            var_subset: List of variables to include in the plot
             title: Optional plot title
             include_dims: Optional boolean or list of dimension to include in the plot.  True will show all dims.
+            plot_interval_edges: If True, interval edges will be plotted instead of interval mid
 
         Returns:
 
         """
-        df = self.data.to_dataframe()
-        if composition_only:
-            df = df[self._data.mc_vars_chem]
+        df = self.data.mc.to_dataframe()
+
+        if var_subset is not None:
+            missing_vars = set(var_subset).difference(set(df.columns))
+            if len(missing_vars) > 0:
+                raise KeyError(f'var_subset provided contains variable not found in the data: {missing_vars}')
+            df = df[var_subset]
 
         if include_dims is True:
             df.reset_index(inplace=True)
         elif isinstance(include_dims, List):
             for d in include_dims:
                 df.reset_index(d, inplace=True)
+
+        interval_cols: Dict[str, int] = {col: i for i, col in enumerate(df.columns) if df[col].dtype == 'interval'}
+
+        for col, pos in interval_cols.items():
+            if plot_interval_edges:
+                df.insert(loc=pos + 1, column=f'{col}_left', value=df[col].array.left)
+                df.insert(loc=pos + 2, column=f'{col}_right', value=df[col].array.right)
+                df.drop(columns=col, inplace=True)
+            else:
+                df[col] = df[col].array.mid
 
         if not title and hasattr(self, 'name'):
             title = self.name

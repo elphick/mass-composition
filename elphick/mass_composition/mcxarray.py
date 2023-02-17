@@ -6,7 +6,7 @@ from typing import Dict, Optional, Union, Iterable, List
 import pandas as pd
 import xarray as xr
 
-from elphick.mc.mass_composition.utils import solve_mass_moisture
+from elphick.mass_composition.utils import solve_mass_moisture
 
 
 class CompositionContext(Enum):
