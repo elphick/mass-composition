@@ -1,6 +1,6 @@
-/doc/source/auto_examples/
-/doc/build/
-/doc/source/api/_autosummary/
+/docs/source/auto_examples/
+/docs/build/
+/docs/source/api/_autosummary/
 poetry.lock
 /.python-version
 /.idea/
