@@ -10,7 +10,7 @@ Demonstrate splitting and math operations that preserve the mass balance of comp
 import xarray.tests
 import pandas as pd
 
-from sample_data.sample_data import sample_data
+from test.data.sample_data import sample_data
 from elphick.mass_composition import MassComposition
 
 # %%

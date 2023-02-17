@@ -5,8 +5,15 @@ import random
 from typing import Optional, Iterable, List
 
 import pandas as pd
+import pytest
 
 from elphick.mass_composition.utils.components import is_compositional
+
+
+@pytest.fixture
+def demo_data():
+    data: pd.DataFrame = sample_data()
+    return data
 
 
 def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,

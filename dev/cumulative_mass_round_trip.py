@@ -33,7 +33,7 @@ from matplotlib import pyplot as plt
 import pvxarray
 
 from elphick.mass_composition import MassComposition
-from sample_data.sample_data import dh_intervals
+from test.data.sample_data import dh_intervals
 
 plt.switch_backend('TkAgg')
 

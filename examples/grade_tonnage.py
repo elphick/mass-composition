@@ -23,7 +23,7 @@ import xarray as xr
 #
 # We get some demo data in the form of a pandas DataFrame
 
-filepath: Path = Path('../sample_data/iron_ore_sample_data_A072391.csv')
+filepath: Path = Path('../test/data/iron_ore_sample_data_A072391.csv')
 name: str = filepath.stem.split('_')[-1]
 df_data: pd.DataFrame = pd.read_csv(filepath, index_col='index')
 df_data.drop(columns=['Na2O', 'CaO', 'MnO', 'TiO2', 'P', 'K2O', 'MgO'], inplace=True)

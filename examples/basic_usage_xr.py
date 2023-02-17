@@ -10,7 +10,7 @@ import xarray.tests
 import pandas as pd
 
 from elphick.mass_composition import MassComposition
-from sample_data.sample_data import sample_data
+from test.data.sample_data import sample_data
 # noinspection PyUnresolvedReferences
 import elphick.mass_composition.mcxarray  # keep this "unused" import - it helps
 

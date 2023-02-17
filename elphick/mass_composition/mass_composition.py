@@ -186,7 +186,7 @@ class MassComposition:
                                 bin_width: float,
                                 cumulative: bool = True,
                                 direction: str = 'descending',
-                                as_dataframe=True,
+                                as_dataframe: bool = True,
                                 ) -> Union[xr.Dataset, pd.DataFrame]:
         """A.K.A "The Grade-Tonnage" curve.
 

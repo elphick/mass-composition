@@ -12,7 +12,7 @@ Once data is loaded chemical analyte names and H2O will conform to the internal 
 import pandas as pd
 
 from elphick.mass_composition import MassComposition
-from sample_data.sample_data import sample_data
+from test.data import sample_data
 
 # %%
 #

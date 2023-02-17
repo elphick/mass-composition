@@ -18,7 +18,7 @@ import pandas as pd
 # We get some demo data in the form of a pandas DataFrame
 from elphick.mass_composition import is_compositional
 
-df_data: pd.DataFrame = pd.read_csv('A072391_met.csv')
+df_data: pd.DataFrame = pd.read_csv('../test/data/A072391_met.csv')
 df_data.dropna(inplace=True)
 print(df_data.shape)
 print(df_data.head())
@@ -37,13 +37,13 @@ mass_comp_data: pd.DataFrame = df_data[['mass_dry', 'H2O'] + cols_components + e
 mass_comp_data.sort_values(['DHID', 'interval_from'], inplace=True)
 mass_comp_data.index.name = 'index'
 
-mass_comp_data.to_csv('../sample_data/iron_ore_sample_data_A072391.csv')
+mass_comp_data.to_csv('../test/data/iron_ore_sample_data_A072391.csv')
 
 # %%
 #
 # Wrangle to create 3D data
 
-df_collars: pd.DataFrame = pd.read_csv('A072391_collars.csv')
+df_collars: pd.DataFrame = pd.read_csv('../test/data/A072391_collars.csv')
 df_collars.dropna(how='all', axis='index', inplace=True)
 df_collars.drop(columns='Unnamed: 0', inplace=True)
 
@@ -60,4 +60,4 @@ df_res['z'] = df_res[['z_lo', 'z_hi']].mean(axis='columns')
 df_res.drop(columns=['z_lo', 'z_hi', 'RL'], inplace=True)
 df_res.index.name = 'index'
 
-df_res.to_csv('../sample_data/iron_ore_sample_data_xyz_A072391.csv')
+df_res.to_csv('../test/data/iron_ore_sample_data_xyz_A072391.csv')
