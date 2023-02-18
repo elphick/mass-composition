@@ -7,7 +7,7 @@ import xarray as xr
 
 
 def test_names(demo_data):
-    obj_mc: MassComposition = MassComposition(demo_data)
+    obj_mc: MassComposition = MassComposition(demo_data, name='name_test')
     xr_data: xr.Dataset = obj_mc._data
     df_export: pd.DataFrame = xr_data.mc.to_dataframe(original_column_names=True)
     for col in demo_data.columns:
