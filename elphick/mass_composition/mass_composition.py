@@ -329,6 +329,22 @@ class MassComposition:
         res._data = xr_sum
 
         return res
+    
+    def add(self, other: 'MassComposition', name: Optional[str] = None) -> 'MassComposition':
+        """Add two objects
+
+        Adds other to self, with optional name of the returned object
+        Args:
+            other: object to add to self
+            name: name of the returned object
+
+        Returns:
+
+        """
+        res: MassComposition = self.__add__(other)
+        if name is not None:
+            res._data.mc.rename(name)
+        return res
 
     def __sub__(self, other: 'MassComposition') -> 'MassComposition':
         """Subtract the supplied object from self
@@ -348,6 +364,22 @@ class MassComposition:
 
         return res
 
+    def sub(self, other: 'MassComposition', name: Optional[str] = None) -> 'MassComposition':
+        """Subtract two objects
+
+        Subtracts other from self, with optional name of the returned object
+        Args:
+            other: object to subtract from self
+            name: name of the returned object
+
+        Returns:
+
+        """
+        res: MassComposition = self.__sub__(other)
+        if name is not None:
+            res._data.mc.rename(name)
+        return res
+
     def __truediv__(self, other: 'MassComposition') -> 'MassComposition':
         """Divide self by the supplied object
 
@@ -364,6 +396,22 @@ class MassComposition:
         res = deepcopy(self)
         res._data = xr_div
 
+        return res
+
+    def div(self, other: 'MassComposition', name: Optional[str] = None) -> 'MassComposition':
+        """Divide two objects
+
+        Divides self by other, with optional name of the returned object
+        Args:
+            other: the denominator (or reference) object
+            name: name of the returned object
+
+        Returns:
+
+        """
+        res: MassComposition = self.__truediv__(other)
+        if name is not None:
+            res._data.mc.rename(name)
         return res
 
     def plot_bins(self,

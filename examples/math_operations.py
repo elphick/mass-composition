@@ -72,4 +72,13 @@ obj_mc_div: MassComposition = obj_mc_split / obj_mc
 print(obj_mc_div)
 
 
+# %%
+#
+# Math operations with rename
+# The alternative syntax, methods rather than operands, allows renaming of the result object
+
+obj_mc_sum_renamed: MassComposition = obj_mc.add(obj_mc_split, name='Summed object')
+print(obj_mc_sum_renamed)
+
+
 print('done')

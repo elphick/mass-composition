@@ -308,7 +308,7 @@ class MassCompositionAccessor:
 
         xr.set_options(keep_attrs=True)
 
-        # initially just add the mass and composition, not the attr vars
+        # initially just divide the mass and composition, not the attr vars
         xr_self: xr.Dataset = self.composition_to_mass()[self.mc_vars]
         xr_other: xr.Dataset = other.mc.composition_to_mass()[self.mc_vars]
 
@@ -320,7 +320,7 @@ class MassCompositionAccessor:
 
         return res
 
-    def _math_post_process(self, other, res, xr_self, operator_string):
+    def _math_post_process(self, other, res, xr_self, operator_string: str):
         # update attrs
         res.attrs.update(self._obj.attrs)
         da: xr.DataArray
@@ -328,13 +328,20 @@ class MassCompositionAccessor:
             new_da.attrs.update(da.attrs)
         # merge in the attr vars
         res = xr.merge([res, self._obj[self._obj.mc_vars_attrs]])
-        if operator_string == 'divided':
-            res.mc.log_to_history(f'Object has been {operator_string} by {other.mc.name}.')
-        else:
+        if operator_string == 'added':
             res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
-        res.mc.rename(f'({self.name} - {other.mc.name})')
-        # convert back to relative composition
-        res = res.mc.mass_to_composition()
+            res.mc.rename(f'({self.name} + {other.mc.name})')
+            res = res.mc.mass_to_composition()
+        elif operator_string == 'subtracted':
+            res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
+            res.mc.rename(f'({self.name} - {other.mc.name})')
+            res = res.mc.mass_to_composition()
+        elif operator_string == 'divided':
+            res.mc.log_to_history(f'Object has been {operator_string} by {other.mc.name}.')
+            res.mc.rename(f'({self.name} / {other.mc.name})')
+            # division returns relative, not absolute - do not convert back to relative composition
+        else:
+            raise NotImplementedError('Unexpected operator string')
         return res
 
     def column_map(self):

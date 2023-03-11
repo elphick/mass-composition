@@ -71,6 +71,6 @@ print(xr_ds_minus)
 #
 # Demonstrate division
 
-xr_ds_div = xr_ds_split / xr_ds
+xr_ds_div = xr_ds_split.mc.div(xr_ds)
 print(xr_ds_div)
 
