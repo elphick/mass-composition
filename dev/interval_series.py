@@ -20,7 +20,7 @@ import pandas as pd
 from pandas import IntervalIndex, Index
 from pandas.core.arrays import IntervalArray, ExtensionArray
 
-from elphick.mass_composition import sample_data
+from test.data import sample_data
 
 
 class IntervalSeries(pd.Series):
