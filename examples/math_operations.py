@@ -63,4 +63,13 @@ obj_mc_minus: MassComposition = obj_mc_sum - obj_mc_split
 xarray.tests.assert_allclose(obj_mc_minus.data, obj_mc.data)
 print(obj_mc_minus)
 
+
+# %%
+#
+# Demonstrate division.
+
+obj_mc_div: MassComposition = obj_mc_split / obj_mc
+print(obj_mc_div)
+
+
 print('done')

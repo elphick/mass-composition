@@ -341,10 +341,28 @@ class MassComposition:
 
         """
 
-        xr_sum: xr.Dataset = self._data.mc.sub(other._data)
+        xr_sub: xr.Dataset = self._data.mc.sub(other._data)
 
         res = deepcopy(self)
-        res._data = xr_sum
+        res._data = xr_sub
+
+        return res
+
+    def __truediv__(self, other: 'MassComposition') -> 'MassComposition':
+        """Divide self by the supplied object
+
+        Perform the division with the mass-composition variables only and then append any attribute variables.
+        Args:
+            other: denominator object, self will be divided by this object
+
+        Returns:
+
+        """
+
+        xr_div: xr.Dataset = self._data.mc.div(other._data)
+
+        res = deepcopy(self)
+        res._data = xr_div
 
         return res
 

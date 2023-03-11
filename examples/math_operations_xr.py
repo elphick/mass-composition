@@ -66,3 +66,11 @@ xr_ds_sum: xr.Dataset = xr_ds.mc.add(xr_ds_split)
 xr_ds_minus: xr.Dataset = xr_ds_sum.mc.sub(xr_ds_split)
 xarray.tests.assert_allclose(xr_ds_minus, xr_ds)
 print(xr_ds_minus)
+
+# %%
+#
+# Demonstrate division
+
+xr_ds_div = xr_ds_split / xr_ds
+print(xr_ds_div)
+

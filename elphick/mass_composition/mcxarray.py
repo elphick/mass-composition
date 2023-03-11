@@ -295,6 +295,31 @@ class MassCompositionAccessor:
 
         return res
 
+    def div(self, other: xr.Dataset) -> xr.Dataset:
+        """Divide self by the supplied object
+
+        Perform the division with the mass-composition variables only and then append any attribute variables.
+        Args:
+            other: denominator object, self will be divided by this object
+
+        Returns:
+
+        """
+
+        xr.set_options(keep_attrs=True)
+
+        # initially just add the mass and composition, not the attr vars
+        xr_self: xr.Dataset = self.composition_to_mass()[self.mc_vars]
+        xr_other: xr.Dataset = other.mc.composition_to_mass()[self.mc_vars]
+
+        res: xr.Dataset = xr_self / xr_other
+
+        res = self._math_post_process(other, res, xr_self, 'divided')
+
+        xr.set_options(keep_attrs='default')
+
+        return res
+
     def _math_post_process(self, other, res, xr_self, operator_string):
         # update attrs
         res.attrs.update(self._obj.attrs)
@@ -303,7 +328,10 @@ class MassCompositionAccessor:
             new_da.attrs.update(da.attrs)
         # merge in the attr vars
         res = xr.merge([res, self._obj[self._obj.mc_vars_attrs]])
-        res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
+        if operator_string == 'divided':
+            res.mc.log_to_history(f'Object has been {operator_string} by {other.mc.name}.')
+        else:
+            res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
         res.mc.rename(f'({self.name} - {other.mc.name})')
         # convert back to relative composition
         res = res.mc.mass_to_composition()
