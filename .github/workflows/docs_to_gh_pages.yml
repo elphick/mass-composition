@@ -11,7 +11,7 @@ jobs:
       - name: copy
         env:
           SRC_FOLDER_PATH: 'docs/build'
-          TARGET_BRANCH: 'dest'
+          TARGET_BRANCH: 'gh-pages'
         run: |
           files=$(find $SRC_FOLDER_PATH -type f) # get the file list
           git config --global user.name 'GitHub Action'
