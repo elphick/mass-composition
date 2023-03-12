@@ -13,9 +13,10 @@ jobs:
           pip install sphinx sphinx_rtd_theme
           pip install sphinx-gallery
           pip install sphinx-autodoc-typehints
-          pip instal myst-parser
+          pip install myst-parser
           pip install orca
           pip install plotly
+          pip install matplotlib
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
