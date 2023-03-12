@@ -36,7 +36,7 @@ If you want to or need to go "under the hood" you can access the underlying xarr
 
 ..  code-block:: python
 
-    xr_ds: xr.Dataset = obj_mc.data()
+    xr_ds: xr.Dataset = obj_mc.data
 
 The mc xarray accessor provides access to mass-composition properties and methods while working with the xarray dataset.
 

@@ -44,7 +44,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',  # to document the
 autosummary_generate = True
 sphinx_gallery_conf = {
     'filename_pattern': r'\.py',
-    'ignore_pattern': r'__init__\.py',
+    'ignore_pattern': r'(__init__)|(3D_data)\.py',
     'examples_dirs': '../../examples',  # path to your example scripts
     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
     # 'subsection_order': ExplicitOrder(['basic_usage',

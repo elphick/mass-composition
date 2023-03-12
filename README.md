@@ -1,13 +1,18 @@
 # mass-composition
 
-Manage mass-composition math operations and visualisation in xarray
+Manage mass-composition math operations and visualisation.
+Working in Metallurgy or Geoscience and tired of writing the same weight-averaging code in separate projects?
+Mass-Composition is for you: Not only does it do the heavy lifting (alright, not-so-heavy lifting), but offers various
+visualisations out of the box.
 
 **Why Xarray? Why not Pandas?**
+
+Mass-Composition is backed by Xarray.
 
 Pandas is great for tabular data with a single index/dimension. While it can handle multi-indexes, it is not
 fundamentally multi-dimensional friendly.
 
-Xarray is designed for multi-dimensional data, and it is typical for mass-composition in the geo-sciences
+Xarray is designed for labelled multi-dimensional data, and it is typical for mass-composition in the geo-sciences
 to be multi-dimensional. Consider a 3D block model, where rock is modelled in the ground in the x, y, z
 dimensions. When structured as an Xarray dataset, the model can have many variables (each being a xarray.DataArray)
 describing a particular property in that 3D space.
