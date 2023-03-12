@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: copy
         env:
-          SRC_FOLDER_PATH: 'static'
+          SRC_FOLDER_PATH: 'docs/build'
           TARGET_BRANCH: 'dest'
         run: |
           files=$(find $SRC_FOLDER_PATH -type f) # get the file list
