@@ -5,16 +5,28 @@ Installation
    :maxdepth: 2
    :caption: Installation:
 
-For now, the package can be installed using pip from the github repository.
 
-..  code-block::
-
-    pip install git+https://github.com/Elphick/mass-composition
-
-
-When published to the pypi index (planned), the package will be pip-installable.
+You can install from the pypi index.
 
 ..  code-block::
 
     pip install mass-composition
+
+If you want the extras (for visualisation) you'll install like this with pip.
+
+.. code-block::
+
+    pip install mass-composition -e ".[viz]"
+
+Or, if poetry is more your flavour.
+
+..  code-block::
+
+    poetry add mass-composition
+
+or with extras...
+
+..  code-block::
+
+    poetry add "mass-composition[viz]"
 
