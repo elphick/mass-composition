@@ -8,6 +8,7 @@ jobs:
     steps:
     - name: install dependencies
       run: |
+        pip install mass-composition
         pip install sphinx-rtd-theme
         pip install sphinx-gallery
         pip install sphinx-autodoc-typehints
