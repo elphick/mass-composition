@@ -19,8 +19,9 @@ import plotly.io as pio
 pio.renderers.default = 'sphinx_gallery_png'  # 'sphinx_gallery'
 
 sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('../../elphick'))
-sys.path.insert(0, os.path.abspath('../../test'))
+sys.path.insert(0, os.path.abspath('../..'))
+# sys.path.insert(0, os.path.abspath('../../elphick'))
+# sys.path.insert(0, os.path.abspath('../../test'))
 
 # -- Project information -----------------------------------------------------
 
