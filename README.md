@@ -41,6 +41,7 @@ regular 3D block models, particularly when leveraging the pyvista-xarray extensi
 ## Roadmap
 
 - 0.1.0 - Preliminary development
-- 1.0.0 - Math operations, aggregation, visualisation of a single mass_composition object
-- 2.0.0 - Flowsheet support for multiple objects (Streams - a named MassComposition object)
-- 3.0.0 - Resampling along dimensions - e.g. depth down hole, size fractions, etc
+- 0.2.0 - Math operations, aggregation, visualisation of a single mass_composition object
+- 0.3.0 - Resampling along dimensions - e.g. depth down hole, size fractions, etc
+- 0.X.0 - Feel free to submit a PR with your suggestions here...
+- 1.0.0 - First stable release

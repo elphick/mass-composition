@@ -2,6 +2,7 @@
 To provide sample data
 """
 import random
+from pathlib import Path
 from typing import Optional, Iterable, List
 
 import pandas as pd
@@ -86,3 +87,8 @@ def dh_intervals(n: int = 5,
     df_data.index.name = 'index'
 
     return df_data
+
+
+def size_distribution() -> pd.DataFrame:
+    df_psd: pd.DataFrame = pd.read_csv(Path('__file__').parent / 'size_distribution_ore_1.csv', index_col=0)
+    return df_psd
