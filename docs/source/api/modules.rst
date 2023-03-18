@@ -1,7 +1,7 @@
 API Reference
 =============
 
-.. automodule:: mass_composition
+.. automodule:: elphick.mass_composition
    :members:
 
 .. autosummary::

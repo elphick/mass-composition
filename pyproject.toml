@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "mass-composition"
 version = "0.1.6"
-description = ""
+description = "For managing multidimensional mass-composition datasets, supporting weighted mathematical operations and visualisation."
 authors = ["Greg <greg@elphick.com.au>"]
-packages = [{include = "elphick/mc/mass_composition"}]
+packages = [{include = "elphick/mass_composition"}]
 
 [[tool.poetry.source]]
-name = "pypi_elphick"
-url = "http://192.168.0.110:8080"
+name = "pypi_"
+url = "https://pypi.org/mass-composition"
 secondary = false
 
 [tool.poetry.scripts]
