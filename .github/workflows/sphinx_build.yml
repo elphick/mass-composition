@@ -1,6 +1,8 @@
 name: "Docs Check"
 on:
 - push
+  paths:
+    - docs/**
 
 jobs:
   check_docs:
