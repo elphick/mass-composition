@@ -1,7 +1,14 @@
 name: Docs
-on: [push, pull_request, workflow_dispatch]
-#paths:
-#  - 'docs/**'
+on:
+  push:
+    paths:
+      - 'docs/**'
+  pull_request:
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
+    paths:
+      - 'docs/**'
 
 permissions:
     contents: write
