@@ -113,52 +113,52 @@ grid.plot(show_edges=True)
 # # xr_ds_interp['Fe'].pyvista.plot(x='x', y='y', z='z')
 #
 # will plot just the non-nan values
-mesh: pv.RectilinearGrid = xr_ds['Fe'].pyvista.mesh(x='x', y='y', z='z')
-mesh: pv.UnstructuredGrid = mesh.cast_to_unstructured_grid()
-
-threshed = mesh.threshold()
-threshed.plot(show_edges=True)
-
-mesh = mesh.point_data_to_cell_data(pass_point_data=True)
-
-mesh.threshold(mesh.get_data_range(), all_scalars=True).plot()
-
-poly: pv.PolyData = pv.PolyData(df.index.to_frame().to_numpy())
-poly.cell_data['Fe'] = df['Fe']
-poly = poly.threshold(poly.get_data_range(), all_scalars=True)
-
-# ghosts = np.argwhere(mesh["Fe"] < 0.0)
-# # This will act on the mesh inplace to mark those cell indices as ghosts
-# mesh.remove_cells(ghosts)
-
-# pts: pv.PointSet = mesh.cast_to_pointset()
-mesh2: pv.RectilinearGrid = mesh.point_data_to_cell_data(pass_point_data=True)
-mesh3: pv.RectilinearGrid = mesh.cell_data_to_point_data()
-
-# Plot in 3D
-p = pv.Plotter()
-p.add_mesh_threshold(poly)  # , clim=[0, 35])
-
-# p.add_mesh_threshold(mesh2)  # , clim=[0, 35])
-# p.add_mesh_threshold(mesh)  # , lighting=False, cmap='plasma')  # , clim=[0, 35])
-# p.view_vector([1, -1, 1])
-# p.set_scale(zscale=0.001)
-p.show()
-
-# # TODO: resolve key error, nan
-# fig: Figure = obj_mc.plot_parallel(color='Fe')
-# fig.show()
+# mesh: pv.RectilinearGrid = xr_ds['Fe'].pyvista.mesh(x='x', y='y', z='z')
+# mesh: pv.UnstructuredGrid = mesh.cast_to_unstructured_grid()
 #
-# # %%
+# threshed = mesh.threshold()
+# threshed.plot(show_edges=True)
 #
-# fig: Figure = obj_mc.plot_parallel(color='Fe', plot_interval_edges=True)
-# fig
+# mesh = mesh.point_data_to_cell_data(pass_point_data=True)
 #
-# # %%
+# mesh.threshold(mesh.get_data_range(), all_scalars=True).plot()
 #
-# # with selected variables
-# fig: Figure = obj_mc.plot_parallel(color='Fe', var_subset=['mass_wet', 'H2O', 'Fe', 'SiO2'])
-# # noinspection PyTypeChecker
-# plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
-
-print('done')
+# poly: pv.PolyData = pv.PolyData(df.index.to_frame().to_numpy())
+# poly.cell_data['Fe'] = df['Fe']
+# poly = poly.threshold(poly.get_data_range(), all_scalars=True)
+#
+# # ghosts = np.argwhere(mesh["Fe"] < 0.0)
+# # # This will act on the mesh inplace to mark those cell indices as ghosts
+# # mesh.remove_cells(ghosts)
+#
+# # pts: pv.PointSet = mesh.cast_to_pointset()
+# mesh2: pv.RectilinearGrid = mesh.point_data_to_cell_data(pass_point_data=True)
+# mesh3: pv.RectilinearGrid = mesh.cell_data_to_point_data()
+#
+# # Plot in 3D
+# p = pv.Plotter()
+# p.add_mesh_threshold(poly)  # , clim=[0, 35])
+#
+# # p.add_mesh_threshold(mesh2)  # , clim=[0, 35])
+# # p.add_mesh_threshold(mesh)  # , lighting=False, cmap='plasma')  # , clim=[0, 35])
+# # p.view_vector([1, -1, 1])
+# # p.set_scale(zscale=0.001)
+# p.show()
+#
+# # # TODO: resolve key error, nan
+# # fig: Figure = obj_mc.plot_parallel(color='Fe')
+# # fig.show()
+# #
+# # # %%
+# #
+# # fig: Figure = obj_mc.plot_parallel(color='Fe', plot_interval_edges=True)
+# # fig
+# #
+# # # %%
+# #
+# # # with selected variables
+# # fig: Figure = obj_mc.plot_parallel(color='Fe', var_subset=['mass_wet', 'H2O', 'Fe', 'SiO2'])
+# # # noinspection PyTypeChecker
+# # plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
+#
+# print('done')
