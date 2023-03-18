@@ -10,6 +10,7 @@ jobs:
       - uses: actions/setup-python@v3
       - name: Install dependencies
         run: |
+          pip install mass-composition
           pip install sphinx sphinx_rtd_theme
           pip install sphinx-gallery
           pip install sphinx-autodoc-typehints
