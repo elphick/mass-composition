@@ -2,8 +2,8 @@
 
 Manage mass-composition math operations and visualisation.
 Working in Metallurgy or Geoscience and tired of writing the same weight-averaging code in separate projects?
-Mass-Composition is for you: Not only does it do the heavy lifting (alright, not-so-heavy lifting), but offers various
-visualisations out of the box.
+Mass-Composition is for you - Not only does it do the heavy lifting (alright, not-so-heavy lifting), but also offers 
+automatic analyte detection and various interactive visualisations out of the box.
 
 **Why Xarray? Why not Pandas?**
 
