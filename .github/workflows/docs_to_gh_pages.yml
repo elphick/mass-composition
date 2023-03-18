@@ -19,6 +19,7 @@ jobs:
           pip install plotly
           pip install matplotlib
           pip install pytest
+          pip install kaleido
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
