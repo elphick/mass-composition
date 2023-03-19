@@ -55,7 +55,7 @@ fig3
 
 fig4 = obj_mc.plot_ternary(variables=['SiO2', 'Al2O3', 'LOI'], color='group')
 # save the figure for use as the sphinx-gallery thumbnail
-fig4.write_image(Path(__file__).parent.parent / 'docs/source/_static/ternary.png')
+# fig4.write_image(Path(__file__).parent.parent / 'docs/source/_static/ternary.png')
 # sphinx_gallery_thumbnail_path = '_static/ternary.png'
 fig4
 
