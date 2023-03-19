@@ -294,7 +294,7 @@ class MassComposition:
                 logging.error(msg)
                 raise IndexError(msg)
 
-    def split(self, fraction: float) -> tuple['MassComposition', 'MassComposition']:
+    def split(self, fraction: float) -> Tuple['MassComposition', 'MassComposition']:
         """Split the object at the specified mass fraction.
 
         Args:
