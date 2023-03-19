@@ -18,6 +18,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from elphick.mass_composition import MassComposition
+from test.data.sample_data import iron_ore_sample_data
+
 
 # %%
 logging.basicConfig(level=logging.INFO,
