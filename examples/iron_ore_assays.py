@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 import plotly
-
+from test.data.sample_data import iron_ore_sample_data
 from plotly.graph_objs import Figure
 
 from elphick.mass_composition import MassComposition
@@ -22,9 +22,8 @@ from elphick.mass_composition import MassComposition
 # -------------------------------
 # We get some demo data in the form of a pandas DataFrame
 
-filepath: Path = Path('../test/data/iron_ore_sample_data_A072391.csv')
-name: str = filepath.stem.split('_')[-1]
-df_data: pd.DataFrame = pd.read_csv(filepath, index_col='index')
+df_data: pd.DataFrame = iron_ore_sample_data()
+
 print(df_data.shape)
 df_data.head()
 
