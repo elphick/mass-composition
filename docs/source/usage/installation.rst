@@ -6,7 +6,7 @@ Installation
    :caption: Installation:
 
 
-You can install from the pypi index.
+The package is pip instalable.
 
 ..  code-block::
 

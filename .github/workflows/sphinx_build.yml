@@ -1,4 +1,4 @@
-name: "Docs Check"
+name: "Check Docs"
 on:
   push:
     paths:
