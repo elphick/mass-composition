@@ -1,6 +1,7 @@
 # mass-composition
 
 [![Publish Docs](https://github.com/Elphick/mass-composition/actions/workflows/docs_to_gh_pages.yml/badge.svg?branch=main)](https://github.com/Elphick/mass-composition/actions/workflows/docs_to_gh_pages.yml)
+[![pages-build-deployment](https://github.com/Elphick/mass-composition/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/Elphick/mass-composition/actions/workflows/pages/pages-build-deployment)
 [![Run Tests](https://github.com/Elphick/mass-composition/actions/workflows/build_and_test.yml/badge.svg?branch=main)](https://github.com/Elphick/mass-composition/actions/workflows/build_and_test.yml)
 
 Manage mass-composition math operations and visualisation.
