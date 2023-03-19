@@ -99,14 +99,14 @@ def dh_intervals(n: int = 5,
 
 
 def size_distribution() -> pd.DataFrame:
-    d: Path = Path(__file__).absolute().parent
+    d: Path = Path(__file__).parent
     print(d)
     df_psd: pd.DataFrame = pd.read_csv(d / 'size_distribution_ore_1.csv', index_col=0)
     return df_psd
 
 
 def iron_ore_sample_data() -> pd.DataFrame:
-    d: Path = Path(__file__).absolute().parent
+    d: Path = Path(__file__).parent
     print(d)
     df_psd: pd.DataFrame = pd.read_csv(d / 'iron_ore_sample_data_A072391.csv', index_col=0)
     return df_psd
