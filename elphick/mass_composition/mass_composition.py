@@ -43,7 +43,7 @@ class MassComposition:
         var_args: Dict = {k: v for k, v in locals().items() if '_var' in k}
 
         if config_file is None:
-            config_file = Path(__file__).parent / './config/mc_config.yaml'
+            config_file = Path(__file__).parent / './config/mc_config.yml'
         self.config = read_yaml(config_file)
 
         # if interval pairs are passed as indexes then create the proper interval index

@@ -1,0 +1,17 @@
+MC:
+  vars:
+    mass_wet: mass_wet
+    mass_dry: mass_dry
+    moisture: H2O
+  units:
+    mass: mass_units
+    composition_rel: '%'
+  intervals:
+    closed: left
+    suffixes:
+      - [from, to]
+      - [retained, passing]
+      - [sink, float]
+  components:
+    chemistry:
+      ignore: ['Y']  # ignore anything in this list when detecting chemistry components
