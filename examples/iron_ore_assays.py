@@ -30,7 +30,7 @@ df_data.head()
 # %%
 # ...and create a MassComposition from the DataFrame.
 
-obj_mc: MassComposition = MassComposition(df_data, name=name)
+obj_mc: MassComposition = MassComposition(df_data, name='A072391')
 obj_mc.aggregate(group_var='DHID')
 
 # %%
