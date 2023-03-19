@@ -1,7 +1,7 @@
 import logging
 from copy import deepcopy
 from enum import Enum
-from typing import Dict, Optional, Union, Iterable, List
+from typing import Dict, Optional, Union, Iterable, List, Tuple
 
 import pandas as pd
 import xarray as xr
@@ -217,7 +217,7 @@ class MassCompositionAccessor:
 
         return dsc
 
-    def split(self, fraction: float) -> tuple[xr.Dataset, xr.Dataset]:
+    def split(self, fraction: float) -> Tuple[xr.Dataset, xr.Dataset]:
         """Split the object at the specified mass fraction.
 
         Args:
