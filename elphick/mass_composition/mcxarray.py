@@ -217,7 +217,7 @@ class MassCompositionAccessor:
 
         return dsc
 
-    def split(self, fraction: float) -> tuple[xr.Dataset, xr.Dataset]:
+    def split(self, fraction: float) -> Tuple[xr.Dataset, xr.Dataset]:
         """Split the object at the specified mass fraction.
 
         Args:
