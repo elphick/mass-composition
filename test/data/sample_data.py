@@ -1,6 +1,7 @@
 """
 To provide sample data
 """
+import os
 import random
 from pathlib import Path
 from typing import Optional, Iterable, List
@@ -108,5 +109,9 @@ def size_distribution() -> pd.DataFrame:
 def iron_ore_sample_data() -> pd.DataFrame:
     d: Path = Path(__file__).parent
     print(d)
+    print('cwd files')
+    print(os.listdir())
+    print('cwd files')
+    print(os.listdir(d))
     df_psd: pd.DataFrame = pd.read_csv(d / 'iron_ore_sample_data_A072391.csv', index_col=0)
     return df_psd
