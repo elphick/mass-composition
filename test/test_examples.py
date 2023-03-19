@@ -9,7 +9,7 @@ def test_examples():
     import examples.math_operations
     import examples.math_operations_xr
 
-    # import examples.iron_ore_assays
+    import examples.iron_ore_assays
 
     import examples.interval_data
 

@@ -33,16 +33,22 @@ logging.basicConfig(level=logging.INFO,
 # We get some demo data in the form of a pandas DataFrame
 # We create this object as 1D based on the pandas index
 
-df_data: pd.DataFrame = pd.read_csv('../test/data/iron_ore_sample_data_A072391.csv', index_col='index')
-print(df_data.head())
+df_data: pd.DataFrame = iron_ore_sample_data()
+df_data.head()
+
+# %%
 
 obj_mc: MassComposition = MassComposition(df_data,
                                           name='Drill program',
                                           mass_units='kg')
-print(obj_mc)
+obj_mc
 
-print(obj_mc.aggregate())
-print(obj_mc.aggregate('DHID'))
+# %%
+
+obj_mc.aggregate()
+
+# %%
+obj_mc.aggregate('DHID')
 
 # %%
 #
