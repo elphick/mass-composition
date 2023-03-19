@@ -11,7 +11,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotly
-from IPython.core.display_functions import display
 
 from plotly.graph_objs import Figure
 import xarray as xr
@@ -32,10 +31,12 @@ filepath: Path = Path('../test/data/iron_ore_sample_data_xyz_A072391.csv')
 name: str = filepath.stem.split('_')[-1]
 df_data: pd.DataFrame = pd.read_csv(filepath, index_col='index')
 print(df_data.shape)
-print(df_data.head())
+df_data.head()
+
+# %%
 
 obj_mc: MassComposition = MassComposition(df_data, name=name)
-display(obj_mc.aggregate(group_var='DHID'))
+obj_mc.aggregate(group_var='DHID')
 
 # %%
 #

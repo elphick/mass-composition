@@ -10,7 +10,6 @@ from pathlib import Path
 
 import pandas as pd
 import plotly
-from IPython.core.display_functions import display
 
 from plotly.graph_objs import Figure
 
@@ -27,13 +26,13 @@ filepath: Path = Path('../test/data/iron_ore_sample_data_A072391.csv')
 name: str = filepath.stem.split('_')[-1]
 df_data: pd.DataFrame = pd.read_csv(filepath, index_col='index')
 print(df_data.shape)
-print(df_data.head())
+df_data.head()
+
+# %%
+# ...and create a MassComposition from the DataFrame.
 
 obj_mc: MassComposition = MassComposition(df_data, name=name)
-display(obj_mc.aggregate(group_var='DHID'))
-
-
-
+obj_mc.aggregate(group_var='DHID')
 
 # %%
 #
