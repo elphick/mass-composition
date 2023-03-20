@@ -42,6 +42,7 @@ myst-parser = "^0.18.0"
 orca = "^1.8"  # for plotly thumbnails in docs
 python-semantic-release = "^7.33.2"
 ydata-profiling = "^4.1.1"
+tox = "^4.4.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
