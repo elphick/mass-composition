@@ -34,13 +34,14 @@ obj_mc_1, obj_mc_2 = obj_mc.split(0.4)
 mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2])
 
 # %%
-# print the node object detail
+# Print the node object detail
 
 for node in mcn.nodes:
     print(mcn.nodes[node]['mc'])
 
 # %%
 # Print the overall network balanced status
+#
 # NOTE: presently this only includes node balance status
 # edge balance status will assure the mass-moisture balance is satisfied
 
