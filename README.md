@@ -26,6 +26,41 @@ If your data is 1D, with sequential or timestamp indexes, don't stress, mass-com
 If you haven't used xarray before, you should check it out. Once you get the hang of it you will find it sweet for
 regular 3D block models, particularly when leveraging the pyvista-xarray extension.
 
+## Getting Started
+
+There are some basic requirements that the incoming DataFrame must meet.  We'll use a sample DataFrame here.
+
+```python    
+df_data: pd.DataFrame = sample_data()
+```
+
+Create the object
+
+```python
+obj_mc: MassComposition = MassComposition(df_data)
+```
+
+It is then trivial to calculate the weight average aggregate of the dataset.
+
+```python
+obj_mc.aggregate()
+```
+
+If you want to or need to go "under the hood" you can access the underlying xarray dataset.
+
+
+```python
+xr_ds: xr.Dataset = obj_mc.data
+```
+
+The mc xarray accessor provides access to mass-composition properties and methods while working with the xarray dataset.
+
+```python 
+xr_ds_wtd: xr.Dataset = xr_ds.mc.aggregate()
+```
+
+For full examples, see the [gallery](/auto_examples/index).
+
 ## Design Notes
 
 1) The data provided must be a pd.DataFrame.
