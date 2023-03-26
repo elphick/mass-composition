@@ -15,7 +15,7 @@ from elphick.mass_composition import MassComposition
 from elphick.mass_composition.mc_network import MCNetwork
 from test.data import sample_data
 
-sphinx_gallery_thumbnail_number = 2
+# sphinx_gallery_thumbnail_number = -1
 
 # %%
 #
@@ -53,4 +53,3 @@ fig: Figure = mcn.plot_sankey()
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for use in the gallery
 
-# %%
