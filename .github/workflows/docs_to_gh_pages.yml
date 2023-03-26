@@ -3,9 +3,11 @@ on:
   push:
     paths:
       - 'docs/**'
+      - 'examples/*.py'
   pull_request:
     paths:
       - 'docs/**'
+      - 'examples/*.py'
 
 permissions:
     contents: write
