@@ -1,8 +1,13 @@
 name: "Check Docs"
 on:
-  push:
-    paths:
-      - 'docs/**'
+#   push:
+#     paths:
+#       - '**'
+#       - 'docs/**'
+  workflow_run:
+    workflows: [Run Tests]
+    types:
+      - completed
 
 jobs:
   check_docs:
