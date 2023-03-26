@@ -7,7 +7,6 @@ Demonstrating the mass-composition plot methods.
 
 import pandas as pd
 from plotly.graph_objs import Figure
-from pathlib import Path
 from test.data.sample_data import sample_data
 from elphick.mass_composition import MassComposition
 

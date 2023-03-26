@@ -28,6 +28,9 @@ class MassCompositionAccessor:
         self._chem: xr.Dataset = self._obj[self.mc_vars_chem]
         self._mass: xr.Dataset = self._obj[self.mc_vars_mass]
 
+        # to support collections / networks
+        self.nodes = self._obj.attrs['nodes']
+
     @property
     def name(self):
         return self._obj.attrs['mc_name']
@@ -233,12 +236,14 @@ class MassCompositionAccessor:
         out._obj[self._obj.mc_vars_mass] = out._obj[self._obj.mc_vars_mass] * fraction
         out.log_to_history(f'Split from object [{self.name}] @ fraction: {fraction}')
         out.rename(f'({fraction} * {self.name})')
+        out._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1],  self._obj.attrs['nodes'][1] + 1]
         res = out._obj
 
         comp = deepcopy(self)
         comp._obj[self._obj.mc_vars_mass] = comp._obj[self._obj.mc_vars_mass] * (1 - fraction)
         comp.log_to_history(f'Split from object [{self.name}] @ 1 - fraction {fraction}: {1 - fraction}')
         comp.rename(f'({1 - fraction} * {self.name})')
+        comp._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1],  self._obj.attrs['nodes'][1] + 2]
 
         xr.set_options(keep_attrs='default')
 

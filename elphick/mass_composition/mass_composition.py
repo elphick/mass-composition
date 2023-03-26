@@ -74,7 +74,8 @@ class MassComposition:
                           'mc_vars_mass': cols_mass,
                           'mc_vars_chem': cols_chem,
                           'mc_vars_attrs': cols_attrs,
-                          'mc_history': [f'Created with name: {name}']}
+                          'mc_history': [f'Created with name: {name}'],
+                          'nodes': [0, 1]}
         xr_ds.attrs = ds_attrs
 
         # add the variable attributes
@@ -307,6 +308,7 @@ class MassComposition:
         comp = deepcopy(self)
 
         xr_ds_1, xr_ds_2 = self._data.mc.split(fraction=fraction)
+
         out._data = xr_ds_1
         comp._data = xr_ds_2
 
@@ -329,7 +331,7 @@ class MassComposition:
         res._data = xr_sum
 
         return res
-    
+
     def add(self, other: 'MassComposition', name: Optional[str] = None) -> 'MassComposition':
         """Add two objects
 
