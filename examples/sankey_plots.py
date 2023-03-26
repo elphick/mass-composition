@@ -7,7 +7,7 @@ Related MassComposition objects are managed as a network.
 """
 
 import pandas as pd
-from matplotlib import pyplot as plt
+import plotly
 from plotly.graph_objs import Figure
 
 from elphick.mass_composition import MassComposition
@@ -34,8 +34,8 @@ obj_mc_1, obj_mc_2 = obj_mc.split(0.4)
 
 mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2])
 
-mcn.plot_network()
-plt.show()
+hf = mcn.plot_network()
+hf
 
 # %%
 #
@@ -47,7 +47,7 @@ plt.show()
 # In this example, grades are the same, so will not add any value.
 
 fig: Figure = mcn.plot_sankey()
-fig
-
+# noinspection PyTypeChecker
+plotly.io.show(fig)  # this call to show will set the thumbnail for use in the gallery
 
 # %%
