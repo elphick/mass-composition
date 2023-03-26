@@ -51,7 +51,7 @@ sphinx_gallery_conf = {
     #                                    'math_operations',
     #                                    'plot_demo']),
     'within_subsection_order': FileNameSortKey,
-    'image_scrapers': ('matplotlib', plotly_sg_scraper)
+    'image_scrapers': (plotly_sg_scraper, 'matplotlib')
 }
 
 # Add any paths that contain templates here, relative to this directory.
