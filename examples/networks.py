@@ -51,29 +51,29 @@ print(mcn.balanced)
 # Plot the network.
 # Imbalanced Nodes will appear red.  Later, Imbalanced Edges will also appear red.
 
-# mcn.plot()
-# plt.show()
-#
-# # %%
-# # Display the weight averages for all edges (streams) in the network (flowsheet)
-#
-# df_report: pd.DataFrame = mcn.report()
-# df_report
-#
+mcn.plot()
+plt.show()
+
+# %%
+# Display the weight averages for all edges (streams) in the network (flowsheet)
+
+df_report: pd.DataFrame = mcn.report()
+df_report
+
 # %%
 # Plot the interactive network using plotly
 
-# fig = mcn.plot_network()
-# fig.show()
+fig = mcn.plot_network()
+fig
 
 # %%
 # Plot the Sankey
 
-# fig = mcn.plot_sankey()
-# fig.show()
+fig = mcn.plot_sankey()
+fig
 
 # %%
-# Demonstrate the multi-plot
+# Demonstrate the table-plot
 
 fig = mcn.table_plot()
-fig.show()
+fig
