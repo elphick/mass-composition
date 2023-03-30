@@ -1,8 +1,9 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Iterable, Set, Union
 
 import pandas as pd
 from matplotlib import pyplot as plt
 from plotly.graph_objs import Figure
+from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
 import networkx as nx
@@ -70,10 +71,15 @@ class MCNetwork(nx.DiGraph):
         out_mc = [self.get_edge_data(oe[0], oe[1])['mc'] for oe in out_edges]
         return in_mc, out_mc
 
-    def plot_network(self) -> plt.Figure:
+    def plot(self) -> plt.Figure:
+        """Plot the network with matplotlib
+
+        Returns:
+
+        """
 
         hf, ax = plt.subplots()
-        # TODO: add muti-partite layout to provide left to right layout
+        # TODO: add multi-partite layout to provide left to right layout
         pos = nx.spring_layout(self, seed=1234)
 
         edge_labels: Dict = {}
@@ -102,29 +108,152 @@ class MCNetwork(nx.DiGraph):
         ax.set_title(f"{self.name}\nBalanced: {self.balanced}")
         return hf
 
+    def plot_network(self) -> go.Figure:
+        """Plot the network with plotly
+
+        Returns:
+
+        """
+        pos = nx.spring_layout(self, seed=1234)
+
+        edge_trace, node_trace = self._get_scatter_node_edges(pos)
+
+        fig = go.Figure(data=[edge_trace, node_trace],
+                        layout=go.Layout(
+                            title=self.name,
+                            titlefont_size=16,
+                            showlegend=False,
+                            hovermode='closest',
+                            margin=dict(b=20, l=5, r=5, t=40),
+                            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                        )
+        return fig
+
+    def _get_scatter_node_edges(self, pos):
+        edge_x = []
+        edge_y = []
+        for edge in self.edges():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x.append(x0)
+            edge_x.append(x1)
+            edge_x.append(None)
+            edge_y.append(y0)
+            edge_y.append(y1)
+            edge_y.append(None)
+        edge_trace = go.Scatter(
+            x=edge_x, y=edge_y,
+            line=dict(width=2, color='#888'),
+            hoverinfo='none',
+            mode='lines')
+        node_x = []
+        node_y = []
+        for node in self.nodes():
+            x, y = pos[node]
+            node_x.append(x)
+            node_y.append(y)
+        node_trace = go.Scatter(
+            x=node_x, y=node_y,
+            mode='markers',
+            hoverinfo='text',
+            marker=dict(
+                color=[],
+                size=20,
+                line_width=2))
+        return edge_trace, node_trace
+
+    def table_plot(self,
+                   named_plots: Union[Tuple, List] = ('sankey', 'table'),
+                   sankey_width_var: str = 'mass_wet',
+                   sankey_color_var: Optional[str] = None,
+                   sankey_edge_colormap: Optional[str] = 'viridis'
+                   ) -> Figure:
+        """Plot multiple components
+
+        Args:
+            named_plots: list of any two ['table', 'sankey', 'network']
+
+        Returns:
+
+        """
+        valid_plots: Set[str] = {'table', 'sankey', 'network'}
+        invalid_plots: Set[str] = set(named_plots).difference(valid_plots)
+
+        if len(list(named_plots)) != 2:
+            raise ValueError('Only two named plots are supported')
+
+        if len(invalid_plots) > 0:
+            raise ValueError(f'The supplied named_plots are not in {valid_plots}')
+
+        name_map: Dict = {'table': 'table', 'sankey': 'sankey', 'network': 'xy'}
+
+        fig = make_subplots(rows=1, cols=2,
+                            print_grid=False,
+                            column_widths=[0.6, 0.4],
+                            specs=[[{"type": name_map[named_plots[0]]},
+                                    {"type": name_map[named_plots[1]]}]])
+
+        for i, plot in enumerate(named_plots):
+            if plot == 'sankey':
+                d_sankey: Dict = self._generate_sankey_args(sankey_color_var,
+                                                            sankey_edge_colormap,
+                                                            sankey_width_var)
+                node, link = self._get_sankey_node_link_dicts(d_sankey)
+                fig.add_trace(go.Sankey(node=node, link=link), row=1, col=1 + i)
+
+            elif plot == 'table':
+                df = self.report().reset_index()
+                fig.add_table(
+                    header=dict(values=list(df.columns),
+                                fill_color='paleturquoise',
+                                align='left'),
+                    cells=dict(values=df.transpose().values.tolist(),
+                               fill_color='lavender',
+                               align='left'),
+                    row=1, col=1 + i)
+
+            elif plot == 'network':
+
+                pos = nx.spring_layout(self, seed=1234)
+
+                edge_trace, node_trace = self._get_scatter_node_edges(pos)
+
+                fig.add_traces(data=[edge_trace, node_trace])
+
+        fig.update_layout(title_text=self.name, font_size=10, showlegend=False, hovermode='closest',
+                          xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                          yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+
+        return fig
+
     def plot_sankey(self,
                     width_var: str = 'mass_wet',
                     color_var: Optional[str] = None,
                     edge_colormap: Optional[str] = 'viridis'
                     ) -> Figure:
+        d_sankey: Dict = self._generate_sankey_args(color_var,
+                                                    edge_colormap,
+                                                    width_var)
+        node, link = self._get_sankey_node_link_dicts(d_sankey)
+        fig = go.Figure(data=[go.Sankey(node=node, link=link)])
+        fig.update_layout(title_text=self.name, font_size=10)
+        return fig
 
+    def _generate_sankey_args(self, color_var, edge_colormap, width_var):
         rpt: pd.DataFrame = self.report()
-
         if color_var is not None:
             import seaborn as sns
             cmap = sns.color_palette(edge_colormap, as_cmap=True)
             rpt: pd.DataFrame = self.report()
             v_min = float(rpt[color_var].min())
             v_max = float(rpt[color_var].max())
-
         if isinstance(list(self.nodes)[0], int):
             labels = [str(n) for n in list(self.nodes)]
         else:
             labels = list(self.nodes)
-
         # run the report for the hover data
         d_custom_data: Dict = self._rpt_to_html(df=rpt)
-
         source: List = []
         target: List = []
         value: List = []
@@ -146,28 +275,37 @@ class MCNetwork(nx.DiGraph):
             else:
                 edge_color: Optional[str] = None
 
-        fig = go.Figure(data=[go.Sankey(
-            node=dict(
-                pad=15,
-                thickness=20,
-                line=dict(color="black", width=0.5),
-                label=labels,
-                color="blue",
-                customdata=labels
-            ),
-            link=dict(
-                source=source,  # indices correspond to labels, eg A1, A2, A1, B1, ...
-                target=target,
-                value=value,
-                color=edge_color,
-                label=edge_labels,  # over-written by hover template
-                customdata=edge_custom_data,
-                hovertemplate='<b><i>%{label}</i></b><br />Source: %{source.customdata}<br />'
-                              'Target: %{target.customdata}<br />%{customdata}'
-            ))])
+        d_sankey: Dict = {'edge_color': edge_color,
+                          'edge_custom_data': edge_custom_data,
+                          'edge_labels': edge_labels,
+                          'labels': labels,
+                          'source': source,
+                          'target': target,
+                          'value': value}
 
-        fig.update_layout(title_text=self.name, font_size=10)
-        return fig
+        return d_sankey
+
+    @staticmethod
+    def _get_sankey_node_link_dicts(d_sankey: Dict):
+        node: Dict = dict(
+            pad=15,
+            thickness=20,
+            line=dict(color="black", width=0.5),
+            label=d_sankey['labels'],
+            color="blue",
+            customdata=d_sankey['labels']
+        )
+        link: Dict = dict(
+            source=d_sankey['source'],  # indices correspond to labels, eg A1, A2, A1, B1, ...
+            target=d_sankey['target'],
+            value=d_sankey['value'],
+            color=d_sankey['edge_color'],
+            label=d_sankey['edge_labels'],  # over-written by hover template
+            customdata=d_sankey['edge_custom_data'],
+            hovertemplate='<b><i>%{label}</i></b><br />Source: %{source.customdata}<br />'
+                          'Target: %{target.customdata}<br />%{customdata}'
+        )
+        return node, link
 
     @staticmethod
     def _rpt_to_html(df: pd.DataFrame) -> Dict:

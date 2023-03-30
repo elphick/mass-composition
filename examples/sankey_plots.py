@@ -8,11 +8,14 @@ Related MassComposition objects are managed as a network.
 
 import pandas as pd
 import plotly
+from matplotlib import pyplot as plt
 from plotly.graph_objs import Figure
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.mc_network import MCNetwork
 from test.data import sample_data
+
+# sphinx_gallery_thumbnail_number = -1
 
 # %%
 #
@@ -35,7 +38,7 @@ obj_mc_1, obj_mc_2 = obj_mc.split(0.4)
 mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2])
 
 hf = mcn.plot_network()
-hf
+plt.show()
 
 # %%
 #
@@ -50,4 +53,3 @@ fig: Figure = mcn.plot_sankey()
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for use in the gallery
 
-# %%
