@@ -16,7 +16,7 @@ from elphick.mass_composition.utils.components import is_compositional
 from elphick.mass_composition.utils.viz import plot_parallel
 
 # noinspection PyUnresolvedReferences
-import elphick.mass_composition.mcxarray  # keep this "unused" import - it helps
+import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
 
 
 class MassComposition:
