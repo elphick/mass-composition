@@ -17,5 +17,6 @@ def test_examples():
 
     import examples.plot_demo
 
+    import examples.networks
 
 
