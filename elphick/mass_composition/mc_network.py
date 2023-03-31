@@ -1,15 +1,13 @@
-from typing import Dict, List, Optional, Tuple, Iterable, Set, Union
+from typing import Dict, List, Optional, Tuple
 
+import networkx as nx
 import pandas as pd
+import plotly.graph_objects as go
 from matplotlib import pyplot as plt
-from plotly.graph_objs import Figure
+from matplotlib.colors import ListedColormap
 from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
-import networkx as nx
-import plotly.graph_objects as go
-from matplotlib.colors import ListedColormap
-
 from elphick.mass_composition.mc_node import MCNode, NodeType
 
 
@@ -19,6 +17,15 @@ class MCNetwork(nx.DiGraph):
 
     @classmethod
     def from_streams(cls, streams: List[MassComposition], name: Optional[str] = 'Flowsheet') -> 'MCNetwork':
+        """Class method from a list of objects
+
+        Args:
+            streams: List of MassComposition objects
+            name: name of the network
+
+        Returns:
+
+        """
         bunch_of_edges: List = []
         for stream in streams:
             if stream.data.nodes is None:
@@ -54,6 +61,7 @@ class MCNetwork(nx.DiGraph):
     def report(self) -> pd.DataFrame:
         """Summary Report
 
+        Total Mass and weight averaged composition
         Returns:
 
         """
@@ -164,74 +172,137 @@ class MCNetwork(nx.DiGraph):
         return edge_trace, node_trace
 
     def table_plot(self,
-                   named_plots: Union[Tuple, List] = ('sankey', 'table'),
+                   plot_type: str = 'sankey',
+                   table_pos: str = 'left',
+                   table_width: float = 0.4,
+                   table_header_color: str = 'cornflowerblue',
+                   table_odd_color: str = 'whitesmoke',
+                   table_even_color: str = 'lightgray',
                    sankey_width_var: str = 'mass_wet',
                    sankey_color_var: Optional[str] = None,
                    sankey_edge_colormap: Optional[str] = 'viridis'
-                   ) -> Figure:
-        """Plot multiple components
+                   ) -> go.Figure:
+        """Plot with table of edge averages
 
         Args:
-            named_plots: list of any two ['table', 'sankey', 'network']
+            plot_type: The type of plot ['sankey', 'network']
+            table_pos: Position of the table ['left', 'right', 'top', 'bottom']
+            table_width: Width of the table as a ratio [0, 1]
+            table_header_color: Color of the table header
+            table_odd_color: Color of the odd table rows
+            table_even_color: Color of the even table rows
+            sankey_width_var: If plot_type is sankey, the variable that determines the sankey width
+            sankey_color_var: If plot_type is sankey, the optional variable that determines the sankey edge color
+            sankey_edge_colormap: If plot_type is sankey, the optional colormap.  Used with sankey_color_var.
 
         Returns:
 
         """
-        valid_plots: Set[str] = {'table', 'sankey', 'network'}
-        invalid_plots: Set[str] = set(named_plots).difference(valid_plots)
 
-        if len(list(named_plots)) != 2:
-            raise ValueError('Only two named plots are supported')
+        valid_plot_types: List[str] = ['sankey', 'network']
+        if plot_type not in valid_plot_types:
+            raise ValueError(f'The supplied plot_type is not in {valid_plot_types}')
 
-        if len(invalid_plots) > 0:
-            raise ValueError(f'The supplied named_plots are not in {valid_plots}')
+        valid_table_pos: List[str] = ['top', 'bottom', 'left', 'right']
+        if table_pos not in valid_table_pos:
+            raise ValueError(f'The supplied table_pos is not in {valid_table_pos}')
 
-        name_map: Dict = {'table': 'table', 'sankey': 'sankey', 'network': 'xy'}
+        d_subplot, d_table, d_plot = self._get_position_kwargs(table_pos, table_width, plot_type)
 
-        fig = make_subplots(rows=1, cols=2,
-                            print_grid=False,
-                            column_widths=[0.6, 0.4],
-                            specs=[[{"type": name_map[named_plots[0]]},
-                                    {"type": name_map[named_plots[1]]}]])
+        fig = make_subplots(**d_subplot, print_grid=False)
 
-        for i, plot in enumerate(named_plots):
-            if plot == 'sankey':
-                d_sankey: Dict = self._generate_sankey_args(sankey_color_var,
-                                                            sankey_edge_colormap,
-                                                            sankey_width_var)
-                node, link = self._get_sankey_node_link_dicts(d_sankey)
-                fig.add_trace(go.Sankey(node=node, link=link), row=1, col=1 + i)
+        df = self.report().reset_index()
+        fmt: List[str] = ["%s"] + [".1f", ".1f"] + [".2f"] * (len(df.columns) - 3)
+        column_widths = [2] + [1] * (len(df.columns) - 1)
 
-            elif plot == 'table':
-                df = self.report().reset_index()
-                fig.add_table(
-                    header=dict(values=list(df.columns),
-                                fill_color='paleturquoise',
-                                align='left'),
-                    cells=dict(values=df.transpose().values.tolist(),
-                               fill_color='lavender',
-                               align='left'),
-                    row=1, col=1 + i)
+        fig.add_table(
+            header=dict(values=list(df.columns),
+                        fill_color=table_header_color,
+                        align='center',
+                        font=dict(color='black', size=12)),
+            columnwidth=column_widths,
+            cells=dict(values=df.transpose().values.tolist(),
+                       align='left', format=fmt,
+                       fill_color=[[table_odd_color if i % 2 == 0 else table_even_color for i in range(len(df))] * len(
+                           df.columns)]),
+            **d_table)
 
-            elif plot == 'network':
+        if plot_type == 'sankey':
+            d_sankey: Dict = self._generate_sankey_args(sankey_color_var,
+                                                        sankey_edge_colormap,
+                                                        sankey_width_var)
+            node, link = self._get_sankey_node_link_dicts(d_sankey)
+            fig.add_trace(go.Sankey(node=node, link=link), **d_plot)
 
-                pos = nx.spring_layout(self, seed=1234)
+        elif plot_type == 'network':
+            pos = nx.spring_layout(self, seed=1234)
 
-                edge_trace, node_trace = self._get_scatter_node_edges(pos)
+            edge_trace, node_trace = self._get_scatter_node_edges(pos)
+            fig.add_traces(data=[edge_trace, node_trace], **d_plot)
 
-                fig.add_traces(data=[edge_trace, node_trace])
+            fig.update_layout(showlegend=False, hovermode='closest',
+                              xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                              yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                              paper_bgcolor='rgba(0,0,0,0)',
+                              plot_bgcolor='rgba(0,0,0,0)'
+                              )
 
-        fig.update_layout(title_text=self.name, font_size=10, showlegend=False, hovermode='closest',
-                          xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                          yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+        fig.update_layout(title_text=self.name, font_size=12)
 
         return fig
+
+    @staticmethod
+    def _get_position_kwargs(table_pos, table_width, plot_type):
+        """Helper to manage location dependencies
+
+        Args:
+            table_pos: position of the table: left|right|top|bottom
+            table_width: fraction of the plot to assign to the table [0, 1]
+
+        Returns:
+
+        """
+        name_type_map: Dict = {'sankey': 'sankey', 'network': 'xy'}
+        specs = [[{"type": 'table'}, {"type": name_type_map[plot_type]}]]
+
+        widths: Optional[List[float]] = [table_width, 1.0 - table_width]
+        subplot_kwargs: Dict = {'rows': 1, 'cols': 2, 'specs': specs}
+        table_kwargs: Dict = {'row': 1, 'col': 1}
+        plot_kwargs: Dict = {'row': 1, 'col': 2}
+
+        if table_pos == 'left':
+            subplot_kwargs['column_widths'] = widths
+        elif table_pos == 'right':
+            subplot_kwargs['column_widths'] = widths[::-1]
+            subplot_kwargs['specs'] = [[{"type": name_type_map[plot_type]}, {"type": 'table'}]]
+            table_kwargs['col'] = 2
+            plot_kwargs['col'] = 1
+        else:
+            subplot_kwargs['rows'] = 2
+            subplot_kwargs['cols'] = 1
+            table_kwargs['col'] = 1
+            plot_kwargs['col'] = 1
+            if table_pos == 'top':
+                subplot_kwargs['row_heights'] = widths
+                subplot_kwargs['specs'] = [[{"type": 'table'}], [{"type": name_type_map[plot_type]}]]
+                table_kwargs['row'] = 1
+                plot_kwargs['row'] = 2
+            elif table_pos == 'bottom':
+                subplot_kwargs['row_heights'] = widths[::-1]
+                subplot_kwargs['specs'] = [[{"type": name_type_map[plot_type]}], [{"type": 'table'}]]
+                table_kwargs['row'] = 2
+                plot_kwargs['row'] = 1
+
+        if plot_type == 'network':  # different arguments for different plots
+            plot_kwargs = {f'{k}s': v for k, v in plot_kwargs.items()}
+
+        return subplot_kwargs, table_kwargs, plot_kwargs
 
     def plot_sankey(self,
                     width_var: str = 'mass_wet',
                     color_var: Optional[str] = None,
                     edge_colormap: Optional[str] = 'viridis'
-                    ) -> Figure:
+                    ) -> go.Figure:
         d_sankey: Dict = self._generate_sankey_args(color_var,
                                                     edge_colormap,
                                                     width_var)
