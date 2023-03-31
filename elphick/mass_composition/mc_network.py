@@ -174,7 +174,7 @@ class MCNetwork(nx.DiGraph):
     def table_plot(self,
                    plot_type: str = 'sankey',
                    table_pos: str = 'left',
-                   table_width: float = 0.4,
+                   table_area: float = 0.4,
                    table_header_color: str = 'cornflowerblue',
                    table_odd_color: str = 'whitesmoke',
                    table_even_color: str = 'lightgray',
@@ -187,7 +187,7 @@ class MCNetwork(nx.DiGraph):
         Args:
             plot_type: The type of plot ['sankey', 'network']
             table_pos: Position of the table ['left', 'right', 'top', 'bottom']
-            table_width: Width of the table as a ratio [0, 1]
+            table_area: The proportion of width or height to allocate to the table [0, 1]
             table_header_color: Color of the table header
             table_odd_color: Color of the odd table rows
             table_even_color: Color of the even table rows
@@ -207,7 +207,7 @@ class MCNetwork(nx.DiGraph):
         if table_pos not in valid_table_pos:
             raise ValueError(f'The supplied table_pos is not in {valid_table_pos}')
 
-        d_subplot, d_table, d_plot = self._get_position_kwargs(table_pos, table_width, plot_type)
+        d_subplot, d_table, d_plot = self._get_position_kwargs(table_pos, table_area, plot_type)
 
         fig = make_subplots(**d_subplot, print_grid=False)
 
@@ -252,7 +252,7 @@ class MCNetwork(nx.DiGraph):
         return fig
 
     @staticmethod
-    def _get_position_kwargs(table_pos, table_width, plot_type):
+    def _get_position_kwargs(table_pos, table_area, plot_type):
         """Helper to manage location dependencies
 
         Args:
@@ -265,7 +265,7 @@ class MCNetwork(nx.DiGraph):
         name_type_map: Dict = {'sankey': 'sankey', 'network': 'xy'}
         specs = [[{"type": 'table'}, {"type": name_type_map[plot_type]}]]
 
-        widths: Optional[List[float]] = [table_width, 1.0 - table_width]
+        widths: Optional[List[float]] = [table_area, 1.0 - table_area]
         subplot_kwargs: Dict = {'rows': 1, 'cols': 2, 'specs': specs}
         table_kwargs: Dict = {'row': 1, 'col': 1}
         plot_kwargs: Dict = {'row': 1, 'col': 2}

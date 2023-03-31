@@ -76,9 +76,11 @@ fig
 # %%
 # Demonstrate the table-plot
 
-fig = mcn.table_plot()
+fig = mcn.table_plot(plot_type='sankey', table_pos='top', table_area=0.3)
 fig
 
-fig = mcn.table_plot(table_pos='right', plot_type='network', table_width=0.3)
+# %%
+
+fig = mcn.table_plot(plot_type='network', table_pos='bottom', table_area=0.3)
 fig
 

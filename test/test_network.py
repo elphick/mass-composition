@@ -28,11 +28,11 @@ def test_table_plot(demo_data):
     fig = mcn.table_plot()
     fig.show()
 
-    fig = mcn.table_plot(table_pos='right', plot_type='network', table_width=0.3)
+    fig = mcn.table_plot(plot_type='network', table_pos='right', table_area=0.3)
     fig.show()
 
-    fig = mcn.table_plot(table_pos='top', plot_type='network', table_width=0.3)
+    fig = mcn.table_plot(plot_type='network', table_pos='top', table_area=0.3)
     fig.show()
 
-    fig = mcn.table_plot(table_pos='bottom', table_width=0.2)
+    fig = mcn.table_plot(table_pos='bottom', table_area=0.2)
     fig.show()
