@@ -13,6 +13,7 @@ from elphick.mass_composition import MassComposition
 from elphick.mass_composition.mc_network import MCNetwork
 from test.data import sample_data
 
+
 # %%
 #
 # Create some MassComposition objects
@@ -77,3 +78,7 @@ fig
 
 fig = mcn.table_plot()
 fig
+
+fig = mcn.table_plot(table_pos='right', plot_type='network', table_width=0.3)
+fig
+
