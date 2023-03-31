@@ -134,7 +134,9 @@ class MCNetwork(nx.DiGraph):
                             hovermode='closest',
                             margin=dict(b=20, l=5, r=5, t=40),
                             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(0,0,0,0)')
                         )
         return fig
 
