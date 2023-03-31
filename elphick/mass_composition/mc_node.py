@@ -7,7 +7,7 @@ import pandas as pd
 
 from elphick.mass_composition import MassComposition
 # noinspection PyUnresolvedReferences
-import elphick.mass_composition.mcxarray  # keep this "unused" import - it helps
+import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
 
 
 class NodeType(Enum):

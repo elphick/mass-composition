@@ -9,6 +9,7 @@ Related MassComposition objects are managed as a network.
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly
+from matplotlib import pyplot as plt
 from plotly.graph_objs import Figure
 
 from elphick.mass_composition import MassComposition

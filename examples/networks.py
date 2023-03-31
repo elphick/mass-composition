@@ -13,6 +13,7 @@ from elphick.mass_composition import MassComposition
 from elphick.mass_composition.mc_network import MCNetwork
 from test.data import sample_data
 
+
 # %%
 #
 # Create some MassComposition objects
@@ -51,7 +52,7 @@ print(mcn.balanced)
 # Plot the network.
 # Imbalanced Nodes will appear red.  Later, Imbalanced Edges will also appear red.
 
-mcn.plot_network()
+mcn.plot()
 plt.show()
 
 # %%
@@ -59,4 +60,27 @@ plt.show()
 
 df_report: pd.DataFrame = mcn.report()
 df_report
+
+# %%
+# Plot the interactive network using plotly
+
+fig = mcn.plot_network()
+fig
+
+# %%
+# Plot the Sankey
+
+fig = mcn.plot_sankey()
+fig
+
+# %%
+# Demonstrate the table-plot
+
+fig = mcn.table_plot(plot_type='sankey', table_pos='top', table_area=0.3)
+fig
+
+# %%
+
+fig = mcn.table_plot(plot_type='network', table_pos='bottom', table_area=0.3)
+fig
 
