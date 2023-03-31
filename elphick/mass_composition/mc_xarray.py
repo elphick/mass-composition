@@ -17,6 +17,11 @@ class CompositionContext(Enum):
 @xr.register_dataset_accessor("mc")
 class MassCompositionAccessor:
     def __init__(self, xarray_obj: xr.Dataset):
+        """MassComposition xarray Accessor
+
+        Args:
+            xarray_obj:
+        """
         self._obj = xarray_obj
 
         self._logger = logging.getLogger(name=self.__class__.__name__)

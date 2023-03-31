@@ -303,6 +303,16 @@ class MCNetwork(nx.DiGraph):
                     color_var: Optional[str] = None,
                     edge_colormap: Optional[str] = 'viridis'
                     ) -> go.Figure:
+        """Plot the Network as a sankey
+
+        Args:
+            width_var: The variable that determines the sankey width
+            color_var: The optional variable that determines the sankey edge color
+            edge_colormap: The optional colormap.  Used with color_var.
+
+        Returns:
+
+        """
         d_sankey: Dict = self._generate_sankey_args(color_var,
                                                     edge_colormap,
                                                     width_var)
