@@ -29,4 +29,3 @@ or with extras...
 ..  code-block::
 
     poetry add "mass-composition[viz,network]"
-
