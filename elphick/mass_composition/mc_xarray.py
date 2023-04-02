@@ -388,7 +388,7 @@ class MassCompositionAccessor:
 
         return res
 
-    def mul(self, value: Union[float, np.ndarray[float]]) -> xr.Dataset:
+    def mul(self, value: Union[float, np.ndarray]) -> xr.Dataset:
         """Multiply self and retain attrs
 
         Multiply the mass-composition variables only by the value then append any attribute variables.
