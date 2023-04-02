@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import matplotlib.cm as cm
+import seaborn as sns
 
 from plotly.subplots import make_subplots
 
@@ -308,7 +309,6 @@ class MCNetwork(nx.DiGraph):
     def _generate_sankey_args(self, color_var, edge_colormap, width_var, v_min, v_max):
         rpt: pd.DataFrame = self.report()
         if color_var is not None:
-            import seaborn as sns
             cmap = sns.color_palette(edge_colormap, as_cmap=True)
             rpt: pd.DataFrame = self.report()
             if not v_min:
