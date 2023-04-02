@@ -1,7 +1,7 @@
 import logging
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Tuple, Iterable
+from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable
 
 import numpy as np
 import pandas as pd
@@ -52,7 +52,6 @@ class MassComposition:
         input_variables: Dict = self._detect_var_types(var_args=var_args, cols_data=list(data.columns))
 
         # solve or validate the moisture balance
-        # TODO: this assumes 2 of the 3 vars are supplied - fix this
         data, col_map = self._solve_mass_moisture(data, input_variables)
         cols_mass = [self.config['vars']['mass_wet'], self.config['vars']['mass_dry']]
         col_map = {**col_map, **{v: k for k, v in input_variables['chemistry'].items()}}
@@ -99,9 +98,16 @@ class MassComposition:
 
         self._data = xr_ds
 
-    @staticmethod
-    def _solve_mass_moisture(data, input_variables) -> Tuple[pd.DataFrame, Dict[str, str]]:
+    def _solve_mass_moisture(self, data, input_variables) -> Tuple[pd.DataFrame, Dict[str, str]]:
         col_map: Dict[str, str] = {}
+
+        # Worst case - a single one of 3 columns supplied, assume zero moisture
+        if (input_variables['mass_wet'] is None) and (input_variables['moisture'] is None):
+            # assume moisture is zero
+            data['H2O'] = 0.0
+            input_variables['moisture'] = 'H2O'
+            self._logger.warning('Zero moisture has been assumed.')
+
         if input_variables['mass_wet'] is None:
             col_map['mass_wet'] = 'mass_wet'
             data['mass_wet'] = solve_mass_moisture(mass_dry=data[input_variables['mass_dry']],
@@ -130,6 +136,10 @@ class MassComposition:
     @property
     def name(self) -> str:
         return self._data.mc.name
+
+    @name.setter
+    def name(self, value):
+        self._data.mc.rename(value)
 
     @property
     def data(self) -> xr.Dataset:
@@ -295,11 +305,18 @@ class MassComposition:
                 logging.error(msg)
                 raise IndexError(msg)
 
-    def split(self, fraction: float) -> Tuple['MassComposition', 'MassComposition']:
-        """Split the object at the specified mass fraction.
+    def split(self,
+              fraction: Union[float, Callable],
+              name_1: Optional[str] = None,
+              name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+        """Split the object by mass
+
+        A simple mass split maintaining the same composition
 
         Args:
-            fraction: The mass fraction that defines the split
+            fraction: A constant in the range [0.0, 1.0]
+            name_1: The name of the reference stream created by the split
+            name_2: The name of the complement stream created by the split
 
         Returns:
             tuple of two datasets, the first with the mass fraction specified, the other the complement
@@ -311,6 +328,44 @@ class MassComposition:
 
         out._data = xr_ds_1
         comp._data = xr_ds_2
+
+        if name_1:
+            out._data.mc.rename(name_1)
+        if name_2:
+            comp._data.mc.rename(name_2)
+
+        return out, comp
+
+    def partition(self,
+                 definition: Callable,
+                 name_1: Optional[str] = None,
+                 name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+        """Partition the object along a given dimension.
+
+        This method applies the defined separation resulting in two new objects.
+
+        See also: split
+
+        Args:
+            definition: A partition function that defines the efficiency of separation along a dimension
+            name_1: The name of the reference stream created by the split
+            name_2: The name of the complement stream created by the split
+
+        Returns:
+            tuple of two datasets, the first with the mass fraction specified, the other the complement
+        """
+        out = deepcopy(self)
+        comp = deepcopy(self)
+
+        xr_ds_1, xr_ds_2 = self._data.mc.partition(definition=definition)
+
+        out._data = xr_ds_1
+        comp._data = xr_ds_2
+
+        if name_1:
+            out._data.mc.rename(name_1)
+        if name_2:
+            comp._data.mc.rename(name_2)
 
         return out, comp
 

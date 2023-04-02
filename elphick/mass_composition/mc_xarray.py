@@ -1,12 +1,14 @@
 import logging
 from copy import deepcopy
 from enum import Enum
-from typing import Dict, Optional, Union, Iterable, List, Tuple
+from typing import Dict, Optional, Union, Iterable, List, Tuple, Callable
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
 from elphick.mass_composition.utils import solve_mass_moisture
+from elphick.mass_composition.utils.size import mean_size
 
 
 class CompositionContext(Enum):
@@ -33,12 +35,17 @@ class MassCompositionAccessor:
         self._chem: xr.Dataset = self._obj[self.mc_vars_chem]
         self._mass: xr.Dataset = self._obj[self.mc_vars_mass]
 
-        # to support collections / networks
-        self.nodes = self._obj.attrs['nodes']
-
     @property
     def name(self):
         return self._obj.attrs['mc_name']
+
+    @property
+    def nodes(self):
+        return self._obj.attrs['nodes']
+
+    @nodes.setter
+    def nodes(self, values):
+        self._obj.attrs['nodes'] = values
 
     @property
     def history(self):
@@ -135,6 +142,8 @@ class MassCompositionAccessor:
         if as_dataframe:
             res: pd.DataFrame = self.to_dataframe(original_column_names=original_column_names,
                                                   ds=res)
+            if len(res) == 1:
+                res.index = pd.Index([self.name], name='name')
 
         return res
 
@@ -187,7 +196,6 @@ class MassCompositionAccessor:
         xr.set_options(keep_attrs=True)
 
         dsm: xr.Dataset = self._obj.copy()
-        dsm_chem: xr.DataArray = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
 
         dsm[self._obj.mc_vars_chem] = (dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100)
 
@@ -226,10 +234,12 @@ class MassCompositionAccessor:
         return dsc
 
     def split(self, fraction: float) -> Tuple[xr.Dataset, xr.Dataset]:
-        """Split the object at the specified mass fraction.
+        """Split the object by mass
+
+        A simple mass split maintaining the same composition
 
         Args:
-            fraction: The mass fraction that defines the split
+            fraction: A constant in the range [0.0, 1.0]
 
         Returns:
             tuple of two datasets, the first with the mass fraction specified, the other the complement
@@ -237,22 +247,89 @@ class MassCompositionAccessor:
 
         xr.set_options(keep_attrs=True)
 
+        if not (isinstance(fraction, float)):
+            raise TypeError("The fraction provided is not a float")
+
+        if not (fraction >= 0.0) and (fraction <= 1.0):
+            raise ValueError("The fraction provided must be between [0.0, 1.0] - mass cannot be created nor destroyed.")
+
         out = deepcopy(self)
+        comp = deepcopy(self)
+
+        # split by mass
         out._obj[self._obj.mc_vars_mass] = out._obj[self._obj.mc_vars_mass] * fraction
         out.log_to_history(f'Split from object [{self.name}] @ fraction: {fraction}')
         out.rename(f'({fraction} * {self.name})')
-        out._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1],  self._obj.attrs['nodes'][1] + 1]
-        res = out._obj
 
-        comp = deepcopy(self)
         comp._obj[self._obj.mc_vars_mass] = comp._obj[self._obj.mc_vars_mass] * (1 - fraction)
         comp.log_to_history(f'Split from object [{self.name}] @ 1 - fraction {fraction}: {1 - fraction}')
         comp.rename(f'({1 - fraction} * {self.name})')
-        comp._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1],  self._obj.attrs['nodes'][1] + 2]
+
+        # set the start and end nodes to the attributes
+        out._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 1]
+        comp._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 2]
 
         xr.set_options(keep_attrs='default')
 
-        return res, comp._obj
+        return out._obj, comp._obj
+
+    def partition(self, definition: Callable) -> Tuple[xr.Dataset, xr.Dataset]:
+        """Partition the object along a given dimension.
+
+        This method applies the defined partition resulting in two new objects.
+
+        See also: split
+
+        Args:
+            definition: A partition function that defines the efficiency of separation along a dimension
+
+        Returns:
+            tuple of two datasets, the first defined by the function, the other the complement
+        """
+
+        xr.set_options(keep_attrs=True)
+
+        out = deepcopy(self)
+        comp = deepcopy(self)
+
+        if not isinstance(definition, Callable):
+            raise TypeError("The definition is not a callable function")
+        if 'dim' not in definition.keywords.keys():
+            raise NotImplementedError("The callable function passed does not have a dim")
+
+        dim = definition.keywords['dim']
+        definition.keywords.pop('dim')
+        if isinstance(self._obj[dim].data[0], pd.Interval):
+            if dim == 'size':
+                x = mean_size(pd.arrays.IntervalArray(self._obj[dim].data))
+            else:
+                x = pd.arrays.IntervalArray(self._obj[dim].data).mid
+        else:
+            # assume the index is already the mean, not a passing or retained value.
+            self._logger.warning('The provided callable is being applied across a dimension that is '
+                                 'not an interval. This is not typical usage.  It is assumed that the '
+                                 'dimension data represents the centre/mean, and not an edge like '
+                                 'retained or passing.')
+        pn = definition(x)
+        if not ((dim in self._obj.dims) and (len(self._obj.dims) == 1)):
+            # TODO: Set the dim to match the partition if it does not already
+            # obj_mass = obj_mass.swap_dims(dim=)
+            pass
+
+        out._obj = out.mul(pn / 100)
+        # zero masses will generate nan grades - make them zero
+        out._obj[out._obj.mc_vars_chem] = out._obj[out._obj.mc_vars_chem].fillna(0.0)
+        comp._obj = self.sub(out._obj)
+        comp._obj[out._obj.mc_vars_chem] = comp._obj[out._obj.mc_vars_chem].where(
+            comp._obj[out._obj.mc_vars_chem].map(np.isfinite), 0.0)
+
+        # set the start and end nodes to the attributes
+        out._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 1]
+        comp._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 2]
+
+        xr.set_options(keep_attrs='default')
+
+        return out._obj, comp._obj
 
     def add(self, other: xr.Dataset) -> xr.Dataset:
         """Add two objects
@@ -275,6 +352,12 @@ class MassCompositionAccessor:
         res: xr.Dataset = xr_self + xr_other
 
         res = self._math_post_process(other, res, xr_self, 'added')
+
+        # when two objects (edges) are added, their to-nodes must be set to the same value (merged)
+        # then the nodes for the summed object will be from that merged node to the next, new node.
+        # add the start and end nodes to the attributes
+        # xr_other.attrs['nodes'][1] = xr_self.attrs['nodes'][1]
+        res.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 1]
 
         xr.set_options(keep_attrs='default')
 
@@ -300,6 +383,35 @@ class MassCompositionAccessor:
         res: xr.Dataset = xr_self - xr_other
 
         res = self._math_post_process(other, res, xr_self, 'subtracted')
+
+        xr.set_options(keep_attrs='default')
+
+        return res
+
+    def mul(self, value: Union[float, np.ndarray]) -> xr.Dataset:
+        """Multiply self and retain attrs
+
+        Multiply the mass-composition variables only by the value then append any attribute variables.
+        NOTE: does not multiply two objects together.  Used for separation (partition) operations.
+
+        Args:
+            value: the multiplier, a scalr or array of floats.
+
+        Returns:
+
+        """
+
+        xr.set_options(keep_attrs=True)
+
+        # initially just add the mass and composition, not the attr vars
+        xr_self: xr.Dataset = self.composition_to_mass()[self.mc_vars]
+        res: xr.Dataset = xr_self * value
+
+        res = self._math_post_process(None, res, xr_self, 'multiplied')
+
+        # when two objects (edges) are added, their to-nodes must be set to the same value (merged)
+        # then the nodes for the summed object will be from that merged node to the next, new node.
+        # res.attrs['nodes'] = [xr_self.attrs['nodes'][1], xr_other.attrs['nodes'][1] + 2]
 
         xr.set_options(keep_attrs='default')
 
@@ -331,6 +443,20 @@ class MassCompositionAccessor:
         return res
 
     def _math_post_process(self, other, res, xr_self, operator_string: str):
+        """Manages cleanup after math operations
+
+        Math operations occur in absolute composition (mass) space, and these operations lose the attrs
+        This method adds back the attrs for the Dataset, DataArrays.  It also converts the result back
+        to relative compositional space.  Attr variables are also added back.
+        Args:
+            other: The other object taking part in the operation
+            res: The result object
+            xr_self: The xarray of the result object - used to recover attrs - we just use self instead?
+            operator_string: string representing the operation
+
+        Returns:
+
+        """
         # update attrs
         res.attrs.update(self._obj.attrs)
         da: xr.DataArray
@@ -350,6 +476,10 @@ class MassCompositionAccessor:
             res.mc.log_to_history(f'Object has been {operator_string} by {other.mc.name}.')
             res.mc.rename(f'({self.name} / {other.mc.name})')
             # division returns relative, not absolute - do not convert back to relative composition
+        elif operator_string == 'multiplied':
+            res.mc.log_to_history(f'Object has been {operator_string} by one or more values.')
+            res.mc.rename(f'({self.name} partitioned)')
+            res = res.mc.mass_to_composition()
         else:
             raise NotImplementedError('Unexpected operator string')
         return res

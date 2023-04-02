@@ -1,3 +1,5 @@
+# REF: https://nedbatchelder.com/blog/202209/making_a_coverage_badge.html
+
 name: "Test Suite"
 
 on:
