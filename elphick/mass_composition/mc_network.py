@@ -2,7 +2,6 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib
 import networkx as nx
-import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
