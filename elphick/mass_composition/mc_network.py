@@ -149,7 +149,7 @@ class MCNetwork(nx.DiGraph):
     def plot_sankey(self,
                     width_var: str = 'mass_wet',
                     color_var: Optional[str] = None,
-                    edge_colormap: Optional[str] = 'viridis',
+                    edge_colormap: Optional[str] = 'copper_r',
                     vmin: Optional[float] = None,
                     vmax: Optional[float] = None,
                     ) -> go.Figure:
@@ -181,7 +181,7 @@ class MCNetwork(nx.DiGraph):
                    table_even_color: str = 'lightgray',
                    sankey_width_var: str = 'mass_wet',
                    sankey_color_var: Optional[str] = None,
-                   sankey_edge_colormap: Optional[str] = 'copper',
+                   sankey_edge_colormap: Optional[str] = 'copper_r',
                    sankey_vmin: Optional[float] = None,
                    sankey_vmax: Optional[float] = None
                    ) -> go.Figure:
