@@ -1,10 +1,14 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
+import matplotlib
 import networkx as nx
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+import matplotlib.cm as cm
+
 from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
@@ -68,8 +72,8 @@ class MCNetwork(nx.DiGraph):
         chunks: List[pd.DataFrame] = []
         for n, nbrs in self.adj.items():
             for nbr, eattr in nbrs.items():
-                chunks.append(eattr['mc'].aggregate().assign(stream=eattr['mc'].name))
-        rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('stream')
+                chunks.append(eattr['mc'].aggregate().assign(name=eattr['mc'].name))
+        rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('name')
         return rpt
 
     def get_node_input_outputs(self, node) -> Tuple:
@@ -125,51 +129,48 @@ class MCNetwork(nx.DiGraph):
         pos = nx.spring_layout(self, seed=1234)
 
         edge_trace, node_trace = self._get_scatter_node_edges(pos)
+        title = f"{self.name}<br>Balanced: {self.balanced}"
 
         fig = go.Figure(data=[edge_trace, node_trace],
                         layout=go.Layout(
-                            title=self.name,
+                            title=title,
                             titlefont_size=16,
                             showlegend=False,
                             hovermode='closest',
                             margin=dict(b=20, l=5, r=5, t=40),
                             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(0,0,0,0)'
+                        ),
                         )
         return fig
 
-    def _get_scatter_node_edges(self, pos):
-        edge_x = []
-        edge_y = []
-        for edge in self.edges():
-            x0, y0 = pos[edge[0]]
-            x1, y1 = pos[edge[1]]
-            edge_x.append(x0)
-            edge_x.append(x1)
-            edge_x.append(None)
-            edge_y.append(y0)
-            edge_y.append(y1)
-            edge_y.append(None)
-        edge_trace = go.Scatter(
-            x=edge_x, y=edge_y,
-            line=dict(width=2, color='#888'),
-            hoverinfo='none',
-            mode='lines')
-        node_x = []
-        node_y = []
-        for node in self.nodes():
-            x, y = pos[node]
-            node_x.append(x)
-            node_y.append(y)
-        node_trace = go.Scatter(
-            x=node_x, y=node_y,
-            mode='markers',
-            hoverinfo='text',
-            marker=dict(
-                color=[],
-                size=20,
-                line_width=2))
-        return edge_trace, node_trace
+    def plot_sankey(self,
+                    width_var: str = 'mass_wet',
+                    color_var: Optional[str] = None,
+                    edge_colormap: Optional[str] = 'viridis',
+                    vmin: Optional[float] = None,
+                    vmax: Optional[float] = None,
+                    ) -> go.Figure:
+        """Plot the Network as a sankey
+
+        Args:
+            width_var: The variable that determines the sankey width
+            color_var: The optional variable that determines the sankey edge color
+            edge_colormap: The optional colormap.  Used with color_var.
+            vmin: The value that maps to the minimum color
+            vmax: The value that maps to the maximum color
+
+        Returns:
+
+        """
+        d_sankey: Dict = self._generate_sankey_args(color_var, edge_colormap, width_var, vmin, vmax)
+        node, link = self._get_sankey_node_link_dicts(d_sankey)
+        fig = go.Figure(data=[go.Sankey(node=node, link=link)])
+        title = f"{self.name}<br>Balanced: {self.balanced}"
+        fig.update_layout(title_text=title, font_size=10)
+        return fig
 
     def table_plot(self,
                    plot_type: str = 'sankey',
@@ -180,7 +181,9 @@ class MCNetwork(nx.DiGraph):
                    table_even_color: str = 'lightgray',
                    sankey_width_var: str = 'mass_wet',
                    sankey_color_var: Optional[str] = None,
-                   sankey_edge_colormap: Optional[str] = 'viridis'
+                   sankey_edge_colormap: Optional[str] = 'copper',
+                   sankey_vmin: Optional[float] = None,
+                   sankey_vmax: Optional[float] = None
                    ) -> go.Figure:
         """Plot with table of edge averages
 
@@ -194,6 +197,8 @@ class MCNetwork(nx.DiGraph):
             sankey_width_var: If plot_type is sankey, the variable that determines the sankey width
             sankey_color_var: If plot_type is sankey, the optional variable that determines the sankey edge color
             sankey_edge_colormap: If plot_type is sankey, the optional colormap.  Used with sankey_color_var.
+            sankey_vmin: The value that maps to the minimum color
+            sankey_vmax: The value that maps to the maximum color
 
         Returns:
 
@@ -230,7 +235,9 @@ class MCNetwork(nx.DiGraph):
         if plot_type == 'sankey':
             d_sankey: Dict = self._generate_sankey_args(sankey_color_var,
                                                         sankey_edge_colormap,
-                                                        sankey_width_var)
+                                                        sankey_width_var,
+                                                        sankey_vmin,
+                                                        sankey_vmax)
             node, link = self._get_sankey_node_link_dicts(d_sankey)
             fig.add_trace(go.Sankey(node=node, link=link), **d_plot)
 
@@ -247,7 +254,8 @@ class MCNetwork(nx.DiGraph):
                               plot_bgcolor='rgba(0,0,0,0)'
                               )
 
-        fig.update_layout(title_text=self.name, font_size=12)
+        title = f"{self.name}<br>Balanced: {self.balanced}"
+        fig.update_layout(title_text=title, font_size=12)
 
         return fig
 
@@ -298,37 +306,16 @@ class MCNetwork(nx.DiGraph):
 
         return subplot_kwargs, table_kwargs, plot_kwargs
 
-    def plot_sankey(self,
-                    width_var: str = 'mass_wet',
-                    color_var: Optional[str] = None,
-                    edge_colormap: Optional[str] = 'viridis'
-                    ) -> go.Figure:
-        """Plot the Network as a sankey
-
-        Args:
-            width_var: The variable that determines the sankey width
-            color_var: The optional variable that determines the sankey edge color
-            edge_colormap: The optional colormap.  Used with color_var.
-
-        Returns:
-
-        """
-        d_sankey: Dict = self._generate_sankey_args(color_var,
-                                                    edge_colormap,
-                                                    width_var)
-        node, link = self._get_sankey_node_link_dicts(d_sankey)
-        fig = go.Figure(data=[go.Sankey(node=node, link=link)])
-        fig.update_layout(title_text=self.name, font_size=10)
-        return fig
-
-    def _generate_sankey_args(self, color_var, edge_colormap, width_var):
+    def _generate_sankey_args(self, color_var, edge_colormap, width_var, v_min, v_max):
         rpt: pd.DataFrame = self.report()
         if color_var is not None:
             import seaborn as sns
             cmap = sns.color_palette(edge_colormap, as_cmap=True)
             rpt: pd.DataFrame = self.report()
-            v_min = float(rpt[color_var].min())
-            v_max = float(rpt[color_var].max())
+            if not v_min:
+                v_min = float(rpt[color_var].min())
+            if not v_max:
+                v_max = float(rpt[color_var].max())
         if isinstance(list(self.nodes)[0], int):
             labels = [str(n) for n in list(self.nodes)]
         else:
@@ -341,6 +328,17 @@ class MCNetwork(nx.DiGraph):
         edge_custom_data = []
         edge_color: List = []
         edge_labels: List = []
+        node_colors: List = []
+
+        for n in self.nodes:
+            if self.nodes[n]['mc'].node_type == NodeType.BALANCE:
+                if self.nodes[n]['mc'].balanced:
+                    node_colors.append('green')
+                else:
+                    node_colors.append('red')
+            else:
+                node_colors.append('blue')
+
         for u, v, data in self.edges(data=True):
             edge_labels.append(data['mc'].name)
             source.append(u)
@@ -350,13 +348,13 @@ class MCNetwork(nx.DiGraph):
 
             if color_var is not None:
                 val: float = float(data['mc'].aggregate()[color_var])
-                str_color: str = f'rgba({self._color_from_float(v_min, v_max, val, cmap)})'.replace('[', '').replace(
-                    ']', '')
+                str_color: str = f'rgba{self._color_from_float(v_min, v_max, val, cmap)}'
                 edge_color.append(str_color)
             else:
                 edge_color: Optional[str] = None
 
-        d_sankey: Dict = {'edge_color': edge_color,
+        d_sankey: Dict = {'node_color': node_colors,
+                          'edge_color': edge_color,
                           'edge_custom_data': edge_custom_data,
                           'edge_labels': edge_labels,
                           'labels': labels,
@@ -373,7 +371,7 @@ class MCNetwork(nx.DiGraph):
             thickness=20,
             line=dict(color="black", width=0.5),
             label=d_sankey['labels'],
-            color="blue",
+            color=d_sankey['node_color'],
             customdata=d_sankey['labels']
         )
         link: Dict = dict(
@@ -388,6 +386,39 @@ class MCNetwork(nx.DiGraph):
         )
         return node, link
 
+    def _get_scatter_node_edges(self, pos):
+        edge_x = []
+        edge_y = []
+        for edge in self.edges():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x.append(x0)
+            edge_x.append(x1)
+            edge_x.append(None)
+            edge_y.append(y0)
+            edge_y.append(y1)
+            edge_y.append(None)
+        edge_trace = go.Scatter(
+            x=edge_x, y=edge_y,
+            line=dict(width=2, color='#888'),
+            hoverinfo='none',
+            mode='lines')
+        node_x = []
+        node_y = []
+        for node in self.nodes():
+            x, y = pos[node]
+            node_x.append(x)
+            node_y.append(y)
+        node_trace = go.Scatter(
+            x=node_x, y=node_y,
+            mode='markers',
+            hoverinfo='text',
+            marker=dict(
+                color=[],
+                size=20,
+                line_width=2))
+        return edge_trace, node_trace
+
     @staticmethod
     def _rpt_to_html(df: pd.DataFrame) -> Dict:
         custom_data: Dict = {}
@@ -399,8 +430,18 @@ class MCNetwork(nx.DiGraph):
         return custom_data
 
     @staticmethod
-    def _color_from_float(vmin: float, vmax: float, val: float, cmap: ListedColormap) -> Tuple[
-        float, float, float]:
-        color_index: int = int((val - vmin) / ((vmax - vmin) / 256.0))
-        color_index = min(max(0, color_index), 255)
-        return cmap.colors[color_index]
+    def _color_from_float(vmin: float, vmax: float, val: float,
+                          cmap: Union[ListedColormap, LinearSegmentedColormap]) -> Tuple[float, float, float]:
+        if isinstance(cmap, ListedColormap):
+            color_index: int = int((val - vmin) / ((vmax - vmin) / 256.0))
+            color_index = min(max(0, color_index), 255)
+            color_rgba = tuple(cmap.colors[color_index])
+        elif isinstance(cmap, LinearSegmentedColormap):
+            norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+            m = cm.ScalarMappable(norm=norm, cmap=cmap)
+            r, g, b, a = m.to_rgba(val, bytes=True)
+            color_rgba = int(r), int(g), int(b), int(a)
+        else:
+            NotImplementedError("Unrecognised colormap type")
+
+        return color_rgba
