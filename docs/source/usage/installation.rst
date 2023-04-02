@@ -12,11 +12,11 @@ The package is pip instalable.
 
     pip install mass-composition
 
-If you want the extras (for visualisation) you'll install like this with pip.
+If you want the extras (for visualisation and networks of objects) you'll install like this with pip.
 
 .. code-block::
 
-    pip install mass-composition -e ".[viz]"
+    pip install mass-composition -e .[viz,network]
 
 Or, if poetry is more your flavour.
 
@@ -28,5 +28,4 @@ or with extras...
 
 ..  code-block::
 
-    poetry add "mass-composition[viz]"
-
+    poetry add "mass-composition[viz,network]"
