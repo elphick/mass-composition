@@ -317,11 +317,7 @@ class MassCompositionAccessor:
             pass
 
         out._obj = out.mul(pn / 100)
-        # zero masses will generate nan grades - make them zero
-        out._obj[out._obj.mc_vars_chem] = out._obj[out._obj.mc_vars_chem].fillna(0.0)
         comp._obj = self.sub(out._obj)
-        comp._obj[out._obj.mc_vars_chem] = comp._obj[out._obj.mc_vars_chem].where(
-            comp._obj[out._obj.mc_vars_chem].map(np.isfinite), 0.0)
 
         # set the start and end nodes to the attributes
         out._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 1]
@@ -482,6 +478,10 @@ class MassCompositionAccessor:
             res = res.mc.mass_to_composition()
         else:
             raise NotImplementedError('Unexpected operator string')
+
+        # protect grades from nans and infs - push them to zero
+        res[res.mc_vars_chem] = res[res.mc_vars_chem].where(res[res.mc_vars_chem].map(np.isfinite), 0.0)
+
         return res
 
     def column_map(self):
