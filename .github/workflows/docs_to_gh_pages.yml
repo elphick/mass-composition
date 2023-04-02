@@ -26,10 +26,7 @@ jobs:
           pip install sphinx-autodoc-typehints
           pip install myst-parser
           pip install orca
-#          pip install plotly
-#          pip install matplotlib
           pip install pytest
-#          pip install kaleido
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
