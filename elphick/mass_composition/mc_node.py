@@ -1,10 +1,10 @@
 import json
 from enum import Enum
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict
 
 import numpy as np
 import pandas as pd
-
+import xarray as xr
 from elphick.mass_composition import MassComposition
 # noinspection PyUnresolvedReferences
 import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
@@ -105,11 +105,10 @@ class MCNode:
             obj_list = self.outputs
 
         if obj_list:
-            obj_sum: MassComposition = obj_list[0]
+            cols = obj_list[0].data.mc.mc_vars_mass + ['H2O'] + obj_list[0].data.mc.mc_vars_chem
+            res: pd.DataFrame = obj_list[0].data.mc.composition_to_mass().to_dataframe()[cols]
             for obj_mc in obj_list[1:]:
-                obj_sum = obj_sum + obj_mc
-            cols = obj_sum.data.mc.mc_vars_mass + ['H2O'] + obj_sum.data.mc.mc_vars_chem
-            res = obj_sum.data.mc.composition_to_mass().to_dataframe()[cols]
+                res = res + obj_mc.data.mc.composition_to_mass().to_dataframe()[cols]
         return res
 
     def node_balance(self) -> Optional[pd.DataFrame]:

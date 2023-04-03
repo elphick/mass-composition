@@ -110,8 +110,9 @@ for obj in [obj_mc, obj_mc_1, obj_mc_2, obj_mc_3, obj_mc_4]:
 mcn2: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2, obj_mc_3, obj_mc_4, obj_mc_5])
 
 fig = mcn2.table_plot(plot_type='sankey', table_pos='top', table_area=0.3)
-fig
+fig.show()
 
+pass
 # %%
 #  .. admonition:: Info
 #

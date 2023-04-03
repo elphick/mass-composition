@@ -1,4 +1,5 @@
 import logging
+import random
 from copy import deepcopy
 from enum import Enum
 from typing import Dict, Optional, Union, Iterable, List, Tuple, Callable
@@ -38,14 +39,6 @@ class MassCompositionAccessor:
     @property
     def name(self):
         return self._obj.attrs['mc_name']
-
-    @property
-    def nodes(self):
-        return self._obj.attrs['nodes']
-
-    @nodes.setter
-    def nodes(self, values):
-        self._obj.attrs['nodes'] = values
 
     @property
     def history(self):
@@ -197,7 +190,8 @@ class MassCompositionAccessor:
 
         dsm: xr.Dataset = self._obj.copy()
 
-        dsm[self._obj.mc_vars_chem] = (dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100)
+        dsm[self._obj.mc_vars_chem] = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
+        dsm['H2O'] = self._obj['mass_wet'] - self._obj['mass_dry']
 
         for da in dsm.values():
             if da.attrs['mc_type'] == 'chemistry':
@@ -221,7 +215,8 @@ class MassCompositionAccessor:
         xr.set_options(keep_attrs=True)
 
         dsc: xr.Dataset = self._obj.copy()
-        dsc[self._obj.mc_vars_chem] = (dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100)
+        dsc[self._obj.mc_vars_chem] = dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100
+        dsc['H2O'] = (self._obj['mass_wet'] - self._obj['mass_dry']) / self._obj['mass_wet'] * 100
 
         for da in dsc.values():
             if da.attrs['mc_type'] == 'chemistry':
@@ -264,10 +259,6 @@ class MassCompositionAccessor:
         comp._obj[self._obj.mc_vars_mass] = comp._obj[self._obj.mc_vars_mass] * (1 - fraction)
         comp.log_to_history(f'Split from object [{self.name}] @ 1 - fraction {fraction}: {1 - fraction}')
         comp.rename(f'({1 - fraction} * {self.name})')
-
-        # set the start and end nodes to the attributes
-        out._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 1]
-        comp._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 2]
 
         xr.set_options(keep_attrs='default')
 
@@ -319,10 +310,6 @@ class MassCompositionAccessor:
         out._obj = out.mul(pn / 100)
         comp._obj = self.sub(out._obj)
 
-        # set the start and end nodes to the attributes
-        out._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 1]
-        comp._obj.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 2]
-
         xr.set_options(keep_attrs='default')
 
         return out._obj, comp._obj
@@ -348,12 +335,6 @@ class MassCompositionAccessor:
         res: xr.Dataset = xr_self + xr_other
 
         res = self._math_post_process(other, res, xr_self, 'added')
-
-        # when two objects (edges) are added, their to-nodes must be set to the same value (merged)
-        # then the nodes for the summed object will be from that merged node to the next, new node.
-        # add the start and end nodes to the attributes
-        # xr_other.attrs['nodes'][1] = xr_self.attrs['nodes'][1]
-        res.attrs['nodes'] = [self._obj.attrs['nodes'][1], self._obj.attrs['nodes'][1] + 1]
 
         xr.set_options(keep_attrs='default')
 
