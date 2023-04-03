@@ -1,4 +1,5 @@
 import logging
+import random
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable
@@ -13,6 +14,7 @@ import yaml
 
 from elphick.mass_composition.utils import solve_mass_moisture
 from elphick.mass_composition.utils.components import is_compositional
+from elphick.mass_composition.utils.random import random_int
 from elphick.mass_composition.utils.viz import plot_parallel
 
 # noinspection PyUnresolvedReferences
@@ -73,8 +75,7 @@ class MassComposition:
                           'mc_vars_mass': cols_mass,
                           'mc_vars_chem': cols_chem,
                           'mc_vars_attrs': cols_attrs,
-                          'mc_history': [f'Created with name: {name}'],
-                          'nodes': [0, 1]}
+                          'mc_history': [f'Created with name: {name}']}
         xr_ds.attrs = ds_attrs
 
         # add the variable attributes
@@ -97,6 +98,10 @@ class MassComposition:
                                      'mc_col_orig': var_attr}
 
         self._data = xr_ds
+
+        in_node = random_int()
+        out_node = random_int()
+        self.nodes: List[int] = [in_node, out_node]
 
     def _solve_mass_moisture(self, data, input_variables) -> Tuple[pd.DataFrame, Dict[str, str]]:
         col_map: Dict[str, str] = {}
@@ -306,7 +311,7 @@ class MassComposition:
                 raise IndexError(msg)
 
     def split(self,
-              fraction: Union[float, Callable],
+              fraction: float,
               name_1: Optional[str] = None,
               name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
         """Split the object by mass
@@ -329,12 +334,18 @@ class MassComposition:
         out._data = xr_ds_1
         comp._data = xr_ds_2
 
-        if name_1:
-            out._data.mc.rename(name_1)
-        if name_2:
-            comp._data.mc.rename(name_2)
+        self._post_process_split(out, comp, name_1, name_2)
 
         return out, comp
+
+    def _post_process_split(self, obj_1, obj_2, name_1, name_2):
+        if name_1:
+            obj_1._data.mc.rename(name_1)
+        if name_2:
+            obj_2._data.mc.rename(name_2)
+        obj_1.nodes = [self.nodes[1], random_int()]
+        obj_2.nodes = [self.nodes[1], random_int()]
+        return obj_1, obj_2
 
     def partition(self,
                  definition: Callable,
@@ -362,10 +373,7 @@ class MassComposition:
         out._data = xr_ds_1
         comp._data = xr_ds_2
 
-        if name_1:
-            out._data.mc.rename(name_1)
-        if name_2:
-            comp._data.mc.rename(name_2)
+        self._post_process_split(out, comp, name_1, name_2)
 
         return out, comp
 
@@ -384,6 +392,9 @@ class MassComposition:
 
         res = deepcopy(self)
         res._data = xr_sum
+
+        other.nodes = [other.nodes[0], self.nodes[1]]
+        res.nodes = [self.nodes[1], random_int()]
 
         return res
 

@@ -32,9 +32,9 @@ class MCNetwork(nx.DiGraph):
         """
         bunch_of_edges: List = []
         for stream in streams:
-            if stream.data.nodes is None:
+            if stream.nodes is None:
                 raise KeyError(f'Stream {stream.name} does not have the node property set')
-            nodes = stream.data.nodes
+            nodes = stream.nodes
 
             # add the objects to the edges
             bunch_of_edges.append((nodes[0], nodes[1], {'mc': stream}))
@@ -51,9 +51,11 @@ class MCNetwork(nx.DiGraph):
             d_node_objects[node].inputs = [graph.get_edge_data(e[0], e[1])['mc'] for e in graph.in_edges(node)]
             d_node_objects[node].outputs = [graph.get_edge_data(e[0], e[1])['mc'] for e in graph.out_edges(node)]
 
-        # nx.set_node_attributes(graph, d_node_balance, 'data')
-        # bal_vals: List = [n['data'].balanced for n in graph.nodes if n is not None]
-        # graph['balanced'] = all(bal_vals)
+        graph = nx.convert_node_labels_to_integers(graph)
+        # update the temporary nodes on the mc object property to match the renumbered integers
+        for node1, node2, data in graph.edges(data=True):
+            data['mc'].nodes = [node1, node2]
+
         return graph
 
     @property
