@@ -312,7 +312,7 @@ class MassComposition:
                 raise IndexError(msg)
 
     def split(self,
-              fraction: Union[float, Callable],
+              fraction: float,
               name_1: Optional[str] = None,
               name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
         """Split the object by mass

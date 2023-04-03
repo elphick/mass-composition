@@ -81,9 +81,6 @@ mc_ideal_coarse, mc_ideal_fine = mc_ideal_feed.partition(definition=part_ideal,
                                                          name_1='ideal_coarse', name_2='ideal_fine')
 mc_sim_coarse, mc_sim_fine = mc_sim_feed.partition(definition=part_sim, name_1='sim_coarse', name_2='sim_fine')
 
-# manually tweak the nodes (to overcome a known bug with node allocation on large networks)
-mc_ideal_coarse._data.mc.nodes = [2, 7]
-mc_ideal_fine._data.mc.nodes = [2, 8]
 
 mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_ideal_feed, mc_sim_feed,
                                            mc_ideal_coarse, mc_ideal_fine,

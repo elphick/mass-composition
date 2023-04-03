@@ -191,7 +191,8 @@ class MassCompositionAccessor:
         dsm: xr.Dataset = self._obj.copy()
 
         dsm[self._obj.mc_vars_chem] = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
-        dsm['H2O'] = self._obj['mass_wet'] - self._obj['mass_dry']
+        if 'H2O' in dsm.variables:
+            dsm['H2O'] = self._obj['mass_wet'] - self._obj['mass_dry']
 
         for da in dsm.values():
             if da.attrs['mc_type'] == 'chemistry':
@@ -216,7 +217,8 @@ class MassCompositionAccessor:
 
         dsc: xr.Dataset = self._obj.copy()
         dsc[self._obj.mc_vars_chem] = dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100
-        dsc['H2O'] = (self._obj['mass_wet'] - self._obj['mass_dry']) / self._obj['mass_wet'] * 100
+        if 'H2O' in dsc.variables:
+            dsc['H2O'] = (self._obj['mass_wet'] - self._obj['mass_dry']) / self._obj['mass_wet'] * 100
 
         for da in dsc.values():
             if da.attrs['mc_type'] == 'chemistry':
