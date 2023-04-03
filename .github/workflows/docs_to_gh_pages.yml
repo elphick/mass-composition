@@ -20,16 +20,13 @@ jobs:
       - uses: actions/setup-python@v3
       - name: Install dependencies
         run: |
-          pip install mass-composition
+          pip install mass-composition -e ".[viz,network]"
           pip install sphinx sphinx_rtd_theme
           pip install sphinx-gallery
           pip install sphinx-autodoc-typehints
           pip install myst-parser
           pip install orca
-          pip install plotly
-          pip install matplotlib
           pip install pytest
-          pip install kaleido
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
@@ -41,3 +38,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: _build/
           force_orphan: true
+

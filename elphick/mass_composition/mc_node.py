@@ -29,7 +29,7 @@ class MCNode:
         self._inputs: Optional[List[MassComposition]] = None
         self._outputs: Optional[List[MassComposition]] = None
         self._balanced: Optional[bool] = None
-        self._balance_errors: Optional[Tuple] = None
+        self._balance_errors: Optional[pd.DataFrame] = None
 
     def __str__(self) -> str:
         props: Dict = {k: str(v) for k, v in self.__dict__.items() if k[0] != '_'}
@@ -68,6 +68,14 @@ class MCNode:
     @balanced.setter
     def balanced(self, value):
         self._balanced = value
+
+    def imbalance_report(self):
+        """A html report of records that do not balance around the node
+
+        Returns:
+
+        """
+        self._balance_errors.to_html(open(f'balance_errors_node_{self.node_id}.html', 'w'))
 
     @property
     def node_type(self) -> Optional[NodeType]:

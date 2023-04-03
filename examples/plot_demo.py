@@ -6,6 +6,7 @@ Demonstrating the mass-composition plot methods.
 """
 
 import pandas as pd
+import plotly
 from plotly.graph_objs import Figure
 from test.data.sample_data import sample_data
 from elphick.mass_composition import MassComposition
@@ -53,8 +54,6 @@ fig3
 # Create a ternary diagram for 3 composition variables
 
 fig4 = obj_mc.plot_ternary(variables=['SiO2', 'Al2O3', 'LOI'], color='group')
-# save the figure for use as the sphinx-gallery thumbnail
-# fig4.write_image(Path(__file__).parent.parent / 'docs/source/_static/ternary.png')
-# sphinx_gallery_thumbnail_path = '_static/ternary.png'
-fig4
+# noinspection PyTypeChecker
+plotly.io.show(fig4)  # this call to show will set the thumbnail for use in the gallery
 

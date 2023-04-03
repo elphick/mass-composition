@@ -1,7 +1,7 @@
 import pandas as pd
 
 # noinspection PyUnresolvedReferences
-from test.data import demo_data
+from test.data.fixtures import demo_data
 from elphick.mass_composition import MassComposition
 
 
@@ -14,6 +14,5 @@ def test_aggregation(demo_data):
                                               'Fe': [59.0],
                                               'SiO2': [3.515385],
                                               'Al2O3': [1.873077],
-                                              'LOI': [4.0]}, index=[0])
-    df_expected.index.name = demo_data.index.name
+                                              'LOI': [4.0]}, index=pd.Index(['unnamed'], name='name'))
     pd.testing.assert_frame_equal(df_expected, df_agg)

@@ -17,6 +17,8 @@ def test_examples():
 
     import examples.plot_demo
 
-    import examples.networks
+    import examples.network_basics
+
+    import examples.split_and_partition
 
 

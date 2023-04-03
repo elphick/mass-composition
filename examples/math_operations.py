@@ -80,5 +80,8 @@ print(obj_mc_div)
 obj_mc_sum_renamed: MassComposition = obj_mc.add(obj_mc_split, name='Summed object')
 print(obj_mc_sum_renamed)
 
+# %%
+obj_mc_sub_renamed: MassComposition = obj_mc.sub(obj_mc_split, name='Subtracted object')
+print(obj_mc_sum_renamed)
 
 print('done')

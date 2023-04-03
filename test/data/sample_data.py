@@ -7,24 +7,8 @@ from pathlib import Path
 from typing import Optional, Iterable, List
 
 import pandas as pd
-import pytest
 
 from elphick.mass_composition.utils.components import is_compositional
-
-#
-# def script_loc(request):
-#     '''Return the directory of the currently running test script'''
-#     res: Path = Path(__file__):
-#     if str(res) ==  '.':
-#
-#     # a string. LocalPath.join calls normpath for us when joining the path
-#     return Path(request.fspath.join('..'))
-
-
-@pytest.fixture
-def demo_data():
-    data: pd.DataFrame = sample_data()
-    return data
 
 
 def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,
@@ -96,6 +80,28 @@ def dh_intervals(n: int = 5,
 
     df_data.index.name = 'index'
 
+    return df_data
+
+
+def size_by_assay() -> pd.DataFrame:
+    """ Sample Size x Assay dataset
+    REF: https://www.researchgate.net/publication/231575341_In_depth_analysis_of_alumina_removal_from_iron_ore_fines_
+    using_teetered_bed_gravity_separator
+
+    Returns:
+
+    """
+
+    size_retained = [850.0, 500.0, 150.0, 75.0, 45.0, 0.0]
+    size_passing = [2000.0, 850.0, 500.0, 150.0, 75.0, 45.0]
+    mass_pct = [3.3, 9.9, 26.5, 2.5, 8.8, 49.0]
+    fe = [64.15, 64.33, 64.52, 62.65, 62.81, 55.95]
+    sio2 = [2.04, 2.05, 1.84, 2.88, 2.12, 6.39]
+    al2o3 = [2.68, 2.23, 2.19, 3.32, 2.25, 6.34]
+
+    df_data: pd.DataFrame = pd.DataFrame(data=[size_retained, size_passing, mass_pct, fe, sio2, al2o3],
+                                         index=['size_retained', 'size_passing', 'mass_pct', 'Fe', 'SiO2', 'Al2O3']).T
+    df_data.set_index(['size_retained', 'size_passing'], inplace=True)
     return df_data
 
 
