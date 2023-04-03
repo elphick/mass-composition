@@ -15,6 +15,7 @@ import yaml
 from elphick.mass_composition.utils import solve_mass_moisture
 from elphick.mass_composition.utils.components import is_compositional
 from elphick.mass_composition.utils.random import random_int
+from elphick.mass_composition.utils.size import mean_size
 from elphick.mass_composition.utils.viz import plot_parallel
 
 # noinspection PyUnresolvedReferences
@@ -564,7 +565,11 @@ class MassComposition:
                 df.insert(loc=pos + 2, column=f'{col}_right', value=df[col].array.right)
                 df.drop(columns=col, inplace=True)
             else:
-                df[col] = df[col].array.mid
+                # workaround for https://github.com/Elphick/mass-composition/issues/1
+                if col == 'size':
+                    df[col] = mean_size(pd.arrays.IntervalArray(df[col]))
+                else:
+                    df[col] = df[col].array.mid
 
         if not title and hasattr(self, 'name'):
             title = self.name
