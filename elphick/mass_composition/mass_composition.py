@@ -75,8 +75,7 @@ class MassComposition:
                           'mc_vars_mass': cols_mass,
                           'mc_vars_chem': cols_chem,
                           'mc_vars_attrs': cols_attrs,
-                          'mc_history': [f'Created with name: {name}'],
-                          'nodes': [random.sample(range(1000), k=1)[0], random.sample(range(1000), k=1)[0]]}
+                          'mc_history': [f'Created with name: {name}']}
         xr_ds.attrs = ds_attrs
 
         # add the variable attributes
