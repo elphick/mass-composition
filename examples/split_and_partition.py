@@ -78,7 +78,6 @@ xarray.tests.assert_allclose(obj_mc.data, obj_mc_sum.data)
 # dataset (indexed by size).
 
 df_data: pd.DataFrame = size_by_assay()
-df_data.rename(columns={'mass_pct': 'mass_dry'}, inplace=True)
 df_data
 
 # %%
@@ -99,7 +98,7 @@ fig
 # We partially initialise the perfect partition function
 # The dim argument is added to inform the split method which dimension to apply the function/split to
 
-partition = partial(perfect, d50=150, dim='size')
+partition = partial(perfect, d50=0.150, dim='size')
 
 # %%
 #

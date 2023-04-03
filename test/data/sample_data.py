@@ -101,7 +101,15 @@ def size_by_assay() -> pd.DataFrame:
 
     df_data: pd.DataFrame = pd.DataFrame(data=[size_retained, size_passing, mass_pct, fe, sio2, al2o3],
                                          index=['size_retained', 'size_passing', 'mass_pct', 'Fe', 'SiO2', 'Al2O3']).T
+
+    # convert the sizes from micron to mm
+    df_data[['size_retained', 'size_passing']] = df_data[['size_retained', 'size_passing']] / 1000.0
+
     df_data.set_index(['size_retained', 'size_passing'], inplace=True)
+
+    # ensure we meet the input column name requirements
+    df_data.rename(columns={'mass_pct': 'mass_dry'}, inplace=True)
+
     return df_data
 
 
