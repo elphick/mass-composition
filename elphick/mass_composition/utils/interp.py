@@ -84,5 +84,6 @@ def interp_monotonic(ds: xr.Dataset, coords: Dict, include_original_coords: bool
         ds_res[coord] = interval_index.values
 
         ds_res = ds_res.sortby(variables=coord, ascending=False)
+        ds_res = ds_res.mc.mass_to_composition()
 
     return ds_res
