@@ -9,14 +9,11 @@ or fraction was retained by the lower sieve size, but passed the sieve size abov
 
 """
 import logging
-from copy import deepcopy
-from typing import List
 
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
+import plotly
 import xarray as xr
-from scipy.interpolate import pchip_interpolate
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.utils.interp import interp_monotonic
@@ -40,14 +37,11 @@ df_data: pd.DataFrame = size_by_assay()
 df_data
 
 # %%
-
-mc_size: MassComposition = MassComposition(df_data, name='Sample')
-mc_size
-
-# %%
+#
 # The size index is of the Interval type, maintaining the fractional information.
 
-print(mc_size.data.to_dataframe())
+mc_size: MassComposition = MassComposition(df_data, name='Sample')
+mc_size.data.to_dataframe()
 
 # %%
 
@@ -62,15 +56,23 @@ fig
 
 # %%
 #
-# Size distributions are often plotted in the cumulative form
+# Size distributions are often plotted in the cumulative form, first we'll plot the intervals
 
 fig = mc_size.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
                              cumulative=False)
 fig
 
+# %%
+#
+# Cumulative passing
+
 fig = mc_size.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
                              cumulative=True, direction='ascending')
 fig
+
+# %%
+#
+# Cumulative retained
 
 fig = mc_size.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
                              cumulative=True, direction='descending')
@@ -89,15 +91,31 @@ new_coords = np.round(np.geomspace(right_edges.min(), right_edges.max(), 50), 8)
 xr_upsampled: xr.Dataset = interp_monotonic(xr_ds, coords={'size': new_coords}, include_original_coords=True)
 mc_upsampled: MassComposition = MassComposition(xr_upsampled.to_dataframe(), name='Upsampled Sample')
 
+# %%
+
 fig = mc_upsampled.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'], cumulative=False)
-fig.show()
+fig
+
+# %%
 
 fig = mc_upsampled.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
                                   cumulative=True, direction='ascending')
-fig.show()
+# noinspection PyTypeChecker
+plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
+
+# %%
 
 fig = mc_upsampled.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
                                   cumulative=True, direction='descending')
-fig.show()
+fig
 
-print('done')
+# %%
+#
+# Validate the head grade against the original sample
+
+pd.testing.assert_frame_equal(mc_size.aggregate().reset_index(drop=True),
+                              mc_upsampled.aggregate().reset_index(drop=True))
+
+# TODO: Validate the grade of the up-sampled sample grouped by the original intervals.
+#  This will validate that mass has been preserved within the original fractions.
+
