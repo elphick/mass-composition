@@ -103,41 +103,6 @@ class MassComposition:
         out_node = random_int()
         self.nodes: List[int] = [in_node, out_node]
 
-    def _solve_mass_moisture(self, data, input_variables) -> Tuple[pd.DataFrame, Dict[str, str]]:
-        col_map: Dict[str, str] = {}
-
-        # Worst case - a single one of 3 columns supplied, assume zero moisture
-        if (input_variables['mass_wet'] is None) and (input_variables['moisture'] is None):
-            # assume moisture is zero
-            data['H2O'] = 0.0
-            input_variables['moisture'] = 'H2O'
-            self._logger.warning('Zero moisture has been assumed.')
-
-        if input_variables['mass_wet'] is None:
-            col_map['mass_wet'] = 'mass_wet'
-            data['mass_wet'] = solve_mass_moisture(mass_dry=data[input_variables['mass_dry']],
-                                                   moisture=data[input_variables['moisture']])
-        else:
-            col_map['mass_wet'] = input_variables['mass_wet']
-
-        if input_variables['mass_dry'] is None:
-            col_map['mass_dry'] = 'mass_dry'
-            data['mass_dry'] = solve_mass_moisture(mass_wet=data[input_variables['mass_wet']],
-                                                   moisture=data[input_variables['moisture']])
-        else:
-            col_map['mass_dry'] = input_variables['mass_dry']
-
-        if input_variables['moisture'] is None:
-            col_map['H2O'] = 'H2O'
-        else:
-            # drop the moisture column, since it is now redundant, work with mass, moisture is dependent property
-            data.drop(columns=input_variables['moisture'], inplace=True)
-            col_map['H2O'] = input_variables['moisture']
-
-        data.rename(columns={v: k for k, v in col_map.items()}, inplace=True)
-
-        return data, col_map
-
     @property
     def name(self) -> str:
         return self._data.mc.name
@@ -196,6 +161,11 @@ class MassComposition:
                                                   as_dataframe=as_dataframe,
                                                   original_column_names=original_column_names)
 
+        return res
+
+    def query(self, queries) -> 'MassComposition':
+        res: MassComposition = deepcopy(self)
+        res._data = res._data.query(queries=queries)
         return res
 
     def binned_mass_composition(self, cutoff_var: str,
@@ -348,9 +318,9 @@ class MassComposition:
         return obj_1, obj_2
 
     def partition(self,
-                 definition: Callable,
-                 name_1: Optional[str] = None,
-                 name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+                  definition: Callable,
+                  name_1: Optional[str] = None,
+                  name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
         """Partition the object along a given dimension.
 
         This method applies the defined separation resulting in two new objects.
@@ -629,6 +599,41 @@ class MassComposition:
                     data.drop(columns=keys, inplace=True)
 
         return data
+
+    def _solve_mass_moisture(self, data, input_variables) -> Tuple[pd.DataFrame, Dict[str, str]]:
+        col_map: Dict[str, str] = {}
+
+        # Worst case - a single one of 3 columns supplied, assume zero moisture
+        if (input_variables['mass_wet'] is None) and (input_variables['moisture'] is None):
+            # assume moisture is zero
+            data['H2O'] = 0.0
+            input_variables['moisture'] = 'H2O'
+            self._logger.warning('Zero moisture has been assumed.')
+
+        if input_variables['mass_wet'] is None:
+            col_map['mass_wet'] = 'mass_wet'
+            data['mass_wet'] = solve_mass_moisture(mass_dry=data[input_variables['mass_dry']],
+                                                   moisture=data[input_variables['moisture']])
+        else:
+            col_map['mass_wet'] = input_variables['mass_wet']
+
+        if input_variables['mass_dry'] is None:
+            col_map['mass_dry'] = 'mass_dry'
+            data['mass_dry'] = solve_mass_moisture(mass_wet=data[input_variables['mass_wet']],
+                                                   moisture=data[input_variables['moisture']])
+        else:
+            col_map['mass_dry'] = input_variables['mass_dry']
+
+        if input_variables['moisture'] is None:
+            col_map['H2O'] = 'H2O'
+        else:
+            # drop the moisture column, since it is now redundant, work with mass, moisture is dependent property
+            data.drop(columns=input_variables['moisture'], inplace=True)
+            col_map['H2O'] = input_variables['moisture']
+
+        data.rename(columns={v: k for k, v in col_map.items()}, inplace=True)
+
+        return data, col_map
 
 
 def read_yaml(file_path):

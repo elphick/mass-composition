@@ -54,3 +54,23 @@ fig: Figure = mcn.plot_sankey()
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for use in the gallery
 
+# %%
+#
+# Filtered Data
+# -------------
+#
+# It is convenient to filter the underlying data before plotting.
+#
+# To verify the filtering, we'll plot the sankey as part of the table_plot, which will tabulate the
+# aggregated mass-composition for each edge/stream in the network.
+
+fig: Figure = mcn.table_plot(plot_type='sankey', table_pos='left')
+fig
+
+# %%
+#
+# Now filter and plot again
+
+fig: Figure = mcn.query(mc_name='Feed', queries={'index': 'Fe>58'}).table_plot(plot_type='sankey', table_pos='left')
+fig
+
