@@ -22,7 +22,7 @@ from test.data import sample_data
 # We get some demo data in the form of a pandas DataFrame
 
 df_data: pd.DataFrame = sample_data()
-print(df_data.head())
+df_data
 
 # %%
 #
@@ -38,11 +38,23 @@ print(obj_mc)
 #
 # i.e. weight average of the dataset, a.k.a. head grade
 
-print(obj_mc.aggregate())
-print(obj_mc.aggregate(as_dataframe=False))
+obj_mc.aggregate()
+
+# %%
+obj_mc.aggregate(as_dataframe=False)
 
 # %%
 #
 # Aggregate by a group variable
 
-print(obj_mc.aggregate(group_var='group'))
+obj_mc.aggregate(group_var='group')
+
+# %%
+#
+# Filter the object
+# -----------------
+#
+# Filter with a criteria, just like pandas
+
+obj_mc.query(queries={'index': 'Fe>58'}).aggregate()
+
