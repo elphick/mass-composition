@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib
 import networkx as nx
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
@@ -335,9 +336,9 @@ class MCNetwork(nx.DiGraph):
             cmap = sns.color_palette(edge_colormap, as_cmap=True)
             rpt: pd.DataFrame = self.report()
             if not v_min:
-                v_min = float(rpt[color_var].min())
+                v_min = np.floor(rpt[color_var].min())
             if not v_max:
-                v_max = float(rpt[color_var].max())
+                v_max = np.ceil(rpt[color_var].max())
         if isinstance(list(self.nodes)[0], int):
             labels = [str(n) for n in list(self.nodes)]
         else:

@@ -41,8 +41,12 @@ from elphick.mass_composition import MassComposition
 # We get some demo data in the form of a pandas DataFrame
 
 df_data: pd.DataFrame = size_by_assay()
-df_data.rename(columns={'mass_pct': 'mass_dry'}, inplace=True)
 df_data
+
+# # since we intend to split the sample in half, we'll re-base the original mass to 200,
+# for easier interpretation later.
+
+df_data['mass_dry'] = df_data['mass_dry'] * 2
 
 # %%
 # Create the object
@@ -70,8 +74,8 @@ mc_ideal_feed, mc_sim_feed = mc_size.split(0.5, 'ideal feed', 'sim feed')
 # We partially initialise the two partitions
 # The dim argument is added to inform the split method which dimension to apply the function/split to
 
-part_ideal = partial(perfect, d50=150, dim='size')
-part_sim = partial(napier_munn, d50=150, ep=100, dim='size')
+part_ideal = partial(perfect, d50=0.150, dim='size')
+part_sim = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
 
 # %%
 #
@@ -94,6 +98,7 @@ plotly.io.show(fig)  # this call to show will set the thumbnail for use in the g
 # %%
 # ..  note::
 #     The mass split and grades are different as shown in the table above.
-#     More work reviewing recovery of both cases would be prudent.
+#     The difference in coarse yield (mass recovery) of the two cases is 7.4%.
+#     More work reviewing recovery of components in both cases would be prudent.
 #     This is illustrative only but demonstrates why using ore characterisation and ignoring
 #     process characterisation to capture the real world process inefficiencies is dangerous.

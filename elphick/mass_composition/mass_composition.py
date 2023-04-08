@@ -15,6 +15,7 @@ import yaml
 from elphick.mass_composition.utils import solve_mass_moisture
 from elphick.mass_composition.utils.components import is_compositional
 from elphick.mass_composition.utils.random import random_int
+from elphick.mass_composition.utils.size import mean_size
 from elphick.mass_composition.utils.viz import plot_parallel
 
 # noinspection PyUnresolvedReferences
@@ -75,6 +76,7 @@ class MassComposition:
                           'mc_vars_mass': cols_mass,
                           'mc_vars_chem': cols_chem,
                           'mc_vars_attrs': cols_attrs,
+                          'mc_interval_edges': data.attrs,
                           'mc_history': [f'Created with name: {name}']}
         xr_ds.attrs = ds_attrs
 
@@ -493,6 +495,95 @@ class MassComposition:
 
         return fig
 
+    def _intervals_to_columns(self, interval_index: pd.IntervalIndex) -> pd.DataFrame:
+        """Reconstruct columns from an interval index
+        
+        Uses the left and right names stored in the xr.Dataset attrs
+
+        Args:
+            interval_index: The IntervalIndex to convert to named columns of edges
+
+        Returns:
+
+        """
+        base_name: str = str(interval_index.name)
+        if base_name in self._data.attrs['mc_interval_edges'].keys():
+            d_edge_names = self._data.attrs['mc_interval_edges'][base_name]
+        else:
+            d_edge_names = {'left': 'left', 'right': 'right'}
+        df_intervals: pd.DataFrame = pd.DataFrame(index=interval_index).reset_index()
+        df_intervals[f'{base_name}_{d_edge_names["left"]}'] = df_intervals[base_name].apply(lambda x: x.left)
+        df_intervals[f'{base_name}_{d_edge_names["right"]}'] = df_intervals[base_name].apply(lambda x: x.right)
+        df_intervals.set_index(base_name, inplace=True)
+        return df_intervals
+
+    def plot_intervals(self,
+                       variables: List[str],
+                       cumulative: bool = True,
+                       direction: str = 'descending',
+                       min_x: Optional[float] = None) -> go.Figure:
+        """Plot "The Grade-Tonnage" curve.
+
+        Mass and grade by bins for a cut-off variable.
+
+        Args:
+            variables: List of variables to include in the plot
+            cutoff_var: The variable that defines the bins
+            bin_width: The width of the bin
+            cumulative: If True, the results are cumulative weight averaged.
+            direction: 'ascending'|'descending', if cumulative is True, the direction of accumulation
+            min_x: Optional minimum value for the x-axis, useful to set reasonable visual range with a log
+            scaled x-axis when plotting size data
+        """
+
+        res: xr.Dataset = self.data
+
+        plot_kwargs: Dict = dict(line_shape='vh')
+        if cumulative:
+            res = res.mc.data().mc.cumulate(direction=direction)
+            plot_kwargs = dict(line_shape='spline')
+
+        interval_data: pd.DataFrame = res.mc.to_dataframe()
+
+        df_intervals: pd.DataFrame = self._intervals_to_columns(interval_index=interval_data.index)
+        df = pd.concat([df_intervals, interval_data], axis='columns')
+        x_var: str = interval_data.index.name
+        if not cumulative:
+            # append on the largest fraction right edge for display purposes
+            df_end: pd.DataFrame = df.loc[df.index.max(), list(df_intervals.columns) + variables].to_frame().T
+            df_end[df_intervals.columns[0]] = df_end[df_intervals.columns[1]]
+            df_end[df_intervals.columns[1]] = np.inf
+            df = pd.concat([df_end, df], axis='index')
+            df[interval_data.index.name] = df[df_intervals.columns[0]]
+        else:
+            if direction == 'ascending':
+                x_var = df_intervals.columns[1]
+            elif direction == 'descending':
+                x_var = df_intervals.columns[0]
+
+        if 'size' in x_var:
+            if not min_x:
+                min_x = interval_data.index.min().right / 2.0
+            # set zero to the minimum x value (for display only) to enable the tooltips on that point.
+            df.loc[df[x_var] == df[x_var].min(), x_var] = min_x
+            hover_data = {'component': True,  # add other column, default formatting
+                          x_var: ':.3f',  # add other column, customized formatting
+                          'value': ':.2f'
+                          }
+            plot_kwargs = {**plot_kwargs,
+                           **dict(log_x=True,
+                                  range_x=[min_x, interval_data.index.max().right],
+                                  hover_data=hover_data)}
+
+        df = df[[x_var] + variables].melt(id_vars=[x_var], var_name='component')
+
+        fig = px.line(df, x=x_var, y='value', facet_row='component', **plot_kwargs)
+        fig.for_each_annotation(lambda a: a.update(text=a.text.replace("component=", "")))
+        fig.update_yaxes(matches=None)
+        fig.update_layout(title=self.name)
+
+        return fig
+
     def plot_parallel(self, color: Optional[str] = None,
                       var_subset: Optional[List[str]] = None,
                       title: Optional[str] = None,
@@ -534,7 +625,11 @@ class MassComposition:
                 df.insert(loc=pos + 2, column=f'{col}_right', value=df[col].array.right)
                 df.drop(columns=col, inplace=True)
             else:
-                df[col] = df[col].array.mid
+                # workaround for https://github.com/Elphick/mass-composition/issues/1
+                if col == 'size':
+                    df[col] = mean_size(pd.arrays.IntervalArray(df[col]))
+                else:
+                    df[col] = df[col].array.mid
 
         if not title and hasattr(self, 'name'):
             title = self.name
@@ -590,11 +685,17 @@ class MassComposition:
                                                                    closed=self.config['intervals']['closed'])
                     # verbose but need to preserve index order...
                     new_indexes: List = []
+                    index_edge_names: Dict = {base_name: {'left': keys[0].split('_')[-1],
+                                                          'right': keys[1].split('_')[-1]}}
                     for index in indexes_orig:
                         if index not in keys:
                             new_indexes.append(index)
                         if (index in keys) and (base_name not in new_indexes):
                             new_indexes.append(base_name)
+
+                    # push the left and right names (suffixes) to the dataset attrs
+                    # (series attrs are lost when set to an index)
+                    data.attrs = index_edge_names
                     data.set_index(new_indexes, inplace=True)
                     data.drop(columns=keys, inplace=True)
 

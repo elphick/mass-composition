@@ -1,5 +1,4 @@
 import logging
-import random
 from copy import deepcopy
 from enum import Enum
 from typing import Dict, Optional, Union, Iterable, List, Tuple, Callable
@@ -143,7 +142,7 @@ class MassCompositionAccessor:
     def cumulate(self, direction: str) -> xr.Dataset:
         """Cumulate along the dims
 
-        Expected use case in only for Datasets that have been reduced to 1D.
+        Expected use case is only for Datasets that have been reduced to 1D.
 
         Args:
             direction: 'ascending'|'descending'
@@ -156,24 +155,36 @@ class MassCompositionAccessor:
         if direction not in valid_dirs:
             raise KeyError(f'Invalid direction provided.  Valid arguments are: {valid_dirs}')
 
+        d_dir: Dict = {'ascending': True, 'descending': False}
+
         if len(self._obj.dims) > 1:
             raise NotImplementedError('Datasets > 1D have not been tested.')
+
+        index_var: str = str(list(self._obj.dims.keys())[0])
+        if not isinstance(self._obj[index_var].data[0], pd.Interval):
+            self._logger.warning("Unexpected use of the cumulate method on non-fractional data.  "
+                                 "Consider setting the index (dim) as intervals.")
+
+        interval_index = pd.Index(self._obj[index_var])
+        if not (interval_index.is_monotonic_increasing or interval_index.is_monotonic_decreasing):
+            raise ValueError('Index is not monotonically increasing or decreasing')
+
+        in_data_ascending: bool = True
+        if interval_index.is_monotonic_decreasing:
+            in_data_ascending = False
 
         # convert to mass, then cumsum, then convert back to relative composition (grade)
         mass: xr.Dataset = self.composition_to_mass()
 
-        index_var = list(mass.indexes)[0]
-        if direction == 'descending':
-            mass = mass.sortby(variables=index_var, ascending=False)
+        mass = mass.sortby(variables=index_var, ascending=d_dir[direction])
 
         mass_cum: xr.Dataset = mass.cumsum(keep_attrs=True)
         # put the coords back
         mass_cum = mass_cum.assign_coords(**mass.coords)
         res: xr.Dataset = mass_cum.mc.mass_to_composition()
 
-        if direction == 'descending':
-            # put back to ascending order
-            res = res.sortby(variables=index_var, ascending=True)
+        # put back to original order
+        res = res.sortby(variables=index_var, ascending=in_data_ascending)
 
         return res
 
@@ -485,6 +496,9 @@ class MassCompositionAccessor:
         if original_column_names:
             df.rename(columns=self.column_map(), inplace=True)
         return df
+
+    def resample(self):
+        pass
 
 
 def mc_aggregate(xr_ds: xr.Dataset) -> xr.Dataset:
