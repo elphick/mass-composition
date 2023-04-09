@@ -33,8 +33,8 @@ print(obj_mc)
 
 # %%
 #
-# Demonstrate the aggregate function
-# -----------------------------------
+# Demonstrate the aggregate method
+# --------------------------------
 #
 # i.e. weight average of the dataset, a.k.a. head grade
 

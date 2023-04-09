@@ -2,7 +2,7 @@ import logging
 import random
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable
+from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set
 
 import numpy as np
 import pandas as pd
@@ -25,7 +25,7 @@ import elphick.mass_composition.mc_xarray  # keep this "unused" import - it help
 class MassComposition:
 
     def __init__(self,
-                 data: pd.DataFrame,
+                 data: Optional[pd.DataFrame] = None,
                  name: Optional[str] = 'unnamed',
                  mass_wet_var: Optional[str] = None,
                  mass_dry_var: Optional[str] = None,
@@ -34,76 +34,84 @@ class MassComposition:
                  mass_units: Optional[str] = 'mass units',
                  config_file: Optional[Path] = None):
 
-        if sum(data.index.duplicated()) > 0:
-            raise KeyError('The data has duplicate indexes.')
-
-        data: pd.DataFrame = data.copy()
         self._logger = logging.getLogger(name=self.__class__.__name__)
-
-        self._input_columns: List[str] = list(data.columns)
-        self._mass_units = mass_units
-
-        var_args: Dict = {k: v for k, v in locals().items() if '_var' in k}
 
         if config_file is None:
             config_file = Path(__file__).parent / './config/mc_config.yml'
         self.config = read_yaml(config_file)
 
-        # if interval pairs are passed as indexes then create the proper interval index
-        data = self._create_interval_indexes(data=data)
-
-        input_variables: Dict = self._detect_var_types(var_args=var_args, cols_data=list(data.columns))
-
-        # solve or validate the moisture balance
-        data, col_map = self._solve_mass_moisture(data, input_variables)
-        cols_mass = [self.config['vars']['mass_wet'], self.config['vars']['mass_dry']]
-        col_map = {**col_map, **{v: k for k, v in input_variables['chemistry'].items()}}
-
-        data.rename(columns=input_variables['chemistry'], inplace=True)
-
-        cols_chem = list(input_variables['chemistry'].values())
-        cols_attrs = input_variables['attrs']
-
-        data = data[cols_mass + cols_chem + cols_attrs]
-
-        # create the xr.Dataset, dims from the index.
-        xr_ds: xr.Dataset = data.to_xarray()
-        # move the attrs to become coords
-        xr_ds = xr_ds.set_coords(cols_attrs)
-
-        # add the dataset attributes
-        ds_attrs: Dict = {'mc_name': name,
-                          'mc_vars_mass': cols_mass,
-                          'mc_vars_chem': cols_chem,
-                          'mc_vars_attrs': cols_attrs,
-                          'mc_interval_edges': data.attrs,
-                          'mc_history': [f'Created with name: {name}']}
-        xr_ds.attrs = ds_attrs
-
-        # add the variable attributes
-
-        for var_name, var_data in {'mass_wet': xr_ds[cols_mass[0]], 'mass_dry': xr_ds[cols_mass[1]]}.items():
-            var_data.attrs = {'units': self._mass_units,
-                              'standard_name': ' '.join(var_name.split('_')[::-1]).title(),
-                              'mc_type': 'mass',
-                              'mc_col_orig': input_variables[var_name]}
-
-        for in_analyte, analyte in input_variables['chemistry'].items():
-            xr_ds[analyte].attrs = {'units': '%',
-                                    'standard_name': analyte,
-                                    'mc_type': 'chemistry',
-                                    'mc_col_orig': in_analyte}
-
-        for var_attr in input_variables['attrs']:
-            xr_ds[var_attr].attrs = {'standard_name': var_attr,
-                                     'mc_type': 'attribute',
-                                     'mc_col_orig': var_attr}
-
-        self._data = xr_ds
-
         in_node = random_int()
         out_node = random_int()
         self.nodes: List[int] = [in_node, out_node]
+
+        if data is not None:
+            if sum(data.index.duplicated()) > 0:
+                raise KeyError('The data has duplicate indexes.')
+
+            data: pd.DataFrame = data.copy()
+
+            self._input_columns: List[str] = list(data.columns)
+            self._mass_units = mass_units
+
+            var_args: Dict = {k: v for k, v in locals().items() if '_var' in k}
+
+            # if interval pairs are passed as indexes then create the proper interval index
+            data = self._create_interval_indexes(data=data)
+
+            input_variables: Dict = self._detect_var_types(var_args=var_args, cols_data=list(data.columns))
+
+            # solve or validate the moisture balance
+            data, col_map = self._solve_mass_moisture(data, input_variables)
+            cols_mass = [self.config['vars']['mass_wet'], self.config['vars']['mass_dry']]
+            col_map = {**col_map, **{v: k for k, v in input_variables['chemistry'].items()}}
+
+            data.rename(columns=input_variables['chemistry'], inplace=True)
+
+            cols_chem = list(input_variables['chemistry'].values())
+            cols_attrs = input_variables['attrs']
+
+            data = data[cols_mass + cols_chem + cols_attrs]
+
+            # create the xr.Dataset, dims from the index.
+            xr_ds: xr.Dataset = data.to_xarray()
+            # move the attrs to become coords - HOLD - this creates merging problems in the data property, reconsider.
+            # xr_ds = xr_ds.set_coords(cols_attrs)
+
+            # add the dataset attributes
+            ds_attrs: Dict = {'mc_name': name,
+                              'mc_vars_mass': cols_mass,
+                              'mc_vars_chem': cols_chem,
+                              'mc_vars_attrs': cols_attrs,
+                              'mc_interval_edges': data.attrs}
+            xr_ds.attrs = ds_attrs
+
+            # add the variable attributes
+
+            for var_name, var_data in {'mass_wet': xr_ds[cols_mass[0]], 'mass_dry': xr_ds[cols_mass[1]]}.items():
+                var_data.attrs = {'units': self._mass_units,
+                                  'standard_name': ' '.join(var_name.split('_')[::-1]).title(),
+                                  'mc_type': 'mass',
+                                  'mc_col_orig': input_variables[var_name]}
+
+            for in_analyte, analyte in input_variables['chemistry'].items():
+                xr_ds[analyte].attrs = {'units': '%',
+                                        'standard_name': analyte,
+                                        'mc_type': 'chemistry',
+                                        'mc_col_orig': in_analyte}
+
+            for var_attr in input_variables['attrs']:
+                xr_ds[var_attr].attrs = {'standard_name': var_attr,
+                                         'mc_type': 'attribute',
+                                         'mc_col_orig': var_attr}
+
+            self._data = xr_ds
+
+    @classmethod
+    def from_xarray(cls, ds: xr.Dataset, name: Optional[str] = 'unnamed'):
+        obj = cls()
+        obj._data = ds
+        obj.name = name
+        return obj
 
     @property
     def name(self) -> str:
@@ -125,7 +133,9 @@ class MassComposition:
                                               )
 
         data: xr.Dataset = xr.merge(
-            [self._data[self._data.attrs['mc_vars_mass']], moisture, self._data[self._data.attrs['mc_vars_chem']],
+            [self._data[self._data.attrs['mc_vars_mass']],
+             moisture,
+             self._data[self._data.attrs['mc_vars_chem']],
              self._data[self._data.attrs['mc_vars_attrs']]])
         return data
 
@@ -169,6 +179,123 @@ class MassComposition:
         res: MassComposition = deepcopy(self)
         res._data = res._data.query(queries=queries)
         return res
+
+    def constrain(self,
+                  clip_mass: Optional[Union[Tuple, Dict]] = None,
+                  clip_composition: Optional[Union[Tuple, Dict]] = None,
+                  relative_mass: Optional[Union[Tuple, Dict]] = None,
+                  relative_composition: Optional[Union[Tuple, Dict]] = None,
+                  other: Optional['MassComposition'] = None) -> 'MassComposition':
+
+        """Constrain the mass-composition
+
+        It is possible that a MassComposition object is created from a source that has improbable results.
+        In this case this method can help improve the integrity of the mass-composition.
+
+        Args:
+            clip_mass: Limit the minimum and maximum values of the mass between a minimum and maximum absolute value.
+            clip_composition: Limit the minimum and maximum values of the composition between a minimum and
+                maximum absolute value.
+            relative_mass: Constrain the mass recovery of the object to the other object
+            relative_composition: Constrain the component recovery of the object to the other object
+            other: The other object used for recovery calculation.  Must be provided if relative_mass or
+            relative_composition are provided.
+
+
+
+        Returns:
+            Returns the new object constrained per the provided arguments.
+        """
+
+        xr_ds: xr.Dataset = self.data.copy()
+
+        if clip_mass:
+            if isinstance(clip_mass, Dict):
+                for k, v in clip_mass.items():
+                    xr_ds = self._clip(xr_ds=xr_ds, variables=[k], limits=v)
+            else:
+                xr_ds = self._clip(xr_ds=xr_ds, variables=xr_ds.mc.mc_vars_mass, limits=clip_mass)
+
+        if clip_composition:
+            if isinstance(clip_composition, Dict):
+                for k, v in clip_composition.items():
+                    xr_ds = self._clip(xr_ds=xr_ds, variables=[k], limits=v)
+            else:
+                xr_ds = self._clip(xr_ds=xr_ds, variables=xr_ds.mc.mc_vars_chem, limits=clip_composition)
+
+        if relative_mass or relative_composition:
+            if not object:
+                raise ValueError("The other other argument must be provided to apply relative constraints.")
+            
+        if relative_mass:
+            xr_relative: xr.Dataset = self.data[xr_ds.mc.mc_vars_mass] / other.data[xr_ds.mc.mc_vars_mass]
+            if isinstance(relative_mass, Dict):
+                for k, v in relative_mass.items():
+                    xr_relative = self._clip(xr_ds=xr_relative, variables=[k], limits=v)
+            else:
+                xr_relative = self._clip(xr_ds=xr_relative, variables=xr_ds.mc.mc_vars_mass, limits=relative_mass)
+
+            # convert back to relative composition (mass/grades)
+            xr_ds = other.data[xr_ds.mc.mc_vars_mass] * xr_relative
+            xr_ds = xr.merge([xr_ds, self.data[self.data.mc.mc_vars_chem], self.data[self.data.mc.mc_vars_attrs]])
+            xr_ds = self._copy_all_attrs(xr_ds, self.data)
+
+        if relative_composition:
+            xr_relative: xr.Dataset = self.compare(other=other, comparison='recovery', explicit_names=False,
+                                                   as_dataframe=False)
+            if isinstance(relative_composition, Dict):
+                for k, v in relative_composition.items():
+                    xr_relative = self._clip(xr_ds=xr_relative, variables=[k], limits=v)
+            else:
+                xr_relative = self._clip(xr_ds=xr_relative, variables=self.data.mc.mc_vars_chem,
+                                         limits=relative_composition)
+
+            # convert back to relative composition (mass/grades)
+            xr_ds = other.data.mc.composition_to_mass() * xr_relative
+            xr_ds = xr.merge([xr_ds, self.data[self.data.mc.mc_vars_attrs]])
+            xr_ds = self._copy_all_attrs(xr_ds, self.data)
+
+        res: MassComposition = MassComposition().from_xarray(xr_ds, name=self.name)
+
+        return res
+
+    @staticmethod
+    def _copy_all_attrs(xr_to: xr.Dataset, xr_from: xr.Dataset) -> xr.Dataset:
+        xr_to.attrs.update(xr_from.attrs)
+        da: xr.DataArray
+        for new_da, da in zip(xr_to.values(), xr_from.values()):
+            new_da.attrs.update(da.attrs)
+        return xr_to
+
+    def compare(self, other: 'MassComposition', comparison: str = 'recovery',
+                explicit_names: bool = True, as_dataframe: bool = True) -> Union[pd.DataFrame, xr.Dataset]:
+
+        valid_comparisons: Set = {'recovery', 'difference', 'divide'}
+
+        cols = [col for col in self.data.data_vars if col not in self.data.mc.mc_vars_attrs]
+
+        if comparison == 'recovery':
+            res: xr.Dataset = self.data.mc.composition_to_mass()[cols] / other.data.mc.composition_to_mass()[cols]
+        else:
+            raise ValueError(f"The comparison argument is not valid: {valid_comparisons}")
+
+        if explicit_names:
+            res = res.rename_vars(
+                {col: f"{self.name}_{col}_{self.config['comparisons'][comparison]}_{other.name}" for col in
+                 res.data_vars})
+
+        if as_dataframe:
+            res: pd.DataFrame = res.to_dataframe()
+
+        return res
+
+    @staticmethod
+    def _clip(xr_ds: xr.Dataset, variables: List[str], limits: Tuple) -> xr.Dataset:
+        if len(variables) == 1:
+            variables = variables[0]
+        xr_ds[variables] = xr_ds[variables].where(xr_ds[variables] > limits[0], limits[0])
+        xr_ds[variables] = xr_ds[variables].where(xr_ds[variables] < limits[1], limits[1])
+        return xr_ds
 
     def binned_mass_composition(self, cutoff_var: str,
                                 bin_width: float,
