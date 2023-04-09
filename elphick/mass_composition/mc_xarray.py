@@ -39,10 +39,6 @@ class MassCompositionAccessor:
     def name(self):
         return self._obj.attrs['mc_name']
 
-    @property
-    def history(self):
-        return self._obj.attrs['mc_history']
-
     def data(self):
 
         moisture: xr.DataArray = xr.DataArray((self._obj['mass_wet'] - self._obj['mass_dry']) /
@@ -75,11 +71,6 @@ class MassCompositionAccessor:
 
     def rename(self, new_name: str):
         self._obj.attrs['mc_name'] = new_name
-        self.log_to_history(f'Renamed to {new_name}')
-
-    def log_to_history(self, msg: str):
-        self._logger.info(msg)
-        self._obj.attrs['mc_history'].append(msg)
 
     def aggregate(self, group_var: Optional[str] = None,
                   group_bins: Optional[Union[int, Iterable]] = None,
@@ -209,8 +200,6 @@ class MassCompositionAccessor:
             if da.attrs['mc_type'] == 'chemistry':
                 da.attrs['units'] = dsm['mass_wet'].attrs['units']
 
-        self.log_to_history(f'Converted to {self.composition_context}, dropped attr variables')
-
         xr.set_options(keep_attrs='default')
 
         return dsm
@@ -234,8 +223,6 @@ class MassCompositionAccessor:
         for da in dsc.values():
             if da.attrs['mc_type'] == 'chemistry':
                 da.attrs['units'] = '%'
-
-        self.log_to_history(f'Converted to {self.composition_context}')
 
         xr.set_options(keep_attrs='default')
 
@@ -266,11 +253,9 @@ class MassCompositionAccessor:
 
         # split by mass
         out._obj[self._obj.mc_vars_mass] = out._obj[self._obj.mc_vars_mass] * fraction
-        out.log_to_history(f'Split from object [{self.name}] @ fraction: {fraction}')
         out.rename(f'({fraction} * {self.name})')
 
         comp._obj[self._obj.mc_vars_mass] = comp._obj[self._obj.mc_vars_mass] * (1 - fraction)
-        comp.log_to_history(f'Split from object [{self.name}] @ 1 - fraction {fraction}: {1 - fraction}')
         comp.rename(f'({1 - fraction} * {self.name})')
 
         xr.set_options(keep_attrs='default')
@@ -455,19 +440,15 @@ class MassCompositionAccessor:
         # merge in the attr vars
         res = xr.merge([res, self._obj[self._obj.mc_vars_attrs]])
         if operator_string == 'added':
-            res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
             res.mc.rename(f'({self.name} + {other.mc.name})')
             res = res.mc.mass_to_composition()
         elif operator_string == 'subtracted':
-            res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
             res.mc.rename(f'({self.name} - {other.mc.name})')
             res = res.mc.mass_to_composition()
         elif operator_string == 'divided':
-            res.mc.log_to_history(f'Object has been {operator_string} by {other.mc.name}.')
             res.mc.rename(f'({self.name} / {other.mc.name})')
             # division returns relative, not absolute - do not convert back to relative composition
         elif operator_string == 'multiplied':
-            res.mc.log_to_history(f'Object has been {operator_string} by one or more values.')
             res.mc.rename(f'({self.name} partitioned)')
             res = res.mc.mass_to_composition()
         else:
