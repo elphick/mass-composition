@@ -290,7 +290,7 @@ class MassComposition:
         return res
 
     @staticmethod
-    def _clip(xr_ds: xr.Dataset, variables: list[str], limits: Tuple) -> xr.Dataset:
+    def _clip(xr_ds: xr.Dataset, variables: List[str], limits: Tuple) -> xr.Dataset:
         if len(variables) == 1:
             variables = variables[0]
         xr_ds[variables] = xr_ds[variables].where(xr_ds[variables] > limits[0], limits[0])
