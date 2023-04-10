@@ -7,7 +7,7 @@ def mean_size(size_intervals: IntervalArray) -> np.ndarray:
 
     Size calculations are performed using the geometric mean, not the arithmetic mean
 
-    NOTE: If geometric mean is used for the pan fraction (0.0mm retained) it will return zero, which is and
+    NOTE: If geometric mean is used for the pan fraction (0.0mm retained) it will return zero, which is an
     edge size not mean size.  So the mean ratio of the geometric mean to the arithmetic mean for all other
      fractions is used for the bottom fraction.
 

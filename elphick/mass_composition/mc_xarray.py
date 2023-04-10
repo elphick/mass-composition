@@ -1,5 +1,4 @@
 import logging
-import random
 from copy import deepcopy
 from enum import Enum
 from typing import Dict, Optional, Union, Iterable, List, Tuple, Callable
@@ -40,10 +39,6 @@ class MassCompositionAccessor:
     def name(self):
         return self._obj.attrs['mc_name']
 
-    @property
-    def history(self):
-        return self._obj.attrs['mc_history']
-
     def data(self):
 
         moisture: xr.DataArray = xr.DataArray((self._obj['mass_wet'] - self._obj['mass_dry']) /
@@ -76,11 +71,6 @@ class MassCompositionAccessor:
 
     def rename(self, new_name: str):
         self._obj.attrs['mc_name'] = new_name
-        self.log_to_history(f'Renamed to {new_name}')
-
-    def log_to_history(self, msg: str):
-        self._logger.info(msg)
-        self._obj.attrs['mc_history'].append(msg)
 
     def aggregate(self, group_var: Optional[str] = None,
                   group_bins: Optional[Union[int, Iterable]] = None,
@@ -143,7 +133,7 @@ class MassCompositionAccessor:
     def cumulate(self, direction: str) -> xr.Dataset:
         """Cumulate along the dims
 
-        Expected use case in only for Datasets that have been reduced to 1D.
+        Expected use case is only for Datasets that have been reduced to 1D.
 
         Args:
             direction: 'ascending'|'descending'
@@ -156,24 +146,36 @@ class MassCompositionAccessor:
         if direction not in valid_dirs:
             raise KeyError(f'Invalid direction provided.  Valid arguments are: {valid_dirs}')
 
+        d_dir: Dict = {'ascending': True, 'descending': False}
+
         if len(self._obj.dims) > 1:
             raise NotImplementedError('Datasets > 1D have not been tested.')
+
+        index_var: str = str(list(self._obj.dims.keys())[0])
+        if not isinstance(self._obj[index_var].data[0], pd.Interval):
+            self._logger.warning("Unexpected use of the cumulate method on non-fractional data.  "
+                                 "Consider setting the index (dim) as intervals.")
+
+        interval_index = pd.Index(self._obj[index_var])
+        if not (interval_index.is_monotonic_increasing or interval_index.is_monotonic_decreasing):
+            raise ValueError('Index is not monotonically increasing or decreasing')
+
+        in_data_ascending: bool = True
+        if interval_index.is_monotonic_decreasing:
+            in_data_ascending = False
 
         # convert to mass, then cumsum, then convert back to relative composition (grade)
         mass: xr.Dataset = self.composition_to_mass()
 
-        index_var = list(mass.indexes)[0]
-        if direction == 'descending':
-            mass = mass.sortby(variables=index_var, ascending=False)
+        mass = mass.sortby(variables=index_var, ascending=d_dir[direction])
 
         mass_cum: xr.Dataset = mass.cumsum(keep_attrs=True)
         # put the coords back
         mass_cum = mass_cum.assign_coords(**mass.coords)
         res: xr.Dataset = mass_cum.mc.mass_to_composition()
 
-        if direction == 'descending':
-            # put back to ascending order
-            res = res.sortby(variables=index_var, ascending=True)
+        # put back to original order
+        res = res.sortby(variables=index_var, ascending=in_data_ascending)
 
         return res
 
@@ -198,8 +200,6 @@ class MassCompositionAccessor:
             if da.attrs['mc_type'] == 'chemistry':
                 da.attrs['units'] = dsm['mass_wet'].attrs['units']
 
-        self.log_to_history(f'Converted to {self.composition_context}, dropped attr variables')
-
         xr.set_options(keep_attrs='default')
 
         return dsm
@@ -223,8 +223,6 @@ class MassCompositionAccessor:
         for da in dsc.values():
             if da.attrs['mc_type'] == 'chemistry':
                 da.attrs['units'] = '%'
-
-        self.log_to_history(f'Converted to {self.composition_context}')
 
         xr.set_options(keep_attrs='default')
 
@@ -255,11 +253,9 @@ class MassCompositionAccessor:
 
         # split by mass
         out._obj[self._obj.mc_vars_mass] = out._obj[self._obj.mc_vars_mass] * fraction
-        out.log_to_history(f'Split from object [{self.name}] @ fraction: {fraction}')
         out.rename(f'({fraction} * {self.name})')
 
         comp._obj[self._obj.mc_vars_mass] = comp._obj[self._obj.mc_vars_mass] * (1 - fraction)
-        comp.log_to_history(f'Split from object [{self.name}] @ 1 - fraction {fraction}: {1 - fraction}')
         comp.rename(f'({1 - fraction} * {self.name})')
 
         xr.set_options(keep_attrs='default')
@@ -444,19 +440,15 @@ class MassCompositionAccessor:
         # merge in the attr vars
         res = xr.merge([res, self._obj[self._obj.mc_vars_attrs]])
         if operator_string == 'added':
-            res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
             res.mc.rename(f'({self.name} + {other.mc.name})')
             res = res.mc.mass_to_composition()
         elif operator_string == 'subtracted':
-            res.mc.log_to_history(f'Object called {other.mc.name} has been {operator_string}.')
             res.mc.rename(f'({self.name} - {other.mc.name})')
             res = res.mc.mass_to_composition()
         elif operator_string == 'divided':
-            res.mc.log_to_history(f'Object has been {operator_string} by {other.mc.name}.')
             res.mc.rename(f'({self.name} / {other.mc.name})')
             # division returns relative, not absolute - do not convert back to relative composition
         elif operator_string == 'multiplied':
-            res.mc.log_to_history(f'Object has been {operator_string} by one or more values.')
             res.mc.rename(f'({self.name} partitioned)')
             res = res.mc.mass_to_composition()
         else:
@@ -485,6 +477,9 @@ class MassCompositionAccessor:
         if original_column_names:
             df.rename(columns=self.column_map(), inplace=True)
         return df
+
+    def resample(self):
+        pass
 
 
 def mc_aggregate(xr_ds: xr.Dataset) -> xr.Dataset:
