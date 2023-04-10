@@ -3,8 +3,8 @@ import pytest
 
 def test_examples():
 
-    import examples.xarray.basic_usage_xr
-    import examples.xarray.math_operations_xr
+    import examples.xarray_examples.basic_usage_xr
+    import examples.xarray_examples.math_operations_xr
 
     import examples.basic_usage
     import examples.math_operations
@@ -26,3 +26,5 @@ def test_examples():
     import examples.sankey_plots
 
     import examples.constrain
+
+    import examples.compare
