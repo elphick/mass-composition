@@ -28,3 +28,6 @@ def test_examples():
     import examples.constrain
 
     import examples.compare
+
+    import examples.filtering
+
