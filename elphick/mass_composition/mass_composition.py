@@ -276,6 +276,10 @@ class MassComposition:
 
         if comparison == 'recovery':
             res: xr.Dataset = self.data.mc.composition_to_mass()[cols] / other.data.mc.composition_to_mass()[cols]
+        elif comparison == 'difference':
+            res: xr.Dataset = self.data[cols] - other.data[cols]
+        elif comparison == 'divide':
+            res: xr.Dataset = self.data[cols] / other.data[cols]
         else:
             raise ValueError(f"The comparison argument is not valid: {valid_comparisons}")
 
