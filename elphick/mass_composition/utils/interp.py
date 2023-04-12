@@ -77,9 +77,9 @@ def interp_monotonic(ds: xr.Dataset, coords: Dict, include_original_coords: bool
         ds_res = xr.concat([mass.isel({coord: 0}).expand_dims(coord), ds_res.diff(dim=coord)], dim=coord)
 
         # create a new interval index
-        interval_index: pd.Series = pd.Series(pd.arrays.IntervalArray.from_arrays(
-            left=ds_res[coord].shift({coord: 1}).fillna(original_index.min().left).values, right=ds_res[coord].values),
-            name=coord)
+        interval_index: pd.Series = pd.Series(pd.IntervalIndex.from_arrays(
+            left=ds_res[coord].shift({coord: 1}).fillna(original_index.min().left).values, right=ds_res[coord].values,
+            closed='left'), name=coord)
 
         ds_res[coord] = interval_index.values
 

@@ -97,25 +97,38 @@ fig = mc_upsampled.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
 fig
 
 # %%
-
-fig = mc_upsampled.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
-                                  cumulative=True, direction='ascending')
-# noinspection PyTypeChecker
-plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
-
-# %%
-
-fig = mc_upsampled.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
-                                  cumulative=True, direction='descending')
-fig
-
-# %%
 #
 # Validate the head grade against the original sample
 
 pd.testing.assert_frame_equal(mc_size.aggregate().reset_index(drop=True),
                               mc_upsampled.aggregate().reset_index(drop=True))
 
-# TODO: Validate the grade of the up-sampled sample grouped by the original intervals.
-#  This will validate that mass has been preserved within the original fractions.
+# %%
+# Next, validate the grade of the up-sampled sample grouped by the original intervals.
+# This will validate that mass has been preserved within the original fractions.
 
+bins = [0] + list(pd.arrays.IntervalArray(mc_size.data['size'].data[::-1]).right)
+original_sizes: pd.Series = pd.cut(
+    pd.Series(pd.arrays.IntervalArray(mc_upsampled.data['size'].data).mid, name='original_size'),
+    bins=bins, right=False, precision=8)
+original_sizes.index = pd.arrays.IntervalArray(xr_upsampled['size'].data, closed='left')
+original_sizes.index.name = 'size'
+xr_upsampled = xr.merge([xr_upsampled, original_sizes.to_xarray()])
+
+mc_upsampled2: MassComposition = MassComposition(xr_upsampled.to_dataframe(), name='Upsampled Sample')
+
+df_check: pd.DataFrame = mc_upsampled2.aggregate(group_var='original_size').sort_index(ascending=False)
+df_check.index = pd.IntervalIndex(df_check.index)
+df_check.index.name = 'size'
+
+pd.testing.assert_frame_equal(df_check, mc_size.data.to_dataframe())
+
+# %%
+# We passed the assertion above and so have validated that mass has been preserved for all the original intervals.
+# We'll display the two datasets that were compared
+
+mc_size.data.to_dataframe()
+
+# %%
+
+df_check
