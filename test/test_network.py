@@ -11,9 +11,8 @@ from elphick.mass_composition import MassComposition
 
 def test_sankey_plot(size_assay_data):
     df_data: pd.DataFrame = size_assay_data
-    df_data.rename(columns={'mass_pct': 'mass_dry'}, inplace=True)
     mc_size: MassComposition = MassComposition(df_data, name='size sample')
-    partition = partial(perfect, d50=150, dim='size')
+    partition = partial(perfect, d50=0.150, dim='size')
     mc_coarse, mc_fine = mc_size.partition(definition=partition)
     mc_coarse.name = 'coarse'
     mc_fine.name = 'fine'

@@ -12,6 +12,10 @@ MC:
       - [from, to]
       - [retained, passing]
       - [sink, float]
+  comparisons:
+    recovery: 'rec'
+    difference: 'diff'
+    divide: 'ur'
   components:
     chemistry:
       ignore: ['Y']  # ignore anything in this list when detecting chemistry components

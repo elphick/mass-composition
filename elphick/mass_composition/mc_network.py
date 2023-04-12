@@ -1,7 +1,9 @@
+from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib
 import networkx as nx
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from matplotlib import pyplot as plt
@@ -63,6 +65,26 @@ class MCNetwork(nx.DiGraph):
         bal_vals: List = [self.nodes[n]['mc'].balanced for n in self.nodes]
         bal_vals = [bv for bv in bal_vals if bv is not None]
         return all(bal_vals)
+
+    def get_edge_by_name(self, name: str) -> MassComposition:
+        """Get the MC object from the network by its name
+
+        Args:
+            name: The string name of the MassComposition object stored on an edge in the network.
+
+        Returns:
+
+        """
+
+        res: Optional[MassComposition] = None
+        for u, v, a in self.edges(data=True):
+            if a['mc'].name == name:
+                res = a['mc']
+
+        if not res:
+            raise ValueError(f"The specified name: {name} is not found on the network.")
+
+        return res
 
     def report(self) -> pd.DataFrame:
         """Summary Report
@@ -314,9 +336,9 @@ class MCNetwork(nx.DiGraph):
             cmap = sns.color_palette(edge_colormap, as_cmap=True)
             rpt: pd.DataFrame = self.report()
             if not v_min:
-                v_min = float(rpt[color_var].min())
+                v_min = np.floor(rpt[color_var].min())
             if not v_max:
-                v_max = float(rpt[color_var].max())
+                v_max = np.ceil(rpt[color_var].max())
         if isinstance(list(self.nodes)[0], int):
             labels = [str(n) for n in list(self.nodes)]
         else:
@@ -446,3 +468,36 @@ class MCNetwork(nx.DiGraph):
             NotImplementedError("Unrecognised colormap type")
 
         return color_rgba
+
+    def query(self, mc_name: str, queries: Dict) -> 'MCNetwork':
+        """Query/filter across the network
+
+        The queries provided will be applied to the MassComposition object in the network with the mc_name.
+        The indexes for that result are then used to filter the other edges of the network.
+
+        Args:
+            mc_name: The name of the MassComposition object in the network to which the first filter to be applied.
+            queries: The query or queries to apply to the object with mc_name.
+
+        Returns:
+
+        """
+
+        mc_obj_ref: MassComposition = self.get_edge_by_name(mc_name).query(queries=queries)
+        # TODO: This construct limits us to filtering along a single dimension only
+        coord: str = list(queries.keys())[0]
+        index = mc_obj_ref.data[coord]
+
+        # iterate through all other objects on the edges and filter them to the same indexes
+        mc_objects: List[MassComposition] = []
+        for u, v, a in self.edges(data=True):
+            if a['mc'].name == mc_name:
+                mc_objects.append(mc_obj_ref)
+            else:
+                mc_obj: MassComposition = self.get_edge_by_name(a['mc'].name)
+                mc_obj._data = mc_obj._data.sel({coord: index.values})
+                mc_objects.append(mc_obj)
+
+        res: MCNetwork = MCNetwork.from_streams(mc_objects)
+
+        return res
