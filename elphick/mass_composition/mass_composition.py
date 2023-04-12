@@ -480,6 +480,11 @@ class MassComposition:
 
         return out, comp
 
+    def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> 'MassComposition':
+        res = deepcopy(self)
+        res._data = self._data.mc.resample(dim=dim, num_intervals=num_intervals, edge_precision=edge_precision)
+        return res
+
     def __add__(self, other: 'MassComposition') -> 'MassComposition':
         """Add two objects
 
@@ -811,9 +816,8 @@ class MassComposition:
                 for i in range(0, num_intervals):
                     keys = list(suffixes.keys())[i: i + 2]
                     base_name: str = '_'.join(keys[0].split('_')[:-1])
-                    data[base_name] = pd.IntervalIndex.from_arrays(left=data[keys[0]],
-                                                                   right=data[keys[1]],
-                                                                   closed=self.config['intervals']['closed'])
+                    data[base_name] = pd.arrays.IntervalArray.from_arrays(left=data[keys[0]], right=data[keys[1]],
+                                                                          closed=self.config['intervals']['closed'])
                     # verbose but need to preserve index order...
                     new_indexes: List = []
                     index_edge_names: Dict = {base_name: {'left': keys[0].split('_')[-1],

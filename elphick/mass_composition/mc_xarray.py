@@ -8,6 +8,7 @@ import pandas as pd
 import xarray as xr
 
 from elphick.mass_composition.utils import solve_mass_moisture
+from elphick.mass_composition.utils.interp import interp_monotonic
 from elphick.mass_composition.utils.size import mean_size
 
 
@@ -478,9 +479,16 @@ class MassCompositionAccessor:
             df.rename(columns=self.column_map(), inplace=True)
         return df
 
-    def resample(self):
-        pass
+    def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> xr.Dataset:
+        if len(self._obj.dims) > 1:
+            raise NotImplementedError("Not yet tested on datasets > 1D")
 
+        # define the new coordinates
+        right_edges = pd.arrays.IntervalArray(self._obj[dim].data).right
+        new_coords = np.round(np.geomspace(right_edges.min(), right_edges.max(), num_intervals), edge_precision)
+        xr_upsampled: xr.Dataset = interp_monotonic(self._obj, coords={'size': new_coords},
+                                                    include_original_coords=True)
+        return xr_upsampled
 
 def mc_aggregate(xr_ds: xr.Dataset) -> xr.Dataset:
     """A standalone function to aggregate
