@@ -108,18 +108,20 @@ class MCNetwork(nx.DiGraph):
         out_mc = [self.get_edge_data(oe[0], oe[1])['mc'] for oe in out_edges]
         return in_mc, out_mc
 
-    def plot(self) -> plt.Figure:
+    def plot(self, orientation: str = 'horizontal') -> plt.Figure:
         """Plot the network with matplotlib
+
+        Args:
+            orientation: 'horizontal'|'vertical' network layout
 
         Returns:
 
         """
 
         hf, ax = plt.subplots()
-        # TODO: add multi-partite layout to provide left to right layout
         # pos = nx.spring_layout(self, seed=1234)
-        # pos = nx.multipartite_layout(self, subset_key="subset", align="horizontal")
-        pos = linear_layout(self)
+        # pos = linear_layout(self)
+        pos = digraph_linear_layout(self, orientation=orientation)
 
         edge_labels: Dict = {}
         edge_colors: List = []
@@ -147,8 +149,11 @@ class MCNetwork(nx.DiGraph):
         ax.set_title(f"{self.name}\nBalanced: {self.balanced}")
         return hf
 
-    def plot_network(self, orientation='horizontal') -> go.Figure:
+    def plot_network(self, orientation: str = 'horizontal') -> go.Figure:
         """Plot the network with plotly
+
+        Args:
+            orientation: 'horizontal'|'vertical' network layout
 
         Returns:
 
