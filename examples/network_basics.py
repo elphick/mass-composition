@@ -81,10 +81,6 @@ fig = mcn.plot_network()
 fig
 
 # %%
-# ..  note::
-#     This plot requires development to include labels and colors per the matplotlib version.
-
-# %%
 # Plot the Sankey
 
 fig = mcn.plot_sankey()

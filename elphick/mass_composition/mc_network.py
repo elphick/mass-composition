@@ -14,7 +14,9 @@ import seaborn as sns
 from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
+from elphick.mass_composition.layout import digraph_linear_layout, linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
+from elphick.mass_composition.utils.geometry import midpoint
 
 
 class MCNetwork(nx.DiGraph):
@@ -46,7 +48,6 @@ class MCNetwork(nx.DiGraph):
         d_node_objects: Dict = {}
         for node in graph.nodes:
             d_node_objects[node] = MCNode(node_id=int(node))
-
         nx.set_node_attributes(graph, d_node_objects, 'mc')
 
         for node in graph.nodes:
@@ -107,16 +108,20 @@ class MCNetwork(nx.DiGraph):
         out_mc = [self.get_edge_data(oe[0], oe[1])['mc'] for oe in out_edges]
         return in_mc, out_mc
 
-    def plot(self) -> plt.Figure:
+    def plot(self, orientation: str = 'horizontal') -> plt.Figure:
         """Plot the network with matplotlib
+
+        Args:
+            orientation: 'horizontal'|'vertical' network layout
 
         Returns:
 
         """
 
         hf, ax = plt.subplots()
-        # TODO: add multi-partite layout to provide left to right layout
-        pos = nx.spring_layout(self, seed=1234)
+        # pos = nx.spring_layout(self, seed=1234)
+        # pos = linear_layout(self)
+        pos = digraph_linear_layout(self, orientation=orientation)
 
         edge_labels: Dict = {}
         edge_colors: List = []
@@ -144,18 +149,23 @@ class MCNetwork(nx.DiGraph):
         ax.set_title(f"{self.name}\nBalanced: {self.balanced}")
         return hf
 
-    def plot_network(self) -> go.Figure:
+    def plot_network(self, orientation: str = 'horizontal') -> go.Figure:
         """Plot the network with plotly
+
+        Args:
+            orientation: 'horizontal'|'vertical' network layout
 
         Returns:
 
         """
-        pos = nx.spring_layout(self, seed=1234)
+        # pos = nx.spring_layout(self, seed=1234)
+        # pos = linear_layout(self, orientation=orientation)
+        pos = digraph_linear_layout(self, orientation=orientation)
 
-        edge_trace, node_trace = self._get_scatter_node_edges(pos)
+        edge_trace, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
         title = f"{self.name}<br>Balanced: {self.balanced}"
 
-        fig = go.Figure(data=[edge_trace, node_trace],
+        fig = go.Figure(data=[edge_trace, node_trace, edge_annotation_trace],
                         layout=go.Layout(
                             title=title,
                             titlefont_size=16,
@@ -168,6 +178,9 @@ class MCNetwork(nx.DiGraph):
                             plot_bgcolor='rgba(0,0,0,0)'
                         ),
                         )
+        # for k, d_args in edge_annotations.items():
+        #     fig.add_annotation(x=d_args['pos'][0], y=d_args['pos'][1], text=k, textangle=d_args['angle'])
+
         return fig
 
     def plot_sankey(self,
@@ -207,7 +220,8 @@ class MCNetwork(nx.DiGraph):
                    sankey_color_var: Optional[str] = None,
                    sankey_edge_colormap: Optional[str] = 'copper_r',
                    sankey_vmin: Optional[float] = None,
-                   sankey_vmax: Optional[float] = None
+                   sankey_vmax: Optional[float] = None,
+                   network_orientation: Optional[str] = 'horizontal'
                    ) -> go.Figure:
         """Plot with table of edge averages
 
@@ -223,6 +237,7 @@ class MCNetwork(nx.DiGraph):
             sankey_edge_colormap: If plot_type is sankey, the optional colormap.  Used with sankey_color_var.
             sankey_vmin: The value that maps to the minimum color
             sankey_vmax: The value that maps to the maximum color
+            network_orientation: The orientation of the network layout 'vertical'|'horizontal'
 
         Returns:
 
@@ -266,10 +281,12 @@ class MCNetwork(nx.DiGraph):
             fig.add_trace(go.Sankey(node=node, link=link), **d_plot)
 
         elif plot_type == 'network':
-            pos = nx.spring_layout(self, seed=1234)
+            # pos = nx.spring_layout(self, seed=1234)
+            # pos = linear_layout(self, orientation=network_orientation)
+            pos = digraph_linear_layout(self, orientation=network_orientation)
 
-            edge_trace, node_trace = self._get_scatter_node_edges(pos)
-            fig.add_traces(data=[edge_trace, node_trace], **d_plot)
+            edge_trace, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
+            fig.add_traces(data=[edge_trace, node_trace, edge_annotation_trace], **d_plot)
 
             fig.update_layout(showlegend=False, hovermode='closest',
                               xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
@@ -410,37 +427,68 @@ class MCNetwork(nx.DiGraph):
         return node, link
 
     def _get_scatter_node_edges(self, pos):
+        # edges
         edge_x = []
         edge_y = []
-        for edge in self.edges():
-            x0, y0 = pos[edge[0]]
-            x1, y1 = pos[edge[1]]
+        edge_labels = []
+        edge_annotations: Dict = {}
+        for u, v, data in self.edges(data=True):
+            x0, y0 = pos[u]
+            x1, y1 = pos[v]
             edge_x.append(x0)
             edge_x.append(x1)
             edge_x.append(None)
             edge_y.append(y0)
             edge_y.append(y1)
             edge_y.append(None)
+            edge_labels.append(data['mc'].name)
+            edge_labels.append(None)
+            edge_annotations[data['mc'].name] = {'pos': midpoint(pos[u], pos[v])}
         edge_trace = go.Scatter(
             x=edge_x, y=edge_y,
             line=dict(width=2, color='#888'),
-            hoverinfo='none',
-            mode='lines')
+            hoverinfo='text',
+            mode='lines',
+            text=edge_labels)
+
+        # nodes
+        node_color_map: Dict = {None: 'grey', True: 'green', False: 'red'}
         node_x = []
         node_y = []
+        node_color = []
+        node_text = []
         for node in self.nodes():
             x, y = pos[node]
             node_x.append(x)
             node_y.append(y)
+            node_color.append(node_color_map[self.nodes[node]['mc'].balanced])
+            node_text.append(node)
         node_trace = go.Scatter(
             x=node_x, y=node_y,
+            mode='markers+text',
+            hoverinfo='none',
+            marker=dict(
+                color=node_color,
+                size=30,
+                line_width=2),
+            text=node_text)
+
+        # edge annotations
+        edge_labels = list(edge_annotations.keys())
+        edge_label_x = [edge_annotations[k]['pos'][0] for k, v in edge_annotations.items()]
+        edge_label_y = [edge_annotations[k]['pos'][1] for k, v in edge_annotations.items()]
+
+        edge_annotation_trace = go.Scatter(
+            x=edge_label_x, y=edge_label_y,
             mode='markers',
             hoverinfo='text',
             marker=dict(
-                color=[],
-                size=20,
-                line_width=2))
-        return edge_trace, node_trace
+                color='grey',
+                size=3,
+                line_width=1),
+            text=edge_labels)
+
+        return edge_trace, node_trace, edge_annotation_trace
 
     @staticmethod
     def _rpt_to_html(df: pd.DataFrame) -> Dict:

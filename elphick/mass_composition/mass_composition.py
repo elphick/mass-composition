@@ -14,13 +14,12 @@ import yaml
 
 from elphick.mass_composition.utils import solve_mass_moisture
 from elphick.mass_composition.utils.components import is_compositional
-from elphick.mass_composition.utils.random import random_int
+from elphick.mass_composition.utils.sampling import random_int
 from elphick.mass_composition.utils.size import mean_size
 from elphick.mass_composition.utils.viz import plot_parallel
 
 # noinspection PyUnresolvedReferences
 import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
-
 
 class MassComposition:
 
@@ -226,7 +225,7 @@ class MassComposition:
         if relative_mass or relative_composition:
             if not object:
                 raise ValueError("The other other argument must be provided to apply relative constraints.")
-            
+
         if relative_mass:
             xr_relative: xr.Dataset = self.data[xr_ds.mc.mc_vars_mass] / other.data[xr_ds.mc.mc_vars_mass]
             if isinstance(relative_mass, Dict):
