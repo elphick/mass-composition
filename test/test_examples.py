@@ -18,6 +18,7 @@ def test_examples():
     import examples.plot_demo
 
     import examples.network_basics
+    import examples.network_layouts
 
     import examples.split_and_partition
 
@@ -30,4 +31,6 @@ def test_examples():
     import examples.compare
 
     import examples.filtering
+
+
 

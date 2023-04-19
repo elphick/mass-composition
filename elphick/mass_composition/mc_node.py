@@ -20,10 +20,12 @@ class MCNode:
     def __init__(self,
                  node_id: int = 0,
                  node_name: str = 'Node',
+                 node_subset: int = 0,
                  ):
 
         self.node_id: int = node_id
         self.node_name: str = node_name
+        self.node_subset: int = node_subset
         self._tolerance: float = np.finfo('float32').eps
 
         self._inputs: Optional[List[MassComposition]] = None
