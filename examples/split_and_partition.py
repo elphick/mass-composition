@@ -4,11 +4,9 @@ Splitting and Partitioning Objects
 
 Demonstrate splitting by mass and partitioning along dimensions.
 """
-
 import plotly
 import xarray.tests
 import pandas as pd
-from matplotlib import pyplot as plt
 from functools import partial
 
 from elphick.mass_composition.mc_network import MCNetwork
@@ -109,9 +107,8 @@ mc_coarse.name = 'coarse'
 mc_fine.name = 'fine'
 
 mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
-
-hf = mcn.plot()
-plt.show()
+fig = mcn.plot_network()
+fig.show()
 
 # %%
 
@@ -119,6 +116,3 @@ fig = mcn.table_plot(table_pos='top',
                      sankey_color_var='Fe', sankey_edge_colormap='copper_r', sankey_vmin=50, sankey_vmax=70)
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for use in the gallery
-
-
-

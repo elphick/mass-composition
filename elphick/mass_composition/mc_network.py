@@ -14,6 +14,7 @@ import seaborn as sns
 from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
+from elphick.mass_composition.layout import digraph_linear_layout, linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.utils.geometry import midpoint
 
@@ -47,7 +48,6 @@ class MCNetwork(nx.DiGraph):
         d_node_objects: Dict = {}
         for node in graph.nodes:
             d_node_objects[node] = MCNode(node_id=int(node))
-
         nx.set_node_attributes(graph, d_node_objects, 'mc')
 
         for node in graph.nodes:
@@ -117,7 +117,9 @@ class MCNetwork(nx.DiGraph):
 
         hf, ax = plt.subplots()
         # TODO: add multi-partite layout to provide left to right layout
-        pos = nx.spring_layout(self, seed=1234)
+        # pos = nx.spring_layout(self, seed=1234)
+        # pos = nx.multipartite_layout(self, subset_key="subset", align="horizontal")
+        pos = linear_layout(self)
 
         edge_labels: Dict = {}
         edge_colors: List = []
@@ -145,13 +147,15 @@ class MCNetwork(nx.DiGraph):
         ax.set_title(f"{self.name}\nBalanced: {self.balanced}")
         return hf
 
-    def plot_network(self) -> go.Figure:
+    def plot_network(self, orientation='horizontal') -> go.Figure:
         """Plot the network with plotly
 
         Returns:
 
         """
-        pos = nx.spring_layout(self, seed=1234)
+        # pos = nx.spring_layout(self, seed=1234)
+        # pos = linear_layout(self, orientation=orientation)
+        pos = digraph_linear_layout(self, orientation=orientation)
 
         edge_trace, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
         title = f"{self.name}<br>Balanced: {self.balanced}"
@@ -211,7 +215,8 @@ class MCNetwork(nx.DiGraph):
                    sankey_color_var: Optional[str] = None,
                    sankey_edge_colormap: Optional[str] = 'copper_r',
                    sankey_vmin: Optional[float] = None,
-                   sankey_vmax: Optional[float] = None
+                   sankey_vmax: Optional[float] = None,
+                   network_orientation: Optional[str] = 'horizontal'
                    ) -> go.Figure:
         """Plot with table of edge averages
 
@@ -227,6 +232,7 @@ class MCNetwork(nx.DiGraph):
             sankey_edge_colormap: If plot_type is sankey, the optional colormap.  Used with sankey_color_var.
             sankey_vmin: The value that maps to the minimum color
             sankey_vmax: The value that maps to the maximum color
+            network_orientation: The orientation of the network layout 'vertical'|'horizontal'
 
         Returns:
 
@@ -270,7 +276,9 @@ class MCNetwork(nx.DiGraph):
             fig.add_trace(go.Sankey(node=node, link=link), **d_plot)
 
         elif plot_type == 'network':
-            pos = nx.spring_layout(self, seed=1234)
+            # pos = nx.spring_layout(self, seed=1234)
+            # pos = linear_layout(self, orientation=network_orientation)
+            pos = digraph_linear_layout(self, orientation=network_orientation)
 
             edge_trace, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
             fig.add_traces(data=[edge_trace, node_trace, edge_annotation_trace], **d_plot)
@@ -459,7 +467,7 @@ class MCNetwork(nx.DiGraph):
                 size=30,
                 line_width=2),
             text=node_text)
-        
+
         # edge annotations
         edge_labels = list(edge_annotations.keys())
         edge_label_x = [edge_annotations[k]['pos'][0] for k, v in edge_annotations.items()]
@@ -474,7 +482,7 @@ class MCNetwork(nx.DiGraph):
                 size=3,
                 line_width=1),
             text=edge_labels)
-        
+
         return edge_trace, node_trace, edge_annotation_trace
 
     @staticmethod
