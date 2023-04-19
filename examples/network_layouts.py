@@ -57,6 +57,7 @@ mcn: MCNetwork = MCNetwork().from_streams([mc_feed,
 fig = mcn.plot_network(orientation='horizontal')
 fig
 
+# %%
 fig = mcn.plot_network(orientation='vertical')
 fig
 
