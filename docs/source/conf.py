@@ -47,9 +47,6 @@ sphinx_gallery_conf = {
     'ignore_pattern': r'(__init__)|(3D_data)\.py',
     'examples_dirs': '../../examples',  # path to your example scripts
     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
-    # 'subsection_order': ExplicitOrder(['basic_usage',
-    #                                    'math_operations',
-    #                                    'plot_demo']),
     'within_subsection_order': FileNameSortKey,
     'image_scrapers': (plotly_sg_scraper, 'matplotlib')
 }

@@ -11,7 +11,7 @@ import os
 def script_loc(request):
     """Return the directory of the currently running test script"""
 
-    # uses .join instead of .dirname so we get a LocalPath object instead of
+    # uses .join instead of .dirname, so we get a LocalPath object instead of
     # a string. LocalPath.join calls normpath for us when joining the path
     return Path(request.fspath.join('..'))
 
