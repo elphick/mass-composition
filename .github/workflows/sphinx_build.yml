@@ -1,21 +1,26 @@
-name: "Docs Check"
+name: "Check Docs"
 on:
-- push
-  paths:
-    - docs/**
+   push:
+     paths:
+       - 'examples/*.py'
+       - 'docs/**'
 
 jobs:
   check_docs:
     runs-on: ubuntu-latest
     steps:
-    - name: install dependencies
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - name: Install dependencies
       run: |
-        pip install mass-composition
-        pip install sphinx-rtd-theme
+        pip install mass-composition -e ".[viz,network]"
+        pip install sphinx sphinx_rtd_theme
         pip install sphinx-gallery
         pip install sphinx-autodoc-typehints
         pip install myst-parser
-    - uses: actions/checkout@v1
-    - uses: ammaraskar/sphinx-action@master
-      with:
-        docs-folder: "docs/"
+        pip install orca
+        pip install pytest
+    - name: Sphinx build
+      run: |
+        sphinx-build docs/source _build
+        
