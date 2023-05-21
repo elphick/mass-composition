@@ -1,30 +1,14 @@
 """
 To provide sample data
 """
-import os
 import random
 from pathlib import Path
 from typing import Optional, Iterable, List
 
+import numpy as np
 import pandas as pd
-import pytest
 
 from elphick.mass_composition.utils.components import is_compositional
-
-#
-# def script_loc(request):
-#     '''Return the directory of the currently running test script'''
-#     res: Path = Path(__file__):
-#     if str(res) ==  '.':
-#
-#     # a string. LocalPath.join calls normpath for us when joining the path
-#     return Path(request.fspath.join('..'))
-
-
-@pytest.fixture
-def demo_data():
-    data: pd.DataFrame = sample_data()
-    return data
 
 
 def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,
@@ -99,6 +83,36 @@ def dh_intervals(n: int = 5,
     return df_data
 
 
+def size_by_assay() -> pd.DataFrame:
+    """ Sample Size x Assay dataset
+    REF: https://www.researchgate.net/publication/231575341_In_depth_analysis_of_alumina_removal_from_iron_ore_fines_
+    using_teetered_bed_gravity_separator
+
+    Returns:
+
+    """
+
+    size_retained = [850.0, 500.0, 150.0, 75.0, 45.0, 0.0]
+    size_passing = [2000.0, 850.0, 500.0, 150.0, 75.0, 45.0]
+    mass_pct = [3.3, 9.9, 26.5, 2.5, 8.8, 49.0]
+    fe = [64.15, 64.33, 64.52, 62.65, 62.81, 55.95]
+    sio2 = [2.04, 2.05, 1.84, 2.88, 2.12, 6.39]
+    al2o3 = [2.68, 2.23, 2.19, 3.32, 2.25, 6.34]
+
+    df_data: pd.DataFrame = pd.DataFrame(data=[size_retained, size_passing, mass_pct, fe, sio2, al2o3],
+                                         index=['size_retained', 'size_passing', 'mass_pct', 'Fe', 'SiO2', 'Al2O3']).T
+
+    # convert the sizes from micron to mm
+    df_data[['size_retained', 'size_passing']] = df_data[['size_retained', 'size_passing']] / 1000.0
+
+    df_data.set_index(['size_retained', 'size_passing'], inplace=True)
+
+    # ensure we meet the input column name requirements
+    df_data.rename(columns={'mass_pct': 'mass_dry'}, inplace=True)
+
+    return df_data
+
+
 def size_distribution() -> pd.DataFrame:
     d: Path = Path(__file__).parent
     print(d)
@@ -108,10 +122,16 @@ def size_distribution() -> pd.DataFrame:
 
 def iron_ore_sample_data() -> pd.DataFrame:
     d: Path = Path(__file__).parent
-    print(d)
-    print('cwd files')
-    print(os.listdir())
-    print('cwd files')
-    print(os.listdir(d))
     df_psd: pd.DataFrame = pd.read_csv(d / 'iron_ore_sample_data_A072391.csv', index_col=0)
     return df_psd
+
+
+def iron_ore_met_sample_data() -> pd.DataFrame:
+    d: Path = Path(__file__).parent
+    df_met: pd.DataFrame = pd.read_csv(d / 'A072391_met.csv', index_col=0)
+    df_met.dropna(subset=['Dry Weight Lump (kg)'], inplace=True)
+    df_met['Dry Weight Lump (kg)'] = df_met['Dry Weight Lump (kg)'].apply(lambda x: x.replace('..', '.')).astype('float64')
+    df_met['Fe'] = df_met['Fe'].replace('MISSING', np.nan).astype('float64')
+    df_met.dropna(subset=['Fe', 'Bulk_Hole_No', 'Dry Weight Fines (kg)'], inplace=True)
+    df_met.columns = [col.replace('LOITotal', 'LOI') for col in df_met.columns]
+    return df_met

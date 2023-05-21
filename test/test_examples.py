@@ -3,11 +3,11 @@ import pytest
 
 def test_examples():
 
-    import examples.basic_usage
-    import examples.basic_usage_xr
+    import examples.xarray_examples.basic_usage_xr
+    import examples.xarray_examples.math_operations_xr
 
+    import examples.basic_usage
     import examples.math_operations
-    import examples.math_operations_xr
 
     import examples.iron_ore_assays
 
@@ -16,6 +16,23 @@ def test_examples():
     import examples.grade_tonnage
 
     import examples.plot_demo
+
+    import examples.network_basics
+    import examples.network_layouts
+
+    import examples.split_and_partition
+
+    import examples.resampling_interval_data
+
+    import examples.sankey_plots
+
+    import examples.constrain
+
+    import examples.compare
+
+    import examples.filtering
+
+    import examples.constraints_and_status
 
 
 

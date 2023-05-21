@@ -6,7 +6,6 @@ Demonstrate with some real data
 """
 
 # %%
-from pathlib import Path
 
 import pandas as pd
 import plotly
@@ -52,6 +51,6 @@ fig
 # %%
 
 # with selected variables
-fig: Figure = obj_mc.plot_parallel(color='Fe', var_subset=['mass_wet', 'H2O', 'Fe', 'SiO2'])
+fig: Figure = obj_mc.plot_parallel(color='Fe', vars_include=['mass_wet', 'H2O', 'Fe', 'SiO2'])
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery

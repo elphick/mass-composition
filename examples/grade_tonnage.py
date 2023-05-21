@@ -8,7 +8,6 @@ It is a cumulative view that presents the "mass (tonnes) and head grade" with in
 They are useful in comparing deposits.
 
 """
-from pathlib import Path
 
 import pandas as pd
 import plotly
