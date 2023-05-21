@@ -5,7 +5,7 @@ Welcome to mass-composition documentation!
    :parser: myst_parser.sphinx_
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
    :hidden:
 
@@ -15,6 +15,7 @@ Welcome to mass-composition documentation!
    auto_examples/index
    glossary/glossary
    api/modules
+   license/license
 
 
 Indices and tables

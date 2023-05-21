@@ -32,5 +32,7 @@ def test_examples():
 
     import examples.filtering
 
+    import examples.constraints_and_status
+
 
 

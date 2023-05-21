@@ -68,4 +68,3 @@ fig
 fig = mcn.table_plot(table_pos='left', plot_type='network', network_orientation='vertical')
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for use in the gallery
-

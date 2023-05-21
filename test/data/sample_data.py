@@ -1,11 +1,11 @@
 """
 To provide sample data
 """
-import os
 import random
 from pathlib import Path
 from typing import Optional, Iterable, List
 
+import numpy as np
 import pandas as pd
 
 from elphick.mass_composition.utils.components import is_compositional
@@ -122,10 +122,16 @@ def size_distribution() -> pd.DataFrame:
 
 def iron_ore_sample_data() -> pd.DataFrame:
     d: Path = Path(__file__).parent
-    print(d)
-    print('cwd files')
-    print(os.listdir())
-    print('cwd files')
-    print(os.listdir(d))
     df_psd: pd.DataFrame = pd.read_csv(d / 'iron_ore_sample_data_A072391.csv', index_col=0)
     return df_psd
+
+
+def iron_ore_met_sample_data() -> pd.DataFrame:
+    d: Path = Path(__file__).parent
+    df_met: pd.DataFrame = pd.read_csv(d / 'A072391_met.csv', index_col=0)
+    df_met.dropna(subset=['Dry Weight Lump (kg)'], inplace=True)
+    df_met['Dry Weight Lump (kg)'] = df_met['Dry Weight Lump (kg)'].apply(lambda x: x.replace('..', '.')).astype('float64')
+    df_met['Fe'] = df_met['Fe'].replace('MISSING', np.nan).astype('float64')
+    df_met.dropna(subset=['Fe', 'Bulk_Hole_No', 'Dry Weight Fines (kg)'], inplace=True)
+    df_met.columns = [col.replace('LOITotal', 'LOI') for col in df_met.columns]
+    return df_met
