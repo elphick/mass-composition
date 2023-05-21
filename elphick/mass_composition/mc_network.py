@@ -16,7 +16,10 @@ from plotly.subplots import make_subplots
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.layout import digraph_linear_layout, linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
+from elphick.mass_composition.plot import parallel_plot
 from elphick.mass_composition.utils.geometry import midpoint
+from elphick.mass_composition.utils.size import mean_size
+from elphick.mass_composition.utils.viz import plot_parallel
 
 
 class MCNetwork(nx.DiGraph):
@@ -67,6 +70,16 @@ class MCNetwork(nx.DiGraph):
         bal_vals = [bv for bv in bal_vals if bv is not None]
         return all(bal_vals)
 
+    @property
+    def edge_status(self) -> Tuple:
+        d_edge_status_ok: Dict = {}
+        d_failing_edges: Dict = {}
+        for u, v, data in self.edges(data=True):
+            d_edge_status_ok[data['mc'].name] = data['mc'].status.ok
+            if not data['mc'].status.ok:
+                d_failing_edges[data['mc'].name] = data['mc'].status.failing_components
+        return all(d_edge_status_ok.values()), d_failing_edges
+
     def get_edge_by_name(self, name: str) -> MassComposition:
         """Get the MC object from the network by its name
 
@@ -101,6 +114,39 @@ class MCNetwork(nx.DiGraph):
         rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('name')
         return rpt
 
+    def query(self, mc_name: str, queries: Dict) -> 'MCNetwork':
+        """Query/filter across the network
+
+        The queries provided will be applied to the MassComposition object in the network with the mc_name.
+        The indexes for that result are then used to filter the other edges of the network.
+
+        Args:
+            mc_name: The name of the MassComposition object in the network to which the first filter to be applied.
+            queries: The query or queries to apply to the object with mc_name.
+
+        Returns:
+
+        """
+
+        mc_obj_ref: MassComposition = self.get_edge_by_name(mc_name).query(queries=queries)
+        # TODO: This construct limits us to filtering along a single dimension only
+        coord: str = list(queries.keys())[0]
+        index = mc_obj_ref.data[coord]
+
+        # iterate through all other objects on the edges and filter them to the same indexes
+        mc_objects: List[MassComposition] = []
+        for u, v, a in self.edges(data=True):
+            if a['mc'].name == mc_name:
+                mc_objects.append(mc_obj_ref)
+            else:
+                mc_obj: MassComposition = deepcopy(self.get_edge_by_name(a['mc'].name))
+                mc_obj._data = mc_obj._data.sel({coord: index.values})
+                mc_objects.append(mc_obj)
+
+        res: MCNetwork = MCNetwork.from_streams(mc_objects)
+
+        return res
+
     def get_node_input_outputs(self, node) -> Tuple:
         in_edges = self.in_edges(node)
         in_mc = [self.get_edge_data(oe[0], oe[1])['mc'] for oe in in_edges]
@@ -120,7 +166,6 @@ class MCNetwork(nx.DiGraph):
 
         hf, ax = plt.subplots()
         # pos = nx.spring_layout(self, seed=1234)
-        # pos = linear_layout(self)
         pos = digraph_linear_layout(self, orientation=orientation)
 
         edge_labels: Dict = {}
@@ -129,8 +174,10 @@ class MCNetwork(nx.DiGraph):
 
         for node1, node2, data in self.edges(data=True):
             edge_labels[(node1, node2)] = data['mc'].name
-            # TODO: add colors by edge balance status, once defined
-            edge_colors.append('gray')
+            if data['mc'].status.ok:
+                edge_colors.append('gray')
+            else:
+                edge_colors.append('red')
 
         for n in self.nodes:
             if self.nodes[n]['mc'].node_type == NodeType.BALANCE:
@@ -145,8 +192,8 @@ class MCNetwork(nx.DiGraph):
                 node_color=node_colors, edge_color=edge_colors)
 
         nx.draw_networkx_edge_labels(self, pos=pos, ax=ax, edge_labels=edge_labels, font_color='black')
+        ax.set_title(self._plot_title(html=False), fontsize=10)
 
-        ax.set_title(f"{self.name}\nBalanced: {self.balanced}")
         return hf
 
     def plot_network(self, orientation: str = 'horizontal') -> go.Figure:
@@ -159,13 +206,12 @@ class MCNetwork(nx.DiGraph):
 
         """
         # pos = nx.spring_layout(self, seed=1234)
-        # pos = linear_layout(self, orientation=orientation)
         pos = digraph_linear_layout(self, orientation=orientation)
 
-        edge_trace, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
-        title = f"{self.name}<br>Balanced: {self.balanced}"
+        edge_traces, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
+        title = self._plot_title()
 
-        fig = go.Figure(data=[edge_trace, node_trace, edge_annotation_trace],
+        fig = go.Figure(data=[*edge_traces, node_trace, edge_annotation_trace],
                         layout=go.Layout(
                             title=title,
                             titlefont_size=16,
@@ -205,12 +251,13 @@ class MCNetwork(nx.DiGraph):
         d_sankey: Dict = self._generate_sankey_args(color_var, edge_colormap, width_var, vmin, vmax)
         node, link = self._get_sankey_node_link_dicts(d_sankey)
         fig = go.Figure(data=[go.Sankey(node=node, link=link)])
-        title = f"{self.name}<br>Balanced: {self.balanced}"
+        title = self._plot_title()
         fig.update_layout(title_text=title, font_size=10)
         return fig
 
     def table_plot(self,
                    plot_type: str = 'sankey',
+                   cols_exclude: Optional[List] = None,
                    table_pos: str = 'left',
                    table_area: float = 0.4,
                    table_header_color: str = 'cornflowerblue',
@@ -227,6 +274,7 @@ class MCNetwork(nx.DiGraph):
 
         Args:
             plot_type: The type of plot ['sankey', 'network']
+            cols_exclude: List of columns to exclude from the table
             table_pos: Position of the table ['left', 'right', 'top', 'bottom']
             table_area: The proportion of width or height to allocate to the table [0, 1]
             table_header_color: Color of the table header
@@ -255,7 +303,9 @@ class MCNetwork(nx.DiGraph):
 
         fig = make_subplots(**d_subplot, print_grid=False)
 
-        df = self.report().reset_index()
+        df: pd.DataFrame = self.report().reset_index()
+        if cols_exclude:
+            df = df[[col for col in df.columns if col not in cols_exclude]]
         fmt: List[str] = ["%s"] + [".1f", ".1f"] + [".2f"] * (len(df.columns) - 3)
         column_widths = [2] + [1] * (len(df.columns) - 1)
 
@@ -282,11 +332,10 @@ class MCNetwork(nx.DiGraph):
 
         elif plot_type == 'network':
             # pos = nx.spring_layout(self, seed=1234)
-            # pos = linear_layout(self, orientation=network_orientation)
             pos = digraph_linear_layout(self, orientation=network_orientation)
 
-            edge_trace, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
-            fig.add_traces(data=[edge_trace, node_trace, edge_annotation_trace], **d_plot)
+            edge_traces, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
+            fig.add_traces(data=[*edge_traces, node_trace, edge_annotation_trace], **d_plot)
 
             fig.update_layout(showlegend=False, hovermode='closest',
                               xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
@@ -295,9 +344,58 @@ class MCNetwork(nx.DiGraph):
                               plot_bgcolor='rgba(0,0,0,0)'
                               )
 
-        title = f"{self.name}<br>Balanced: {self.balanced}"
+        title = self._plot_title(compact=True)
         fig.update_layout(title_text=title, font_size=12)
 
+        return fig
+
+    def to_dataframe(self,
+                     names: Optional[str] = None):
+        """Return a tidy dataframe
+
+        Args:
+            names: Optional List of names of MassComposition objects (network edges) for export
+
+        Returns:
+
+        """
+        chunks: List[pd.DataFrame] = []
+        for u, v, data in self.edges(data=True):
+            if (names is None) or ((names is not None) and (data['mc'].name in names)):
+                chunks.append(data['mc'].data.mc.to_dataframe().assign(name=data['mc'].name))
+        return pd.concat(chunks, axis='index')
+
+    def plot_parallel(self,
+                      names: Optional[str] = None,
+                      color: Optional[str] = None,
+                      vars_include: Optional[List[str]] = None,
+                      vars_exclude: Optional[List[str]] = None,
+                      title: Optional[str] = None,
+                      include_dims: Optional[Union[bool, List[str]]] = True,
+                      plot_interval_edges: bool = False) -> go.Figure:
+        """Create an interactive parallel plot
+
+        Useful to explore multidimensional data like mass-composition data
+
+        Args:
+            names: Optional List of Names to plot
+            color: Optional color variable
+            vars_include: Optional List of variables to include in the plot
+            vars_exclude: Optional List of variables to exclude in the plot
+            title: Optional plot title
+            include_dims: Optional boolean or list of dimension to include in the plot.  True will show all dims.
+            plot_interval_edges: If True, interval edges will be plotted instead of interval mid
+
+        Returns:
+
+        """
+        df: pd.DataFrame = self.to_dataframe(names=names)
+
+        if not title and hasattr(self, 'name'):
+            title = self.name
+
+        fig = parallel_plot(data=df, color=color, vars_include=vars_include, vars_exclude=vars_exclude, title=title,
+                            include_dims=include_dims, plot_interval_edges=plot_interval_edges)
         return fig
 
     @staticmethod
@@ -428,28 +526,19 @@ class MCNetwork(nx.DiGraph):
 
     def _get_scatter_node_edges(self, pos):
         # edges
-        edge_x = []
-        edge_y = []
-        edge_labels = []
+        edge_color_map: Dict = {True: 'grey', False: 'red'}
         edge_annotations: Dict = {}
+
+        edge_traces = []
         for u, v, data in self.edges(data=True):
             x0, y0 = pos[u]
             x1, y1 = pos[v]
-            edge_x.append(x0)
-            edge_x.append(x1)
-            edge_x.append(None)
-            edge_y.append(y0)
-            edge_y.append(y1)
-            edge_y.append(None)
-            edge_labels.append(data['mc'].name)
-            edge_labels.append(None)
             edge_annotations[data['mc'].name] = {'pos': midpoint(pos[u], pos[v])}
-        edge_trace = go.Scatter(
-            x=edge_x, y=edge_y,
-            line=dict(width=2, color='#888'),
-            hoverinfo='text',
-            mode='lines',
-            text=edge_labels)
+            edge_traces.append(go.Scatter(x=[x0, x1], y=[y0, y1],
+                                          line=dict(width=2, color=edge_color_map[data['mc'].status.ok]),
+                                          hoverinfo='text',
+                                          mode='lines',
+                                          text=data['mc'].name))
 
         # nodes
         node_color_map: Dict = {None: 'grey', True: 'green', False: 'red'}
@@ -488,7 +577,7 @@ class MCNetwork(nx.DiGraph):
                 line_width=1),
             text=edge_labels)
 
-        return edge_trace, node_trace, edge_annotation_trace
+        return edge_traces, node_trace, edge_annotation_trace
 
     @staticmethod
     def _rpt_to_html(df: pd.DataFrame) -> Dict:
@@ -517,35 +606,12 @@ class MCNetwork(nx.DiGraph):
 
         return color_rgba
 
-    def query(self, mc_name: str, queries: Dict) -> 'MCNetwork':
-        """Query/filter across the network
-
-        The queries provided will be applied to the MassComposition object in the network with the mc_name.
-        The indexes for that result are then used to filter the other edges of the network.
-
-        Args:
-            mc_name: The name of the MassComposition object in the network to which the first filter to be applied.
-            queries: The query or queries to apply to the object with mc_name.
-
-        Returns:
-
-        """
-
-        mc_obj_ref: MassComposition = self.get_edge_by_name(mc_name).query(queries=queries)
-        # TODO: This construct limits us to filtering along a single dimension only
-        coord: str = list(queries.keys())[0]
-        index = mc_obj_ref.data[coord]
-
-        # iterate through all other objects on the edges and filter them to the same indexes
-        mc_objects: List[MassComposition] = []
-        for u, v, a in self.edges(data=True):
-            if a['mc'].name == mc_name:
-                mc_objects.append(mc_obj_ref)
-            else:
-                mc_obj: MassComposition = self.get_edge_by_name(a['mc'].name)
-                mc_obj._data = mc_obj._data.sel({coord: index.values})
-                mc_objects.append(mc_obj)
-
-        res: MCNetwork = MCNetwork.from_streams(mc_objects)
-
-        return res
+    def _plot_title(self, html: bool = True, compact: bool = False):
+        title = f"{self.name}<br><br><sup>Balanced: {self.balanced}<br>Edge Status OK: {self.edge_status[0]}</sup>"
+        if compact:
+            title = title.replace("<br><br>", "<br>").replace("<br>Edge", ", Edge")
+        if not self.edge_status[0]:
+            title = title.replace("</sup>", "") + f", {self.edge_status[1]}</sup>"
+        if not html:
+            title = title.replace('<br><br>', '\n').replace('<br>', '\n').replace('<sup>', '').replace('</sup>', '')
+        return title

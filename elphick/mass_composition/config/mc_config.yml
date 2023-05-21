@@ -6,6 +6,9 @@ MC:
   units:
     mass: mass_units
     composition_rel: '%'
+  constraints:
+    mass: [0.0, .inf]
+    composition: [0.0, 100.0]
   intervals:
     closed: left
     suffixes:
