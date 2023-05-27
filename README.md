@@ -69,9 +69,10 @@ fig
 
 
 
-Network visualisations are and other plots are interactive.
+Network visualisations are and other plots are interactive (click on the image).
 
-<iframe src='./docs/source/_static/example_plot.html'></iframe>
+[![example plot](./docs/source/_static/example_plot.png)](./docs/source/_static/example_plot.html)
+
 
 For full examples, see the [gallery](/auto_examples/index).
 
