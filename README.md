@@ -69,9 +69,9 @@ fig
 
 
 
-Network visualisations are and other plots are interactive (click on the image).
+Network visualisations and other plots are interactive (click on the image).
 
-[![example plot](./docs/source/_static/example_plot.png)](./docs/source/_static/example_plot.html)
+[![example plot](https://elphick.github.io/mass-composition/_static/example_plot.png)](https://elphick.github.io/mass-composition/_static/example_plot.html)
 
 
 For full examples, see the [gallery](/auto_examples/index).
