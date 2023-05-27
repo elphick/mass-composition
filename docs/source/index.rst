@@ -8,14 +8,15 @@ Welcome to mass-composition documentation!
    :maxdepth: 3
    :caption: Contents:
    :hidden:
+   :glob:
 
 
    usage/installation
    usage/quickstart
-   auto_examples/index
-   glossary/glossary
+   auto_examples/*
+   glossary/*
    api/modules
-   license/license
+   license/*
 
 
 Indices and tables
