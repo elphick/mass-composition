@@ -13,7 +13,7 @@ Welcome to mass-composition documentation!
 
    usage/installation
    usage/quickstart
-   auto_examples/*
+   auto_examples/index
    glossary/*
    api/modules
    license/*
