@@ -9,6 +9,7 @@ Welcome to mass-composition documentation!
    :caption: Contents:
    :hidden:
 
+
    usage/installation
    usage/quickstart
    auto_examples/index
