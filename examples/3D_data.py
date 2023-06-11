@@ -2,111 +2,66 @@
 3D Data
 =======
 
-The obvious 3dimensional dataset is one in 3D world space - cartesian coordinates: x, y, z
+Demonstrate MassComposition on a 3D block model dataset.
+
 """
 
-# %%
-from pathlib import Path
-
-import numpy as np
 import pandas as pd
-import plotly
-
-from plotly.graph_objs import Figure
 import xarray as xr
+
+import omfvista
+import pooch
 import pyvista as pv
-import pvxarray
 
 from elphick.mass_composition import MassComposition
+from test.data import sample_data
+
+
+# %%
+# ..  note::
+#
+#     This example is incomplete.  It leverages the fantastic work by Bane Sullivan.
+#     REF: https://banesullivan.com/pyvista/examples/wolf-creek.html#
+#
+#     Where is this heading?  We need a 3D block model to demonstrate mass-composition in the 3D context.
+#     We'll use the dataset in this example to create that 3D block model - coming soon...
+
 
 # %%
 #
-# Load some real data and wrangle
-# -------------------------------
-# We get some demo data in the form of a pandas DataFrame - it has been pre-wrangled to include x, y, z.
+# Load an OMF project
+# -------------------
 #
-# x == Easting, y = Northing, z = RL
+# The Open Mining Format (OMF) is package of geoscientific project data.
 
-filepath: Path = Path('../test/data/iron_ore_sample_data_xyz_A072391.csv')
-name: str = filepath.stem.split('_')[-1]
-df_data: pd.DataFrame = pd.read_csv(filepath, index_col='index')
-print(df_data.shape)
-df_data.head()
+url = "https://raw.githubusercontent.com/pyvista/vtk-data/master/Data/test_file.omf"
+file_path = pooch.retrieve(url=url, known_hash=None)
+
+project = omfvista.load_project(file_path)
+print(project)
 
 # %%
 
-obj_mc: MassComposition = MassComposition(df_data, name=name)
-obj_mc.aggregate(group_var='DHID')
+project.plot()
 
 # %%
-#
-# Plotting using PyVista
-# ----------------------
 
-df: pd.DataFrame = df_data.reset_index().set_index(['x', 'y', 'z'])
+# Grab a few elements of interest and plot em up!
+vol = project["Block Model"]
+assay = project["wolfpass_WP_assay"]
+topo = project["Topography"]
+dacite = project["Dacite"]
 
-obj_mc: MassComposition = MassComposition(df, name=name, mass_units='kg')
+# %%
 
-# get the underlying xarray dataset
-xr_ds: xr.Dataset = obj_mc.data
+assay.set_active_scalars("DENSITY")
 
-
-# # interpolate spatially.  OK so it is not exactly krigging but hey...
-# # xr_ds_interp: xr.Dataset = xr_ds.interp(coords={'x': xr_ds.x, 'y': xr_ds.y, 'z': xr_ds.z})
-#
-# # this plot is not overly useful - nans obscuring...
-# # xr_ds_interp['Fe'].pyvista.plot(x='x', y='y', z='z')
-#
-# will plot just the non-nan values
-mesh: pv.RectilinearGrid = xr_ds['Fe'].pyvista.mesh(x='x', y='y', z='z')
-mesh: pv.UnstructuredGrid = mesh.cast_to_unstructured_grid()
-
-threshed = mesh.threshold()
-threshed.plot(show_edges=True)
-
-mesh = mesh.point_data_to_cell_data(pass_point_data=True)
-
-mesh.threshold(mesh.get_data_range(), all_scalars=True).plot()
-
-
-poly: pv.PolyData = pv.PolyData(df.index.to_frame().to_numpy())
-poly.cell_data['Fe'] = df['Fe']
-poly.threshold(poly.get_data_range(), all_scalars=True).plot()
-
-
-# ghosts = np.argwhere(mesh["Fe"] < 0.0)
-# # This will act on the mesh inplace to mark those cell indices as ghosts
-# mesh.remove_cells(ghosts)
-
-# pts: pv.PointSet = mesh.cast_to_pointset()
-mesh2: pv.RectilinearGrid = mesh.point_data_to_cell_data(pass_point_data=True)
-mesh3: pv.RectilinearGrid = mesh.cell_data_to_point_data()
-
-
-# Plot in 3D
 p = pv.Plotter()
-p.add_mesh_threshold(poly)  # , clim=[0, 35])
-
-# p.add_mesh_threshold(mesh2)  # , clim=[0, 35])
-# p.add_mesh_threshold(mesh)  # , lighting=False, cmap='plasma')  # , clim=[0, 35])
-# p.view_vector([1, -1, 1])
-# p.set_scale(zscale=0.001)
+p.add_mesh(assay.tube(radius=3))
+p.add_mesh(topo, opacity=0.5)
+p.camera_position = [
+    (445542.1943310096, 491993.83439313783, 2319.4833541935445),
+    (445279.0538059701, 493496.6896061105, 2751.562316285356),
+    (-0.03677380086746433, -0.2820672798388477, 0.9586895937758338),
+]
 p.show()
-
-# # TODO: resolve key error, nan
-# fig: Figure = obj_mc.plot_parallel(color='Fe')
-# fig.show()
-#
-# # %%
-#
-# fig: Figure = obj_mc.plot_parallel(color='Fe', plot_interval_edges=True)
-# fig
-#
-# # %%
-#
-# # with selected variables
-# fig: Figure = obj_mc.plot_parallel(color='Fe', var_subset=['mass_wet', 'H2O', 'Fe', 'SiO2'])
-# # noinspection PyTypeChecker
-# plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
-
-print('done')

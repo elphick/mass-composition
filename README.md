@@ -14,6 +14,9 @@ and moisture on a wet basis.
 The package not only supports individual MassComposition objects, but collections of objects that are 
 mathematically related in a Directional Graph (Network or flowsheet).
 
+
+[![example plot](https://elphick.github.io/mass-composition/_static/example_plot.png)](https://elphick.github.io/mass-composition/_static/example_plot.html)
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
@@ -68,10 +71,8 @@ fig
 ```
 
 
+Network visualisations and other plots are interactive.
 
-Network visualisations and other plots are interactive (click on the image).
-
-[![example plot](https://elphick.github.io/mass-composition/_static/example_plot.png)](https://elphick.github.io/mass-composition/_static/example_plot.html)
 
 
 For full examples, see the [gallery](/auto_examples/index).
