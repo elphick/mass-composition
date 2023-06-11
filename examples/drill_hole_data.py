@@ -1,8 +1,8 @@
 """
-3D Data
-=======
+Drill Hole Data
+===============
 
-The obvious 3dimensional dataset is one in 3D world space - cartesian coordinates: x, y, z
+The obvious 3 dimensional dataset is one in 3D world space - cartesian coordinates: x, y, z
 """
 
 # %%

@@ -18,7 +18,6 @@ from elphick.mass_composition.utils import solve_mass_moisture
 from elphick.mass_composition.utils.sampling import random_int
 
 # noinspection PyUnresolvedReferences
-import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
 from elphick.mass_composition.variables import Variables, VariableGroups
 
 
@@ -55,15 +54,13 @@ class MassComposition:
             config_file = Path(__file__).parent / './config/mc_config.yml'
         self.config = read_yaml(config_file)
 
-        in_node = random_int()
-        out_node = random_int()
-        self.nodes: List[int] = [in_node, out_node]
+        # nodes become useful when multiple objects exist
+        self.nodes: List[int] = [random_int(), random_int()]
 
         self._name: str = name
         self._mass_units = self.config['units']['mass'] if not mass_units else None
         self._composition_units = self.config['units']['composition_rel'] if not composition_units else None
 
-        # self._input_columns: Optional[List[str]] = None
         self._specified_columns: Dict = {'mass_wet_var': mass_wet_var,
                                          'mass_dry_var': mass_dry_var,
                                          'moisture_var': moisture_var,
@@ -71,54 +68,45 @@ class MassComposition:
 
         self._data: Optional[xr.Dataset] = None
         self.variables: Optional[Variables] = None
+        self.constraints: Optional[Dict[str, List]] = None
+        self.status: Optional[Status] = None
 
         if data is not None:
-            self.set_data(data)
-            # explicitly define the constraints
-            self.constraints: Dict = self.get_constraint_bounds(constraints=constraints)
-            self.status = Status(self._check_constraints())
+            self.set_data(data, constraints=constraints)
 
-    def set_data(self, data):
-        if sum(data.index.duplicated()) > 0:
-            raise KeyError('The data has duplicate indexes.')
-        data: pd.DataFrame = data.copy()
+    def set_data(self, data: Union[pd.DataFrame, xr.Dataset],
+                 constraints: Optional[Dict[str, List]] = None):
+        if isinstance(data, xr.Dataset):
+            # we assume it is a complianct mc-xarray
+            self._data = data
+            self.variables = Variables(config=self.config['vars'],
+                                       supplied=[str(v) for v in data.variables if v not in data.dims],
+                                       specified_map=self._specified_columns)
+        elif isinstance(data, pd.DataFrame):
+            if sum(data.index.duplicated()) > 0:
+                raise KeyError('The data has duplicate indexes.')
+            data: pd.DataFrame = data.copy()
 
-        self.variables = Variables(config=self.config['vars'],
-                                   supplied=list(data.columns),
-                                   specified_map=self._specified_columns)
+            self.variables = Variables(config=self.config['vars'],
+                                       supplied=list(data.columns),
+                                       specified_map=self._specified_columns)
 
-        # if interval pairs are passed as indexes then create the proper interval index
-        data = self._create_interval_indexes(data=data)
+            # if interval pairs are passed as indexes then create the proper interval index
+            data = self._create_interval_indexes(data=data)
 
-        # rename the columns using the Variables class
-        data.rename(columns=self.variables.vars.col_to_var(), inplace=True)
+            # rename the columns using the Variables class
+            data.rename(columns=self.variables.vars.col_to_var(), inplace=True)
 
-        # solve or validate the moisture balance
-        data = self._solve_mass_moisture(data)
+            # solve or validate the moisture balance
+            data = self._solve_mass_moisture(data)
 
-        # create the xr.Dataset, dims from the index.
-        xr_ds: xr.Dataset = data.to_xarray()
-        # move the attrs to become coords - HOLD - this creates merging problems in the data property, reconsider.
-        # xr_ds = xr_ds.set_coords(cols_attrs)
+            xr_ds = self._dataframe_to_mc_dataset(data)
 
-        # add the dataset attributes
-        ds_attrs: Dict = {'mc_name': self._name,
-                          'mc_vars_mass': self.variables.mass.get_var_names(),
-                          'mc_vars_chem': self.variables.chemistry.get_var_names(),
-                          'mc_vars_attrs': self.variables.supplementary.get_var_names(),
-                          'mc_interval_edges': data.attrs}
-        xr_ds.attrs = ds_attrs
+            self._data = xr_ds
 
-        # add the variable attributes
-        for v in self.variables.xr.variables:
-            xr_ds[v.name].attrs = {
-                'units': self._mass_units if v.group == VariableGroups.MASS else self._composition_units,
-                'standard_name': ' '.join(
-                    v.name.split('_')[::-1]).title() if v.group == VariableGroups.MASS else v.name,
-                'mc_type': (VariableGroups.MASS if v.group == VariableGroups.MASS else VariableGroups.CHEMISTRY).value,
-                'mc_col_orig': v.column_name}
-
-        self._data = xr_ds
+        # explicitly define the constraints
+        self.constraints: Dict = self.get_constraint_bounds(constraints=constraints)
+        self.status = Status(self._check_constraints())
 
     def get_constraint_bounds(self, constraints: Optional[Dict[str, List]]) -> Dict[str, List]:
         d_constraints: Dict = {}
@@ -380,13 +368,13 @@ class MassComposition:
         Returns:
             tuple of two datasets, the first with the mass fraction specified, the other the complement
         """
-        out = deepcopy(self)
-        comp = deepcopy(self)
 
         xr_ds_1, xr_ds_2 = self._data.mc.split(fraction=fraction)
 
-        out._data = xr_ds_1
-        comp._data = xr_ds_2
+        out: MassComposition = MassComposition(name=xr_ds_1.mc.name, constraints=self.constraints)
+        out.set_data(data=xr_ds_1, constraints=self.constraints)
+        comp: MassComposition = MassComposition(name=xr_ds_2.mc.name, constraints=self.constraints)
+        comp.set_data(data=xr_ds_2, constraints=self.constraints)
 
         self._post_process_split(out, comp, name_1, name_2)
 
@@ -660,8 +648,8 @@ class MassComposition:
         """
         xr_sum: xr.Dataset = self._data.mc.add(other._data)
 
-        res = deepcopy(self)
-        res._data = xr_sum
+        res: MassComposition = MassComposition(name=xr_sum.mc.name, constraints=self.constraints)
+        res.set_data(data=xr_sum, constraints=self.constraints)
 
         other.nodes = [other.nodes[0], self.nodes[1]]
         res.nodes = [self.nodes[1], random_int()]
@@ -681,8 +669,9 @@ class MassComposition:
 
         xr_sub: xr.Dataset = self._data.mc.sub(other._data)
 
-        res = deepcopy(self)
-        res._data = xr_sub
+        res: MassComposition = MassComposition(name=xr_sub.mc.name, constraints=self.constraints)
+        res.set_data(data=xr_sub, constraints=self.constraints)
+
         res.nodes = [self.nodes[1], random_int()]
         return res
 
@@ -699,8 +688,8 @@ class MassComposition:
 
         xr_div: xr.Dataset = self._data.mc.div(other._data)
 
-        res = deepcopy(self)
-        res._data = xr_div
+        res: MassComposition = MassComposition(name=xr_div.mc.name, constraints=self.constraints)
+        res.set_data(data=xr_div, constraints=self.constraints)
 
         return res
 
@@ -825,6 +814,28 @@ class MassComposition:
             data.drop(columns=d_var_map['moisture'], inplace=True)
 
         return data
+
+    def _dataframe_to_mc_dataset(self, data):
+        # create the xr.Dataset, dims from the index.
+        xr_ds: xr.Dataset = data.to_xarray()
+        # move the attrs to become coords - HOLD - this creates merging problems in the data property, reconsider.
+        # xr_ds = xr_ds.set_coords(cols_attrs)
+        # add the dataset attributes
+        ds_attrs: Dict = {'mc_name': self._name,
+                          'mc_vars_mass': self.variables.mass.get_var_names(),
+                          'mc_vars_chem': self.variables.chemistry.get_var_names(),
+                          'mc_vars_attrs': self.variables.supplementary.get_var_names(),
+                          'mc_interval_edges': data.attrs}
+        xr_ds.attrs = ds_attrs
+        # add the variable attributes
+        for v in self.variables.xr.variables:
+            xr_ds[v.name].attrs = {
+                'units': self._mass_units if v.group == VariableGroups.MASS else self._composition_units,
+                'standard_name': ' '.join(
+                    v.name.split('_')[::-1]).title() if v.group == VariableGroups.MASS else v.name,
+                'mc_type': (VariableGroups.MASS if v.group == VariableGroups.MASS else VariableGroups.CHEMISTRY).value,
+                'mc_col_orig': v.column_name}
+        return xr_ds
 
     def _check_constraints(self) -> pd.DataFrame:
         """Determine if all records are within the constraints"""
