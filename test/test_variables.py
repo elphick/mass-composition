@@ -31,10 +31,10 @@ def test_variables(demo_data):
 
     obj: Variables = Variables(supplied=list(demo_data.columns), config=_config['vars'],
                                specified_map={'mass_wet': 'wet_mass'})
-    assert obj.vars_mass.get_var_names() == ['mass_wet', 'mass_dry']
-    assert obj.vars_mass.get_col_names() == ['wet_mass', 'mass_dry']
-    assert obj.vars_mass.col_to_var() == {'wet_mass': 'mass_wet', 'mass_dry': 'mass_dry'}
-    assert obj.vars_mass.var_to_col() == {'mass_wet': 'wet_mass', 'mass_dry': 'mass_dry'}
-    assert obj.var_moisture.var_to_col() == {'H2O': None}
+    assert obj.mass.get_var_names() == ['mass_wet', 'mass_dry']
+    assert obj.mass.get_col_names() == ['wet_mass', 'mass_dry']
+    assert obj.mass.col_to_var() == {'wet_mass': 'mass_wet', 'mass_dry': 'mass_dry'}
+    assert obj.mass.var_to_col() == {'mass_wet': 'wet_mass', 'mass_dry': 'mass_dry'}
+    assert obj.moisture.var_to_col() == {'H2O': None}
 
-    assert obj.vars_chemistry.var_to_col() == {'Fe': 'FE', 'SiO2': 'SIO2', 'Al2O3': 'al2o3', 'LOI': 'LOI'}
+    assert obj.chemistry.var_to_col() == {'Fe': 'FE', 'SiO2': 'SIO2', 'Al2O3': 'al2o3', 'LOI': 'LOI'}
