@@ -17,6 +17,7 @@ from plotly.io._sg_scraper import plotly_sg_scraper
 import plotly.io as pio
 import numpy as np
 import pyvista
+
 # necessary when building the sphinx gallery
 pyvista.BUILDING_GALLERY = True
 pyvista.OFF_SCREEN = True
