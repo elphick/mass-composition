@@ -12,6 +12,14 @@ def demo_data():
 
 
 @pytest.fixture
+def demo_data_2():
+    data: pd.DataFrame = sample_data(include_wet_mass=True,
+                                     include_dry_mass=False,
+                                     include_moisture=True)
+    return data
+
+
+@pytest.fixture
 def size_assay_data():
     data: pd.DataFrame = size_by_assay()
     return data
