@@ -114,7 +114,7 @@ class Variables:
                                           name_property=v,
                                           name_match=str(match.group()) if match else None,
                                           name_force=self._specified_map[
-                                              v] if v in self._specified_map.keys() else None,
+                                              f"{v}_var"] if f"{v}_var" in self._specified_map.keys() else None,
                                           group=VariableGroups.MASS)
             res.append(variable)
         return res
@@ -126,7 +126,8 @@ class Variables:
         variable: Variable = Variable(name=self._config[v]['standard_name'],
                                       name_property=v,
                                       name_match=str(match.group()) if match else None,
-                                      name_force=self._specified_map[v] if v in self._specified_map.keys() else None,
+                                      name_force=self._specified_map[
+                                          f"{v}_var"] if f"{v}_var" in self._specified_map.keys() else None,
                                       group=VariableGroups.MOISTURE)
         return variable
 

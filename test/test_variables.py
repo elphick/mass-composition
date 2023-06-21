@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pandas.testing
 import pytest
 import numpy as np
 import pandas as pd
@@ -7,7 +8,7 @@ import pandas as pd
 from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.variables import Variables
 # noinspection PyUnresolvedReferences
-from test.data import demo_data
+from test.data import demo_data, demo_data_2
 from elphick.mass_composition import MassComposition
 import xarray as xr
 
@@ -38,3 +39,15 @@ def test_variables(demo_data):
     assert obj.moisture.var_to_col() == {'H2O': None}
 
     assert obj.chemistry.var_to_col() == {'Fe': 'FE', 'SiO2': 'SIO2', 'Al2O3': 'al2o3', 'LOI': 'LOI'}
+
+
+def test_args(demo_data_2):
+    demo_data_2.rename(columns={'H2O': 'custom_H2O'}, inplace=True)
+    obj_mc: MassComposition = MassComposition(demo_data_2, name='test_math', moisture_var='custom_H2O')
+    # check that the data landed in the objects variable
+    expected = pd.Series({0: 10.0, 1: 11.11111111111111, 2: 18.181818181818183}, name='H2O')
+    expected.index.name = 'index'
+    pd.testing.assert_series_equal(obj_mc.data.to_dataframe()['H2O'], expected)
+
+    # TODO: add tests for the other args.
+

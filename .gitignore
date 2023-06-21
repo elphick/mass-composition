@@ -4,3 +4,5 @@
 /.python-version
 /.idea/
 /dist/
+/.coverage.*
+/test/data/*.html
