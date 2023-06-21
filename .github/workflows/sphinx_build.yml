@@ -14,7 +14,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install mass-composition -e ".[viz,network,omf]"
-        pip install importlib-metadata
         pip install sphinx sphinx_rtd_theme
         pip install sphinx-gallery
         pip install sphinx-autodoc-typehints

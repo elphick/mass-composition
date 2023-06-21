@@ -28,7 +28,6 @@ pyvista = { version = "^0.37.0", optional = true }
 pyvista-xarray = { version = "^0.1.2", optional = true }
 networkx = { version = "^3.0", optional = true }
 omfvista = { version = "^0.2.5", optional = true }
-importlib-metadata = "^6.7.0"
 
 [tool.poetry.extras]
 viz = ["kaleido", "pyvista", "pyvista-xarray"]
