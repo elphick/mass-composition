@@ -1,1 +1,1 @@
-from elphick.mass_composition import mass_composition
+import elphick.mass_composition
