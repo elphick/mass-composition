@@ -1,8 +1,16 @@
 MC:
   vars:
-    mass_wet: mass_wet
-    mass_dry: mass_dry
-    moisture: H2O
+    mass_wet:
+      standard_name: mass_wet
+      search_regex: '(mass_wet)|(wet_mass)|(wmt)'  # case in-sensitive regex
+    mass_dry:
+      standard_name: mass_dry
+      search_regex: '(mass_dry)|(dry_mass)|(dmt)'
+    moisture:
+      standard_name: H2O
+      search_regex: '(h2o)|(moisture)|(moist)'
+    chemistry:
+      ignore: ['Y']  # ignore anything in this list when detecting chemistry components
   units:
     mass: mass_units
     composition_rel: '%'
@@ -19,6 +27,4 @@ MC:
     recovery: 'rec'
     difference: 'diff'
     divide: 'ur'
-  components:
-    chemistry:
-      ignore: ['Y']  # ignore anything in this list when detecting chemistry components
+

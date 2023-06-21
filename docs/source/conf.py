@@ -15,6 +15,16 @@ import sys
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 from plotly.io._sg_scraper import plotly_sg_scraper
 import plotly.io as pio
+import numpy as np
+import pyvista
+
+# necessary when building the sphinx gallery
+pyvista.BUILDING_GALLERY = True
+pyvista.OFF_SCREEN = True
+
+# Optional - set parameters like theme or window size
+pyvista.set_plot_theme('document')
+pyvista.global_theme.window_size = np.array([1024, 768]) * 2
 
 pio.renderers.default = 'sphinx_gallery_png'  # 'sphinx_gallery'
 
@@ -38,17 +48,20 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',  # to document the
               'sphinx.ext.napoleon',  # for parsing numpy/google docstrings
               'sphinx_gallery.gen_gallery',  # to generate a gallery of examples
               'sphinx_autodoc_typehints',
-              'myst_parser'  # for parsing md files
+              'myst_parser',  # for parsing md files
+              "pyvista.ext.plot_directive",
+              # 'jupyter_sphinx'  # interactive pyvista
               ]
 
 autosummary_generate = True
 sphinx_gallery_conf = {
     'filename_pattern': r'\.py',
-    'ignore_pattern': r'(__init__)|(3D_data)\.py',
+    'ignore_pattern': r'(__init__)|(3d_data)|(drill_hole_data)\.py',
     'examples_dirs': '../../examples',  # path to your example scripts
     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
     'within_subsection_order': FileNameSortKey,
-    'image_scrapers': (plotly_sg_scraper, 'matplotlib')
+    'capture_repr': ('_repr_html_', '__repr__'),
+    'image_scrapers': (plotly_sg_scraper, 'matplotlib', 'pyvista')
 }
 
 # Add any paths that contain templates here, relative to this directory.

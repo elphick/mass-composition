@@ -1,0 +1,67 @@
+"""
+3D Data
+=======
+
+Demonstrate MassComposition on a 3D block model dataset.
+
+"""
+
+import pandas as pd
+import xarray as xr
+
+import omfvista
+import pooch
+import pyvista as pv
+
+from elphick.mass_composition import MassComposition
+from test.data import sample_data
+
+
+# %%
+# ..  note::
+#
+#     This example is incomplete.  It leverages the fantastic work by Bane Sullivan.
+#     REF: https://banesullivan.com/pyvista/examples/wolf-creek.html#
+#
+#     Where is this heading?  We need a 3D block model to demonstrate mass-composition in the 3D context.
+#     We'll use the dataset in this example to create that 3D block model - coming soon...
+
+
+# %%
+#
+# Load an OMF project
+# -------------------
+#
+# The Open Mining Format (OMF) is package of geoscientific project data.
+
+url = "https://raw.githubusercontent.com/pyvista/vtk-data/master/Data/test_file.omf"
+file_path = pooch.retrieve(url=url, known_hash=None)
+
+project = omfvista.load_project(file_path)
+print(project)
+
+# %%
+
+project.plot()
+
+# %%
+
+# Grab a few elements of interest and plot em up!
+vol = project["Block Model"]
+assay = project["wolfpass_WP_assay"]
+topo = project["Topography"]
+dacite = project["Dacite"]
+
+# %%
+
+assay.set_active_scalars("DENSITY")
+
+p = pv.Plotter()
+p.add_mesh(assay.tube(radius=3))
+p.add_mesh(topo, opacity=0.5)
+p.camera_position = [
+    (445542.1943310096, 491993.83439313783, 2319.4833541935445),
+    (445279.0538059701, 493496.6896061105, 2751.562316285356),
+    (-0.03677380086746433, -0.2820672798388477, 0.9586895937758338),
+]
+p.show()
