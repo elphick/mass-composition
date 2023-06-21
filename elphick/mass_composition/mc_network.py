@@ -353,6 +353,8 @@ class MCNetwork(nx.DiGraph):
                      names: Optional[str] = None):
         """Return a tidy dataframe
 
+        Adds the mc name to the index so indexes are unique.
+
         Args:
             names: Optional List of names of MassComposition objects (network edges) for export
 
@@ -363,7 +365,7 @@ class MCNetwork(nx.DiGraph):
         for u, v, data in self.edges(data=True):
             if (names is None) or ((names is not None) and (data['mc'].name in names)):
                 chunks.append(data['mc'].data.mc.to_dataframe().assign(name=data['mc'].name))
-        return pd.concat(chunks, axis='index')
+        return pd.concat(chunks, axis='index').set_index('name', append=True)
 
     def plot_parallel(self,
                       names: Optional[str] = None,
