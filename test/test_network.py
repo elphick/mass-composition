@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Dict
 
 import pandas as pd
 
@@ -41,3 +42,44 @@ def test_table_plot(demo_data):
 
     fig = mcn.table_plot(table_pos='bottom', table_area=0.2)
     fig
+
+
+def test_to_dataframe(demo_data):
+    obj_mc: MassComposition = MassComposition(demo_data, name='Feed')
+    obj_mc_1, obj_mc_2 = obj_mc.split(0.4)
+
+    mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2])
+    df_res: pd.DataFrame = mcn.to_dataframe()
+
+    d_expected: Dict = {'mass_wet': {(0, 'Feed'): 100.0, (1, 'Feed'): 90.0, (2, 'Feed'): 110.0,
+                                     (0, '(0.4 * Feed)'): 40.0, (1, '(0.4 * Feed)'): 36.0,
+                                     (2, '(0.4 * Feed)'): 44.0, (0, '(0.6 * Feed)'): 60.0,
+                                     (1, '(0.6 * Feed)'): 54.0, (2, '(0.6 * Feed)'): 66.0},
+                        'mass_dry': {(0, 'Feed'): 90.0, (1, 'Feed'): 80.0, (2, 'Feed'): 90.0,
+                                     (0, '(0.4 * Feed)'): 36.0, (1, '(0.4 * Feed)'): 32.0,
+                                     (2, '(0.4 * Feed)'): 36.0, (0, '(0.6 * Feed)'): 54.0,
+                                     (1, '(0.6 * Feed)'): 48.0, (2, '(0.6 * Feed)'): 54.0},
+                        'H2O': {(0, 'Feed'): 10.0, (1, 'Feed'): 11.11111111111111,
+                                (2, 'Feed'): 18.181818181818183, (0, '(0.4 * Feed)'): 10.0,
+                                (1, '(0.4 * Feed)'): 11.11111111111111, (2, '(0.4 * Feed)'): 18.181818181818183,
+                                (0, '(0.6 * Feed)'): 10.0, (1, '(0.6 * Feed)'): 11.11111111111111,
+                                (2, '(0.6 * Feed)'): 18.181818181818183},
+                        'Fe': {(0, 'Feed'): 57.0, (1, 'Feed'): 59.0, (2, 'Feed'): 61.0, (0, '(0.4 * Feed)'): 57.0,
+                               (1, '(0.4 * Feed)'): 59.0, (2, '(0.4 * Feed)'): 61.0, (0, '(0.6 * Feed)'): 57.0,
+                               (1, '(0.6 * Feed)'): 59.0, (2, '(0.6 * Feed)'): 61.0},
+                        'SiO2': {(0, 'Feed'): 5.2, (1, 'Feed'): 3.1, (2, 'Feed'): 2.2, (0, '(0.4 * Feed)'): 5.2,
+                                 (1, '(0.4 * Feed)'): 3.1, (2, '(0.4 * Feed)'): 2.2, (0, '(0.6 * Feed)'): 5.2,
+                                 (1, '(0.6 * Feed)'): 3.1, (2, '(0.6 * Feed)'): 2.2},
+                        'Al2O3': {(0, 'Feed'): 3.0, (1, 'Feed'): 1.7, (2, 'Feed'): 0.9,
+                                  (0, '(0.4 * Feed)'): 3.0, (1, '(0.4 * Feed)'): 1.7, (2, '(0.4 * Feed)'): 0.9,
+                                  (0, '(0.6 * Feed)'): 3.0, (1, '(0.6 * Feed)'): 1.7, (2, '(0.6 * Feed)'): 0.9},
+                        'LOI': {(0, 'Feed'): 5.0, (1, 'Feed'): 4.0, (2, 'Feed'): 3.0, (0, '(0.4 * Feed)'): 5.0,
+                                (1, '(0.4 * Feed)'): 4.0, (2, '(0.4 * Feed)'): 3.0, (0, '(0.6 * Feed)'): 5.0,
+                                (1, '(0.6 * Feed)'): 4.0, (2, '(0.6 * Feed)'): 3.0},
+                        'group': {(0, 'Feed'): 'grp_1', (1, 'Feed'): 'grp_1', (2, 'Feed'): 'grp_2',
+                                  (0, '(0.4 * Feed)'): 'grp_1', (1, '(0.4 * Feed)'): 'grp_1',
+                                  (2, '(0.4 * Feed)'): 'grp_2', (0, '(0.6 * Feed)'): 'grp_1',
+                                  (1, '(0.6 * Feed)'): 'grp_1', (2, '(0.6 * Feed)'): 'grp_2'}}
+    df_expected: pd.DataFrame = pd.DataFrame.from_dict(d_expected)
+    df_expected.index.names = ['index', 'name']
+    pd.testing.assert_frame_equal(df_expected, df_res)
