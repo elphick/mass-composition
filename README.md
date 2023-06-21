@@ -3,16 +3,16 @@
 [![Run Tests](https://github.com/Elphick/mass-composition/actions/workflows/build_and_test.yml/badge.svg?branch=main)](https://github.com/Elphick/mass-composition/actions/workflows/build_and_test.yml)
 [![Publish Docs](https://github.com/Elphick/mass-composition/actions/workflows/docs_to_gh_pages.yml/badge.svg?branch=main)](https://github.com/Elphick/mass-composition/actions/workflows/docs_to_gh_pages.yml)
 
-MassComposition is a python package that allows Geo-scientists and Metallurgists to easily work with, and visualise
+MassComposition is a python package that allows Geoscientists and Metallurgists to easily work with, and visualise
 mass-compositional data.
 
-Mass Composition in this context is just that - Mass *and* Composition.  It is not Compositional Data Analysis (CoDa), 
+Mass Composition in this context is just that - Mass *and* Composition.  It is not Compositional Data Analysis (CoDA), 
 since here we care more about mathematical operations like weight averaging and technically correct mathematical 
 operations.  Of course, we also need to manage moisture correctly - chemical composition is reported on a dry basis 
 and moisture on a wet basis.
 
-The package not only supports individual MassComposition objects, but collections of objects that are 
-mathematically related in a Directional Graph (Network or flowsheet).
+The package not only supports individual MassComposition, but collections of objects that are 
+mathematically related in a Directional Graph (a.k.a. network or flowsheet).
 
 
 [![example plot](https://elphick.github.io/mass-composition/_static/example_plot.png)](https://elphick.github.io/mass-composition/_static/example_plot.html)
