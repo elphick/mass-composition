@@ -4,6 +4,7 @@ on:
      paths:
        - 'examples/*.py'
        - 'docs/**'
+   workflow_dispatch:
 
 jobs:
   check_docs:
