@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pandas.testing
 import pytest
 import numpy as np
 import pandas as pd
@@ -41,8 +42,12 @@ def test_variables(demo_data):
 
 
 def test_args(demo_data_2):
-    # demo_data_2.rename(columns={'H2O', 'custom_H2O'}, inplace=True)
-    # obj_mc: MassComposition = MassComposition(demo_data_2, name='test_math', moisture_var='custom_H2O')
-    # print('debug')
-    pass
+    demo_data_2.rename(columns={'H2O': 'custom_H2O'}, inplace=True)
+    obj_mc: MassComposition = MassComposition(demo_data_2, name='test_math', moisture_var='custom_H2O')
+    # check that the data landed in the objects variable
+    expected = pd.Series({0: 10.0, 1: 11.11111111111111, 2: 18.181818181818183}, name='H2O')
+    expected.index.name = 'index'
+    pd.testing.assert_series_equal(obj_mc.data.to_dataframe()['H2O'], expected)
+
+    # TODO: add tests for the other args.
 

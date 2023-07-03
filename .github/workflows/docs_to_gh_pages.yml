@@ -8,6 +8,8 @@ on:
     paths:
       - 'docs/**'
       - 'examples/*.py'
+  workflow_dispatch:
+
 
 permissions:
     contents: write
