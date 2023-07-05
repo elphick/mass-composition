@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -18,6 +19,7 @@ from elphick.mass_composition.layout import digraph_linear_layout, linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.plot import parallel_plot
 from elphick.mass_composition.utils.geometry import midpoint
+from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
 from elphick.mass_composition.utils.size import mean_size
 from elphick.mass_composition.utils.viz import plot_parallel
 
@@ -25,10 +27,11 @@ from elphick.mass_composition.utils.viz import plot_parallel
 class MCNetwork(nx.DiGraph):
     def __init__(self, **attr):
         super().__init__(**attr)
+        self._logger: logging.Logger = logging.getLogger(__class__.__name__)
 
     @classmethod
     def from_streams(cls, streams: List[MassComposition], name: Optional[str] = 'Flowsheet') -> 'MCNetwork':
-        """Class method from a list of objects
+        """Instantiate from a list of objects
 
         Args:
             streams: List of MassComposition objects
@@ -63,6 +66,54 @@ class MCNetwork(nx.DiGraph):
             data['mc'].nodes = [node1, node2]
 
         return graph
+
+    @classmethod
+    def from_dataframe(cls, df: pd.DataFrame,
+                       name: Optional[str] = 'Flowsheet',
+                       mc_name_col: Optional[str] = None) -> 'MCNetwork':
+        """Instantiate from a DataFrame
+
+        Args:
+            df: The DataFrame
+            name: name of the network
+            mc_name_col: The column specified contains the names of objects to create.
+              If None the DataFrame is assumed to be wide and the mc objects will be extracted from column prefixes.
+
+        Returns:
+
+        """
+        logger: logging.Logger = logging.getLogger(__class__.__name__)
+
+        res: List = []
+        index_names: List = []
+        if mc_name_col:
+            if mc_name_col in df.index.names:
+                index_names = df.index.names
+                df.reset_index(mc_name_col, inplace=True)
+            if mc_name_col not in df.columns:
+                raise KeyError(f'{mc_name_col} is not in the columns or indexes.')
+            names = df[mc_name_col].unique()
+            for obj_name in names:
+                res.append(MassComposition(
+                    data=df.query(f'{mc_name_col} == @obj_name')[[col for col in df.columns if col != mc_name_col]],
+                    name=obj_name))
+            if index_names:  # reinstate the index on the original dataframe
+                df.reset_index(inplace=True)
+                df.set_index(index_names, inplace=True)
+        else:
+            # wide case - find prefixes where there are at least 3 columns
+            prefix_counts = column_prefix_counts(df.columns)
+            prefix_cols = column_prefixes(df.columns)
+            for prefix, n in prefix_counts.items():
+                if n >= 3:
+                    logger.info(f"Creating object for {prefix}")
+                    cols = prefix_cols[prefix]
+                    res.append(MassComposition(
+                        data=df[[col for col in df.columns if col in cols]].rename(
+                            columns={col: col.replace(f'{prefix}_', '') for col in df.columns}),
+                        name=prefix))
+
+        return cls().from_streams(streams=res, name=name)
 
     @property
     def balanced(self) -> bool:
@@ -317,8 +368,9 @@ class MCNetwork(nx.DiGraph):
             columnwidth=column_widths,
             cells=dict(values=df.transpose().values.tolist(),
                        align='left', format=fmt,
-                       fill_color=[[table_odd_color if i % 2 == 0 else table_even_color for i in range(len(df))] * len(
-                           df.columns)]),
+                       fill_color=[
+                           [table_odd_color if i % 2 == 0 else table_even_color for i in range(len(df))] * len(
+                               df.columns)]),
             **d_table)
 
         if plot_type == 'sankey':

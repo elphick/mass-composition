@@ -80,6 +80,39 @@ def test_to_dataframe(demo_data):
                                   (0, '(0.4 * Feed)'): 'grp_1', (1, '(0.4 * Feed)'): 'grp_1',
                                   (2, '(0.4 * Feed)'): 'grp_2', (0, '(0.6 * Feed)'): 'grp_1',
                                   (1, '(0.6 * Feed)'): 'grp_1', (2, '(0.6 * Feed)'): 'grp_2'}}
+
     df_expected: pd.DataFrame = pd.DataFrame.from_dict(d_expected)
     df_expected.index.names = ['index', 'name']
     pd.testing.assert_frame_equal(df_expected, df_res)
+
+
+def test_from_dataframe_tall(demo_data):
+    obj_mc: MassComposition = MassComposition(demo_data, name='Feed')
+    obj_mc_1, obj_mc_2 = obj_mc.split(0.4)
+    mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2])
+    df_tall: pd.DataFrame = mcn.to_dataframe()
+
+    mcn_res: MCNetwork = MCNetwork().from_dataframe(df=df_tall,
+                                                    mc_name_col='name')
+    df_res: pd.DataFrame = mcn_res.to_dataframe()
+
+    pd.testing.assert_frame_equal(df_tall, df_res)
+
+
+def test_from_dataframe_wide(demo_data):
+    obj_mc: MassComposition = MassComposition(demo_data, name='Feed')
+    obj_mc_1, obj_mc_2 = obj_mc.split(0.4)
+    mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2])
+    df_wide: pd.DataFrame = mcn.to_dataframe().unstack('name')
+    df_wide.columns = df_wide.columns.swaplevel(0, 1)
+    df_wide.columns = ['_'.join(col) for col in df_wide.columns.values]
+
+    mcn_res: MCNetwork = MCNetwork().from_dataframe(df=df_wide, mc_name_col=None)
+
+    df_test: pd.DataFrame = mcn.to_dataframe()
+    df_res: pd.DataFrame = mcn_res.to_dataframe()
+    # indexes are in a different order...  So be it.
+    assert set(df_res.index) == set(df_test.index)
+    df_res = df_res.loc[df_test.index, :]
+
+    pd.testing.assert_frame_equal(df_test, df_res)
