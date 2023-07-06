@@ -173,16 +173,28 @@ class MCNetwork(nx.DiGraph):
         res: List[MassComposition] = [d['mc'] for u, v, d in self.edges(data=True) if degrees[v] == 1]
         return res
 
-    def get_column_formats(self, columns: List[str]) -> Dict[str, str]:
+    def get_column_formats(self, columns: List[str], strip_percent: bool = False) -> Dict[str, str]:
+        """
+
+        Args:
+            columns: The columns to lookup format strings for
+            strip_percent: If True remove the leading % symbol from the format (for plotly tables)
+
+        Returns:
+
+        """
         variables = self.get_input_edges()[0].variables
         d_format: Dict = {}
         for col in columns:
             for v in variables.vars.variables:
                 if col in [v.column_name, v.name]:
                     d_format[col] = v.format
+                    if strip_percent:
+                        d_format[col] = d_format[col].strip('%')
+
         return d_format
 
-    def report(self) -> pd.DataFrame:
+    def report(self, apply_formats: bool = False) -> pd.DataFrame:
         """Summary Report
 
         Total Mass and weight averaged composition
@@ -194,6 +206,10 @@ class MCNetwork(nx.DiGraph):
             for nbr, eattr in nbrs.items():
                 chunks.append(eattr['mc'].aggregate().assign(name=eattr['mc'].name))
         rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('name')
+        if apply_formats:
+            fmts: Dict = self.get_column_formats(rpt.columns)
+            for k, v in fmts.items():
+                rpt[k] = rpt[k].apply((v.replace('%', '{:,') + '}').format)
         return rpt
 
     def query(self, mc_name: str, queries: Dict) -> 'MCNetwork':
@@ -388,7 +404,7 @@ class MCNetwork(nx.DiGraph):
         df: pd.DataFrame = self.report().reset_index()
         if cols_exclude:
             df = df[[col for col in df.columns if col not in cols_exclude]]
-        fmt: List[str] = ['%s'] + list(self.get_column_formats(df.columns).values())
+        fmt: List[str] = ['%s'] + list(self.get_column_formats(df.columns, strip_percent=True).values())
         column_widths = [2] + [1] * (len(df.columns) - 1)
 
         fig.add_table(
@@ -663,7 +679,6 @@ class MCNetwork(nx.DiGraph):
             text=edge_labels)
 
         return edge_traces, node_trace, edge_annotation_trace
-
 
     def _rpt_to_html(self, df: pd.DataFrame) -> Dict:
         custom_data: Dict = {}
