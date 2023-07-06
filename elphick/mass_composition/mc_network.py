@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -18,6 +19,7 @@ from elphick.mass_composition.layout import digraph_linear_layout, linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.plot import parallel_plot
 from elphick.mass_composition.utils.geometry import midpoint
+from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
 from elphick.mass_composition.utils.size import mean_size
 from elphick.mass_composition.utils.viz import plot_parallel
 
@@ -25,10 +27,11 @@ from elphick.mass_composition.utils.viz import plot_parallel
 class MCNetwork(nx.DiGraph):
     def __init__(self, **attr):
         super().__init__(**attr)
+        self._logger: logging.Logger = logging.getLogger(__class__.__name__)
 
     @classmethod
     def from_streams(cls, streams: List[MassComposition], name: Optional[str] = 'Flowsheet') -> 'MCNetwork':
-        """Class method from a list of objects
+        """Instantiate from a list of objects
 
         Args:
             streams: List of MassComposition objects
@@ -63,6 +66,54 @@ class MCNetwork(nx.DiGraph):
             data['mc'].nodes = [node1, node2]
 
         return graph
+
+    @classmethod
+    def from_dataframe(cls, df: pd.DataFrame,
+                       name: Optional[str] = 'Flowsheet',
+                       mc_name_col: Optional[str] = None) -> 'MCNetwork':
+        """Instantiate from a DataFrame
+
+        Args:
+            df: The DataFrame
+            name: name of the network
+            mc_name_col: The column specified contains the names of objects to create.
+              If None the DataFrame is assumed to be wide and the mc objects will be extracted from column prefixes.
+
+        Returns:
+
+        """
+        logger: logging.Logger = logging.getLogger(__class__.__name__)
+
+        res: List = []
+        index_names: List = []
+        if mc_name_col:
+            if mc_name_col in df.index.names:
+                index_names = df.index.names
+                df.reset_index(mc_name_col, inplace=True)
+            if mc_name_col not in df.columns:
+                raise KeyError(f'{mc_name_col} is not in the columns or indexes.')
+            names = df[mc_name_col].unique()
+            for obj_name in names:
+                res.append(MassComposition(
+                    data=df.query(f'{mc_name_col} == @obj_name')[[col for col in df.columns if col != mc_name_col]],
+                    name=obj_name))
+            if index_names:  # reinstate the index on the original dataframe
+                df.reset_index(inplace=True)
+                df.set_index(index_names, inplace=True)
+        else:
+            # wide case - find prefixes where there are at least 3 columns
+            prefix_counts = column_prefix_counts(df.columns)
+            prefix_cols = column_prefixes(df.columns)
+            for prefix, n in prefix_counts.items():
+                if n >= 3:
+                    logger.info(f"Creating object for {prefix}")
+                    cols = prefix_cols[prefix]
+                    res.append(MassComposition(
+                        data=df[[col for col in df.columns if col in cols]].rename(
+                            columns={col: col.replace(f'{prefix}_', '') for col in df.columns}),
+                        name=prefix))
+
+        return cls().from_streams(streams=res, name=name)
 
     @property
     def balanced(self) -> bool:
@@ -100,7 +151,50 @@ class MCNetwork(nx.DiGraph):
 
         return res
 
-    def report(self) -> pd.DataFrame:
+    def get_input_edges(self) -> List[MassComposition]:
+        """Get the input (feed) edge objects
+
+        Returns:
+            List of MassComposition objects
+        """
+
+        degrees = [d for n, d in self.degree()]
+        res: List[MassComposition] = [d['mc'] for u, v, d in self.edges(data=True) if degrees[u] == 1]
+        return res
+
+    def get_output_edges(self) -> List[MassComposition]:
+        """Get the output (product) edge objects
+
+        Returns:
+            List of MassComposition objects
+        """
+
+        degrees = [d for n, d in self.degree()]
+        res: List[MassComposition] = [d['mc'] for u, v, d in self.edges(data=True) if degrees[v] == 1]
+        return res
+
+    def get_column_formats(self, columns: List[str], strip_percent: bool = False) -> Dict[str, str]:
+        """
+
+        Args:
+            columns: The columns to lookup format strings for
+            strip_percent: If True remove the leading % symbol from the format (for plotly tables)
+
+        Returns:
+
+        """
+        variables = self.get_input_edges()[0].variables
+        d_format: Dict = {}
+        for col in columns:
+            for v in variables.vars.variables:
+                if col in [v.column_name, v.name]:
+                    d_format[col] = v.format
+                    if strip_percent:
+                        d_format[col] = d_format[col].strip('%')
+
+        return d_format
+
+    def report(self, apply_formats: bool = False) -> pd.DataFrame:
         """Summary Report
 
         Total Mass and weight averaged composition
@@ -112,6 +206,10 @@ class MCNetwork(nx.DiGraph):
             for nbr, eattr in nbrs.items():
                 chunks.append(eattr['mc'].aggregate().assign(name=eattr['mc'].name))
         rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('name')
+        if apply_formats:
+            fmts: Dict = self.get_column_formats(rpt.columns)
+            for k, v in fmts.items():
+                rpt[k] = rpt[k].apply((v.replace('%', '{:,') + '}').format)
         return rpt
 
     def query(self, mc_name: str, queries: Dict) -> 'MCNetwork':
@@ -306,7 +404,7 @@ class MCNetwork(nx.DiGraph):
         df: pd.DataFrame = self.report().reset_index()
         if cols_exclude:
             df = df[[col for col in df.columns if col not in cols_exclude]]
-        fmt: List[str] = ["%s"] + [".1f", ".1f"] + [".2f"] * (len(df.columns) - 3)
+        fmt: List[str] = ['%s'] + list(self.get_column_formats(df.columns, strip_percent=True).values())
         column_widths = [2] + [1] * (len(df.columns) - 1)
 
         fig.add_table(
@@ -317,8 +415,9 @@ class MCNetwork(nx.DiGraph):
             columnwidth=column_widths,
             cells=dict(values=df.transpose().values.tolist(),
                        align='left', format=fmt,
-                       fill_color=[[table_odd_color if i % 2 == 0 else table_even_color for i in range(len(df))] * len(
-                           df.columns)]),
+                       fill_color=[
+                           [table_odd_color if i % 2 == 0 else table_even_color for i in range(len(df))] * len(
+                               df.columns)]),
             **d_table)
 
         if plot_type == 'sankey':
@@ -483,11 +582,11 @@ class MCNetwork(nx.DiGraph):
             edge_labels.append(data['mc'].name)
             source.append(u)
             target.append(v)
-            value.append(float(data['mc'].aggregate()[width_var]))
+            value.append(float(data['mc'].aggregate()[width_var].iloc[0]))
             edge_custom_data.append(d_custom_data[data['mc'].name])
 
             if color_var is not None:
-                val: float = float(data['mc'].aggregate()[color_var])
+                val: float = float(data['mc'].aggregate()[color_var].iloc[0])
                 str_color: str = f'rgba{self._color_from_float(v_min, v_max, val, cmap)}'
                 edge_color.append(str_color)
             else:
@@ -581,13 +680,13 @@ class MCNetwork(nx.DiGraph):
 
         return edge_traces, node_trace, edge_annotation_trace
 
-    @staticmethod
-    def _rpt_to_html(df: pd.DataFrame) -> Dict:
+    def _rpt_to_html(self, df: pd.DataFrame) -> Dict:
         custom_data: Dict = {}
+        fmts: Dict = self.get_column_formats(df.columns)
         for i, row in df.iterrows():
             str_data: str = '<br />'
             for k, v in dict(row).items():
-                str_data += f'{k}: {round(v, 2)}<br />'
+                str_data += f"{k}: {v:{fmts[k][1:]}}<br />"
             custom_data[i] = str_data
         return custom_data
 

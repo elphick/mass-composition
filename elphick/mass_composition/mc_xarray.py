@@ -76,7 +76,8 @@ class MassCompositionAccessor:
     def aggregate(self, group_var: Optional[str] = None,
                   group_bins: Optional[Union[int, Iterable]] = None,
                   as_dataframe: bool = False,
-                  original_column_names: bool = False) -> Union[xr.Dataset, pd.DataFrame]:
+                  original_column_names: bool = False,
+                  column_formats: Optional[Dict] = None) -> Union[xr.Dataset, pd.DataFrame]:
         """Calculate the weight average of this dataset.
 
         Args:
@@ -84,6 +85,7 @@ class MassCompositionAccessor:
             group_bins: Optional bins to apply to the group_var
             as_dataframe: If True return a pd.DataFrame
             original_column_names: If True, and as_dataframe is True, will return with the original column names.
+            column_formats: If not None, and as_dataframe is True, will format the dataframe per the dict.
 
         Returns:
 
@@ -124,8 +126,7 @@ class MassCompositionAccessor:
             res = res.expand_dims('index')
 
         if as_dataframe:
-            res: pd.DataFrame = self.to_dataframe(original_column_names=original_column_names,
-                                                  ds=res)
+            res: pd.DataFrame = self.to_dataframe(original_column_names=original_column_names, ds=res)
             if len(res) == 1:
                 res.index = pd.Index([self.name], name='name')
 
@@ -464,7 +465,8 @@ class MassCompositionAccessor:
         res: Dict = {var: da.attrs['mc_col_orig'] for var, da in self._obj.items()}
         return res
 
-    def to_dataframe(self, original_column_names: bool = False, ds: Optional[xr.Dataset] = None) -> pd.DataFrame:
+    def to_dataframe(self, original_column_names: bool = False,
+                     ds: Optional[xr.Dataset] = None) -> pd.DataFrame:
 
         if ds is None:
             ds = self._obj.mc.data()
@@ -489,6 +491,7 @@ class MassCompositionAccessor:
         xr_upsampled: xr.Dataset = interp_monotonic(self._obj, coords={'size': new_coords},
                                                     include_original_coords=True)
         return xr_upsampled
+
 
 def mc_aggregate(xr_ds: xr.Dataset) -> xr.Dataset:
     """A standalone function to aggregate

@@ -75,6 +75,11 @@ df_report: pd.DataFrame = mcn.report()
 df_report
 
 # %%
+
+df_report: pd.DataFrame = mcn.report(apply_formats=True)
+df_report
+
+# %%
 # Plot the interactive network using plotly
 
 fig = mcn.plot_network()
