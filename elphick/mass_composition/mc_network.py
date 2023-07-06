@@ -151,6 +151,37 @@ class MCNetwork(nx.DiGraph):
 
         return res
 
+    def get_input_edges(self) -> List[MassComposition]:
+        """Get the input (feed) edge objects
+
+        Returns:
+            List of MassComposition objects
+        """
+
+        degrees = [d for n, d in self.degree()]
+        res: List[MassComposition] = [d['mc'] for u, v, d in self.edges(data=True) if degrees[u] == 1]
+        return res
+
+    def get_output_edges(self) -> List[MassComposition]:
+        """Get the output (product) edge objects
+
+        Returns:
+            List of MassComposition objects
+        """
+
+        degrees = [d for n, d in self.degree()]
+        res: List[MassComposition] = [d['mc'] for u, v, d in self.edges(data=True) if degrees[v] == 1]
+        return res
+
+    def get_column_formats(self, columns: List[str]) -> Dict[str, str]:
+        variables = self.get_input_edges()[0].variables
+        d_format: Dict = {}
+        for col in columns:
+            for v in variables.vars.variables:
+                if col in [v.column_name, v.name]:
+                    d_format[col] = v.format
+        return d_format
+
     def report(self) -> pd.DataFrame:
         """Summary Report
 
@@ -357,7 +388,7 @@ class MCNetwork(nx.DiGraph):
         df: pd.DataFrame = self.report().reset_index()
         if cols_exclude:
             df = df[[col for col in df.columns if col not in cols_exclude]]
-        fmt: List[str] = ["%s"] + [".1f", ".1f"] + [".2f"] * (len(df.columns) - 3)
+        fmt: List[str] = ['%s'] + list(self.get_column_formats(df.columns).values())
         column_widths = [2] + [1] * (len(df.columns) - 1)
 
         fig.add_table(
@@ -535,11 +566,11 @@ class MCNetwork(nx.DiGraph):
             edge_labels.append(data['mc'].name)
             source.append(u)
             target.append(v)
-            value.append(float(data['mc'].aggregate()[width_var]))
+            value.append(float(data['mc'].aggregate()[width_var].iloc[0]))
             edge_custom_data.append(d_custom_data[data['mc'].name])
 
             if color_var is not None:
-                val: float = float(data['mc'].aggregate()[color_var])
+                val: float = float(data['mc'].aggregate()[color_var].iloc[0])
                 str_color: str = f'rgba{self._color_from_float(v_min, v_max, val, cmap)}'
                 edge_color.append(str_color)
             else:
@@ -633,13 +664,14 @@ class MCNetwork(nx.DiGraph):
 
         return edge_traces, node_trace, edge_annotation_trace
 
-    @staticmethod
-    def _rpt_to_html(df: pd.DataFrame) -> Dict:
+
+    def _rpt_to_html(self, df: pd.DataFrame) -> Dict:
         custom_data: Dict = {}
+        fmts: Dict = self.get_column_formats(df.columns)
         for i, row in df.iterrows():
             str_data: str = '<br />'
             for k, v in dict(row).items():
-                str_data += f'{k}: {round(v, 2)}<br />'
+                str_data += f"{k}: {v:{fmts[k][1:]}}<br />"
             custom_data[i] = str_data
         return custom_data
 
