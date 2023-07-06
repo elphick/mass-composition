@@ -3,14 +3,18 @@ MC:
     mass_wet:
       standard_name: mass_wet
       search_regex: '(mass_wet)|(wet_mass)|(wmt)'  # case in-sensitive regex
+      format: '%.0f'  # cannot use %d, use %.0f
     mass_dry:
       standard_name: mass_dry
       search_regex: '(mass_dry)|(dry_mass)|(dmt)'
+      format: '%.0f'
     moisture:
       standard_name: H2O
       search_regex: '(h2o)|(moisture)|(moist)'
+      format: '%.1f'
     chemistry:
       ignore: ['Y']  # ignore anything in this list when detecting chemistry components
+      format: '%.2f'
   units:
     mass: mass_units
     composition_rel: '%'

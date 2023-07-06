@@ -27,8 +27,14 @@ class VariableGroup:
     def var_to_col(self) -> Dict:
         return {v.name: v.column_name for v in self.variables}
 
+    def var_to_format(self) -> Dict:
+        return {v.name: v.format for v in self.variables}
+
     def col_to_var(self) -> Dict:
         return {v.column_name: v.name for v in self.variables}
+
+    def col_to_format(self) -> Dict:
+        return {v.column_name: v.format for v in self.variables}
 
     def property_to_var(self) -> Dict:
         return {v.name_property: v.name for v in self.variables}
@@ -43,14 +49,15 @@ class VariableGroup:
 
 @dataclass()
 class Variable:
-    name: str
-    name_property: str
-    group: VariableGroups
-    name_match: Optional[str] = None
-    name_force: Optional[str] = None
+    name: str  # the variable name
+    name_property: str  # mass_wet, mass_dry, moisture, ...
+    group: VariableGroups  # group that the variable belongs to
+    format: Optional[str] = None  # display format string
+    name_match: Optional[str] = None  # name found by the search
+    name_force: Optional[str] = None  # name forced by user specification
 
     @property
-    def column_name(self):
+    def column_name(self):  # the "go-to" name
         return self.name_force if self.name_force else self.name_match
 
 
@@ -112,6 +119,7 @@ class Variables:
                               flags=re.IGNORECASE | re.MULTILINE)
             variable: Variable = Variable(name=self._config[v]['standard_name'],
                                           name_property=v,
+                                          format=self._config[v]['format'],
                                           name_match=str(match.group()) if match else None,
                                           name_force=self._specified_map[
                                               f"{v}_var"] if f"{v}_var" in self._specified_map.keys() else None,
@@ -125,6 +133,7 @@ class Variables:
                           flags=re.IGNORECASE | re.MULTILINE)
         variable: Variable = Variable(name=self._config[v]['standard_name'],
                                       name_property=v,
+                                      format=self._config[v]['format'],
                                       name_match=str(match.group()) if match else None,
                                       name_force=self._specified_map[
                                           f"{v}_var"] if f"{v}_var" in self._specified_map.keys() else None,
@@ -141,6 +150,7 @@ class Variables:
         for k, v in chemistry_vars.items():
             variable: Variable = Variable(name=v,
                                           name_property=v,
+                                          format=self._config['chemistry']['format'],
                                           name_match=k,
                                           group=VariableGroups.CHEMISTRY)
             res.append(variable)
@@ -156,3 +166,7 @@ class Variables:
                                           group=VariableGroups.SUPPLEMENTARY)
             res.append(variable)
         return res
+
+
+
+
