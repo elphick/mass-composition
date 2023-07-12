@@ -4,7 +4,6 @@ from typing import List, Optional, Dict
 
 import numpy as np
 import pandas as pd
-import xarray as xr
 from elphick.mass_composition import MassComposition
 # noinspection PyUnresolvedReferences
 import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
@@ -63,7 +62,8 @@ class MCNode:
         balance_elements = self.node_balance()
         if self.node_type == NodeType.BALANCE:
             balance_mask = np.abs(balance_elements) < self._tolerance
-            self._balance_errors = balance_elements.loc[~balance_mask.all(axis='columns'), ~balance_mask.all(axis='index')]
+            self._balance_errors = balance_elements.loc[
+                ~balance_mask.all(axis='columns'), ~balance_mask.all(axis='index')]
             self._balanced = self._balance_errors.empty
         return self._balanced
 
@@ -111,6 +111,30 @@ class MCNode:
             res: pd.DataFrame = obj_list[0].data.mc.composition_to_mass().to_dataframe()[cols]
             for obj_mc in obj_list[1:]:
                 res = res + obj_mc.data.mc.composition_to_mass().to_dataframe()[cols]
+        return res
+
+    def add(self, direction: str) -> Optional[pd.DataFrame]:
+        """The weighted addition of either node inputs or outputs
+
+        Args:
+            direction: 'in' | 'out'
+
+        Returns:
+
+        """
+        res: Optional[pd.DataFrame] = None
+        obj_list = []
+        if direction == 'in':
+            obj_list = self.inputs
+        elif direction == 'out':
+            obj_list = self.outputs
+
+        if obj_list:
+            obj_agg: MassComposition = obj_list[0]
+            for o in obj_list[1:]:
+                obj_agg = obj_agg.add(o)
+            obj_agg.name = f"{self.node_name}_{direction}"
+            res = obj_agg.data.to_dataframe()
         return res
 
     def node_balance(self) -> Optional[pd.DataFrame]:
