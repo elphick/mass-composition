@@ -38,6 +38,8 @@ class MCNetwork(nx.DiGraph):
         Returns:
 
         """
+
+        streams: List[MassComposition] = cls._check_indexes(streams)
         bunch_of_edges: List = []
         for stream in streams:
             if stream.nodes is None:
@@ -761,3 +763,16 @@ class MCNetwork(nx.DiGraph):
         if not html:
             title = title.replace('<br><br>', '\n').replace('<br>', '\n').replace('<sup>', '').replace('</sup>', '')
         return title
+
+    @classmethod
+    def _check_indexes(cls, streams):
+        list_of_indexes = [s.data.to_dataframe().index for s in streams]
+        types_of_indexes = [type(i) for i in list_of_indexes]
+        # check the index types are consistent
+        if len(set(types_of_indexes)) != 1:
+            raise KeyError("stream index types are not consistent")
+
+        # check the shapes are consistent
+        if len(np.unique([i.shape for i in list_of_indexes])) != 1:
+            raise KeyError("stream index shapes are not consistent")
+
