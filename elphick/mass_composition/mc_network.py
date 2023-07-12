@@ -15,13 +15,11 @@ import seaborn as sns
 from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.layout import digraph_linear_layout, linear_layout
+from elphick.mass_composition.layout import digraph_linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
-from elphick.mass_composition.plot import parallel_plot
+from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils.geometry import midpoint
 from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
-from elphick.mass_composition.utils.size import mean_size
-from elphick.mass_composition.utils.viz import plot_parallel
 
 
 class MCNetwork(nx.DiGraph):
@@ -149,6 +147,18 @@ class MCNetwork(nx.DiGraph):
         if not res:
             raise ValueError(f"The specified name: {name} is not found on the network.")
 
+        return res
+
+    def get_edge_names(self) -> List[str]:
+        """Get the names of the MC objects on the edges
+
+        Returns:
+
+        """
+
+        res: List = []
+        for u, v, a in self.edges(data=True):
+            res.append(a['mc'].name)
         return res
 
     def get_input_edges(self) -> List[MassComposition]:
@@ -293,6 +303,41 @@ class MCNetwork(nx.DiGraph):
         ax.set_title(self._plot_title(html=False), fontsize=10)
 
         return hf
+
+    def plot_balance(self, facet_col_wrap: int = 3,
+                     color: Optional[str] = 'node') -> go.Figure:
+        """Plot input verus output across all nodes in the network
+
+        Args:
+            facet_col_wrap: the number of subplots per row before wrapping
+            color: The optional variable to color by. If None color will be by Node
+
+        Returns:
+
+        """
+        # prepare the data
+        chunks_in: List = []
+        chunks_out: List = []
+        for n in self.nodes:
+            if self.nodes[n]['mc'].node_type == NodeType.BALANCE:
+                chunks_in.append(self.nodes[n]['mc'].add('in').assign(**{'direction': 'in', 'node': n}))
+                chunks_out.append(self.nodes[n]['mc'].add('out').assign(**{'direction': 'out', 'node': n}))
+        df_in: pd.DataFrame = pd.concat(chunks_in)
+        index_names = ['direction', 'node'] + df_in.index.names
+        df_in = df_in.reset_index().melt(id_vars=index_names)
+        df_out: pd.DataFrame = pd.concat(chunks_out).reset_index().melt(id_vars=index_names)
+        df_plot: pd.DataFrame = pd.concat([df_in, df_out])
+        df_plot = df_plot.set_index(index_names + ['variable'], append=True).unstack(['direction'])
+        df_plot.columns = df_plot.columns.droplevel(0)
+        df_plot.reset_index(level=list(np.arange(-1, -len(index_names) - 1, -1)), inplace=True)
+        df_plot['node'] = pd.Categorical(df_plot['node'])
+
+        # plot
+        fig = comparison_plot(data=df_plot,
+                              x='in', y='out',
+                              facet_col_wrap=facet_col_wrap,
+                              color=color)
+        return fig
 
     def plot_network(self, orientation: str = 'horizontal') -> go.Figure:
         """Plot the network with plotly
