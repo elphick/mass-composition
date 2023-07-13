@@ -12,7 +12,7 @@ import xarray.tests
 import pandas as pd
 
 from elphick.mass_composition import MassComposition
-from test.data.sample_data import sample_data
+from elphick.mass_composition.demo_data.sample_data import sample_data
 # noinspection PyUnresolvedReferences
 from elphick.mass_composition.mc_xarray import MassCompositionAccessor
 

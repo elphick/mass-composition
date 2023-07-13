@@ -27,7 +27,7 @@ from elphick.mass_composition import MassComposition
 #
 # x == Easting, y = Northing, z = RL
 
-filepath: Path = Path('../test/data/iron_ore_sample_data_xyz_A072391.csv')
+filepath: Path = Path('../elphick/mass_composition/demo_data/iron_ore_sample_data_xyz_A072391.csv')
 name: str = filepath.stem.split('_')[-1]
 df_data: pd.DataFrame = pd.read_csv(filepath, index_col='index')
 print(df_data.shape)

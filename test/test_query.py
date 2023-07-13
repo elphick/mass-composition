@@ -5,7 +5,7 @@ import xarray as xr
 
 from elphick.mass_composition.mc_network import MCNetwork
 # noinspection PyUnresolvedReferences
-from test.data import demo_data
+from test.fixtures import demo_data
 from elphick.mass_composition import MassComposition
 
 

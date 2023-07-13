@@ -1,7 +1,7 @@
 import pandas as pd
 
 # noinspection PyUnresolvedReferences
-from test.data.fixtures import demo_data
+from test.fixtures import demo_data
 from elphick.mass_composition import MassComposition
 
 

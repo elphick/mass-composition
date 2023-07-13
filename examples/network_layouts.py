@@ -9,14 +9,10 @@ This example demonstrates layouts of such networks.
 """
 
 import plotly
-import xarray.tests
 import pandas as pd
-from matplotlib import pyplot as plt
-from functools import partial
 
 from elphick.mass_composition.mc_network import MCNetwork
-from elphick.mass_composition.utils.partition import perfect, napier_munn
-from test.data.sample_data import sample_data, size_by_assay
+from elphick.mass_composition.demo_data.sample_data import size_by_assay
 from elphick.mass_composition import MassComposition
 
 # sphinx_gallery_thumbnail_number = -1

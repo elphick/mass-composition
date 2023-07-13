@@ -775,4 +775,5 @@ class MCNetwork(nx.DiGraph):
         # check the shapes are consistent
         if len(np.unique([i.shape for i in list_of_indexes])) != 1:
             raise KeyError("stream index shapes are not consistent")
+        return streams
 
