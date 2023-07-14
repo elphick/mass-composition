@@ -1,5 +1,6 @@
 import json
 from enum import Enum
+from pathlib import Path
 from typing import List, Optional, Dict
 
 import numpy as np
@@ -71,13 +72,15 @@ class MCNode:
     def balanced(self, value):
         self._balanced = value
 
-    def imbalance_report(self):
+    def imbalance_report(self) -> Path:
         """A html report of records that do not balance around the node
 
         Returns:
 
         """
-        self._balance_errors.to_html(open(f'balance_errors_node_{self.node_id}.html', 'w'))
+        rpt_path: Path = Path(f'balance_errors_node_{self.node_id}.html')
+        self._balance_errors.to_html(open(rpt_path, 'w'))
+        return rpt_path
 
     @property
     def node_type(self) -> Optional[NodeType]:

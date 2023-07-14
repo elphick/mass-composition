@@ -1,5 +1,7 @@
 import logging
+import webbrowser
 from copy import deepcopy
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib
@@ -223,6 +225,11 @@ class MCNetwork(nx.DiGraph):
             for k, v in fmts.items():
                 rpt[k] = rpt[k].apply((v.replace('%', '{:,') + '}').format)
         return rpt
+
+    def imbalance_report(self, node: int):
+        mc_node: MCNode = self.nodes[node]['mc']
+        rpt: Path = mc_node.imbalance_report()
+        webbrowser.open(str(rpt))
 
     def query(self, mc_name: str, queries: Dict) -> 'MCNetwork':
         """Query/filter across the network
@@ -776,4 +783,3 @@ class MCNetwork(nx.DiGraph):
         if len(np.unique([i.shape for i in list_of_indexes])) != 1:
             raise KeyError("stream index shapes are not consistent")
         return streams
-
