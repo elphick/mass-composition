@@ -15,6 +15,7 @@ construct a network and check the magnitude of any imbalance.
 
 import logging
 from functools import partial
+from pathlib import Path
 
 import pandas as pd
 import plotly
@@ -36,78 +37,50 @@ logging.basicConfig(level=logging.INFO,
 #
 # We get some demo sizing data, split it with a partition, and manually drop sieves for the undersize stream.
 
-# We create this object as 1D based on the pandas index
+# We create this object as 1D based on the pandas index.
 
 df_data: pd.DataFrame = size_by_assay()
 mc_feed: MassComposition = MassComposition(df_data, name='FEED')
+mc_feed.data.to_dataframe()
 
-# We partially initialise a partition function
+# %%
+# We partially initialise a partition function, and split the feed stream accordingly.
+
 partition = partial(napier_munn, d50=0.150, ep=0.05, dim='size')
-
-# Create a Network using the partition
 mc_oversize, mc_undersize = mc_feed.partition(definition=partition, name_1='OS', name_2='US')
-# drop the two size fractions from mc_fine that have near zero mass
+
+# %%
+# Drop the two size fractions from mc_fine that have near zero mass.
+#
+# This simulates a common situation where fines samples will likely have fewer fractions reported in the results.
+
 df_fine: pd.DataFrame = mc_undersize.data.to_dataframe()
-mc_undersize = MassComposition(df_fine.loc[df_fine.index.left < 0.5, :], name='US')
+df_fine = df_fine.loc[df_fine.index.left < 0.5, :]
+
+mc_undersize.set_data(df_fine)
+mc_undersize.data.to_dataframe()
+
+# %%
+# Notice that the top two fractions are now missing.
 
 # %%
 #
-# Demonstrate the index problem
+# Unifying Indexes
+# ----------------
+#
+# If the dataset contains a single IntervalIndex called 'size' missing coarse size fractions will be added
+# automatically.
+#
+# That said, the remaining sizes must be consistent.  Alignment of sizes across streams/mc objects is coming soon.
+
+mcn: MCNetwork = MCNetwork().from_streams([mc_feed, mc_oversize, mc_undersize])
+fig = mcn.table_plot()
+fig
+
+# %%
+#
+# Troubleshooting the imbalance
 # -----------------------------
-
-try:
-    mcn: MCNetwork = MCNetwork().from_streams([mc_feed, mc_oversize, mc_undersize])
-except KeyError as ex:
-    print(ex)
-
-# %%
-# We get a key error indicating the problem.
-
-# %%
-# Workaround
-# ----------
-#
-# So the task now is to add missing indexes with zero mass
-# Seems the simplest way is via pandas merge and replace nans with zeros
-
-df_streams: pd.DataFrame = pd.concat([s.data.to_dataframe().assign(stream=s.name) for s in [mc_feed, mc_oversize, mc_undersize]])
-id_vars = df_streams.columns
-df_streams_full = df_streams.pivot(columns=['stream'])
-
-# %%
-# .. admonition:: TODO
-#
-#    Require a check here to ensure we're only adding records outside the original range.
-#    Alternatively, new records in between existing records require interpolation to preserve the mass balance.
-
-df_streams_full = df_streams_full.fillna(0).stack(level=-1).reset_index('stream')
-df_streams_full
-
-# %%
-# Try to recreate the network now that our indexes align
-# We can do this directly from our tall dataframe
-
-mcn: MCNetwork = MCNetwork().from_dataframe(df_streams_full, mc_name_col='stream')
-fig = mcn.table_plot()
-fig
-
-# %%
-# Oh, we need to now manually define the relationships between the streams
-#
-# This is too verbose - will look at allowing more succinct syntax.
-
-mc_in: MassComposition = mcn.get_edge_by_name('FEED')
-mc_os: MassComposition = mcn.get_edge_by_name('OS').set_parent(mcn.get_edge_by_name('FEED'))
-mc_us: MassComposition = mcn.get_edge_by_name('US').set_parent(mcn.get_edge_by_name('FEED'))
-mcn: MCNetwork = MCNetwork().from_streams([mc_in, mc_os, mc_us])
-
-fig = mcn.table_plot()
-fig
-
-# %%
-#
-# Troubleshooting the im-balance
-# ------------------------------
 #
 # So we now have our network, but it does not balance.  Perhaps the fractions we removed to generate our test data
 # contained enough mass to breach our balance threshold?  Let's dig deeper with our balance plot.
@@ -117,15 +90,24 @@ fig = mcn.plot_balance(color='size')
 plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
 
 # %%
-# That plot does not reveal the problem, so we'll resort to another report.
+# What is the balance threshold set at?
 
-mcn.imbalance_report(node=1)
+print('Node error tolerance:', mcn.nodes[1]['mc']._tolerance)
 
 # %%
-# The imbalance is now identified in the report shown separately in the browser.
+# That plot does not reveal the problem, so we'll resort to another report.
+
+mcn.nodes[1]['mc']._balance_errors
+
+# %%
+# Let's change the node error tolerance.
+
+mcn.nodes[1]['mc']._tolerance = 0.001
+fig = mcn.table_plot()
+fig
 
 # %%
 # .. admonition:: TODO
 #
 #    Create a single imbalance report across the entire network.
-#    Improve the report format.
+
