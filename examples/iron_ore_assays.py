@@ -9,7 +9,7 @@ Demonstrate with some real data
 
 import pandas as pd
 import plotly
-from test.data.sample_data import iron_ore_sample_data
+from elphick.mass_composition.demo_data.sample_data import iron_ore_sample_data
 from plotly.graph_objs import Figure
 
 from elphick.mass_composition import MassComposition

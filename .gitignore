@@ -6,3 +6,4 @@
 /dist/
 /.coverage.*
 /test/data/*.html
+/elphick/mass_composition/demo_data/A072391_assay_report.html

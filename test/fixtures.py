@@ -1,8 +1,7 @@
 import pandas as pd
 import pytest
 
-from test.data import sample_data
-from test.data.sample_data import size_by_assay
+from elphick.mass_composition.demo_data.sample_data import size_by_assay, sample_data
 
 
 @pytest.fixture

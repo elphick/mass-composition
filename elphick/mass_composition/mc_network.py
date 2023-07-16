@@ -1,5 +1,7 @@
 import logging
+import webbrowser
 from copy import deepcopy
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib
@@ -38,6 +40,8 @@ class MCNetwork(nx.DiGraph):
         Returns:
 
         """
+
+        streams: List[MassComposition] = cls._check_indexes(streams)
         bunch_of_edges: List = []
         for stream in streams:
             if stream.nodes is None:
@@ -221,6 +225,11 @@ class MCNetwork(nx.DiGraph):
             for k, v in fmts.items():
                 rpt[k] = rpt[k].apply((v.replace('%', '{:,') + '}').format)
         return rpt
+
+    def imbalance_report(self, node: int):
+        mc_node: MCNode = self.nodes[node]['mc']
+        rpt: Path = mc_node.imbalance_report()
+        webbrowser.open(str(rpt))
 
     def query(self, mc_name: str, queries: Dict) -> 'MCNetwork':
         """Query/filter across the network
@@ -761,3 +770,44 @@ class MCNetwork(nx.DiGraph):
         if not html:
             title = title.replace('<br><br>', '\n').replace('<br>', '\n').replace('<sup>', '').replace('</sup>', '')
         return title
+
+    @classmethod
+    def _check_indexes(cls, streams):
+        logger: logging.Logger = logging.getLogger(__class__.__name__)
+
+        list_of_indexes = [s.data.to_dataframe().index for s in streams]
+        types_of_indexes = [type(i) for i in list_of_indexes]
+        # check the index types are consistent
+        if len(set(types_of_indexes)) != 1:
+            raise KeyError("stream index types are not consistent")
+
+        # check the shapes are consistent
+        if len(np.unique([i.shape for i in list_of_indexes])) != 1:
+            if list_of_indexes[0].names == ['size']:
+                logger.debug(f"size index detected - attempting index alignment")
+                # two failure modes can be managed:
+                # 1) missing coarse size fractions - can be added with zeros
+                # 2) missing intermediate fractions - require interpolation to preserve mass
+                df_streams: pd.DataFrame = pd.concat([s.data.to_dataframe().assign(stream=s.name) for s in streams])
+                df_streams_full = df_streams.pivot(columns=['stream'])
+                df_streams_full.columns.names = ['component', 'stream']
+                df_streams_full.sort_index(ascending=False, inplace=True)
+                stream_nans: pd.DataFrame = df_streams_full.isna().stack(level=-1)
+
+                for stream in streams:
+                    s: str = stream.name
+                    tmp_nans: pd.Series = stream_nans.query('stream==@s').sum(axis=1)
+                    if tmp_nans.iloc[0] > 0:
+                        logging.debug(f'The {s} stream has missing coarse sizes')
+                        first_zero_index = tmp_nans.loc[tmp_nans == 0].index[0]
+                        if tmp_nans[tmp_nans.index <= first_zero_index].sum() > 0:
+                            logging.debug(f'The {s} stream has missing sizes requiring interpolation')
+                            raise NotImplementedError('Coming soon - we need interpolation!')
+                        else:
+                            logging.debug(f'The {s} stream has missing coarse sizes only')
+                            stream_df = df_streams_full.loc[:, (slice(None), s)].droplevel(-1, axis=1).fillna(0)
+                            # recreate the stream from the dataframe
+                            stream.set_data(stream_df)
+            else:
+                raise KeyError("stream index shapes are not consistent")
+        return streams

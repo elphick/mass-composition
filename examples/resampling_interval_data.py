@@ -12,12 +12,11 @@ import logging
 
 import numpy as np
 import pandas as pd
-import plotly
 import xarray as xr
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.utils.interp import interp_monotonic
-from test.data.sample_data import size_by_assay
+from elphick.mass_composition.demo_data.sample_data import size_by_assay
 
 # %%
 logging.basicConfig(level=logging.WARNING,
