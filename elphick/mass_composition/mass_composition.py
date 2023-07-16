@@ -724,6 +724,8 @@ class MassComposition:
             obj_2._data.mc.rename(name_2)
         obj_1.nodes = [self.nodes[1], random_int()]
         obj_2.nodes = [self.nodes[1], random_int()]
+        obj_1._name = name_1
+        obj_2._name = name_2
         return obj_1, obj_2
 
     def _intervals_to_columns(self, interval_index: pd.IntervalIndex) -> pd.DataFrame:
