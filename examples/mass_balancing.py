@@ -43,26 +43,22 @@ df_data
 # %%
 # Create the object
 
-mc_size: MassComposition = MassComposition(df_data, name='size sample')
-print(mc_size)
-mc_size.aggregate()
-
-# %%
-#
-# We partially initialise a partition function
-# The dim argument is added to inform the split method which dimension to apply the function/split to
-
-partition = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
+mc_feed: MassComposition = MassComposition(df_data, name='feed')
+print(mc_feed)
+mc_feed.aggregate()
 
 # %%
 # Create a Network that balances
 # ------------------------------
 #
-# Separate the object using the defined partition
+# We partially initialise a partition function.
+#
+# Separate the object using the defined partition.
 
-mc_coarse, mc_fine = mc_size.partition(definition=partition, name_1='coarse', name_2='fine')
+partition = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
+mc_coarse, mc_fine = mc_feed.partition(definition=partition, name_1='coarse', name_2='fine')
 
-mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
+mcn: MCNetwork = MCNetwork().from_streams([mc_feed, mc_coarse, mc_fine])
 print(mcn.balanced)
 
 fig = mcn.table_plot(plot_type='network', table_pos='left', table_area=0.3)
@@ -91,10 +87,10 @@ fig
 
 df_coarse_2 = mc_coarse.data.to_dataframe().apply(lambda x: np.random.normal(loc=x, scale=np.std(x)))
 mc_coarse_2: MassComposition = MassComposition(data=df_coarse_2, name='coarse')
-mc_coarse_2 = mc_coarse_2.set_parent(mc_size)
+mc_coarse_2 = mc_coarse_2.set_parent(mc_feed)
 
 # create a new network - which does not balance
-mcn_ub: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse_2, mc_fine])
+mcn_ub: MCNetwork = MCNetwork().from_streams([mc_feed, mc_coarse_2, mc_fine])
 print(mcn_ub.balanced)
 
 fig = mcn_ub.table_plot(plot_type='network', table_pos='left', table_area=0.3)
@@ -103,6 +99,7 @@ fig
 # %%
 fig = mcn_ub.plot_balance()
 fig
+
 
 # %%
 # Balance the Flowsheet
@@ -128,7 +125,30 @@ for k, v in cfs.items():
 
 df_bal: pd.DataFrame = mcb.optimise()
 
+# %%
+#
+# .. admonition:: TODO
+#
+#    The syntax below to set parents on an edge of an existing network is seriously clunky - need to fix this.
+
+# %%
 # create a network using the balanced data
-mcn_bal: MCNetwork = MCNetwork.from_dataframe(df=df_bal, name='balanced', mc_name_col='name')
-fig = mcn_bal.plot_parallel(color='name')
-fig.show()
+
+mcn_bal: MCNetwork = MCNetwork.from_dataframe(df=df_bal, name='Balanced', mc_name_col='name')
+mc_coarse_bal: MassComposition = mcn_bal.get_edge_by_name('coarse').set_parent(mcn_bal.get_edge_by_name('feed'))
+mc_fine_bal: MassComposition = mcn_bal.get_edge_by_name('fine').set_parent(mcn_bal.get_edge_by_name('feed'))
+mcn_bal: MCNetwork = MCNetwork.from_streams([mcn_bal.get_edge_by_name('feed'), mc_coarse_bal, mc_fine_bal])
+
+fig = mcn_bal.table_plot()
+fig
+
+# %%
+
+fig = mcn_bal.plot_balance()
+fig
+
+# %%
+#
+# .. note::
+#
+#    This example is incomplete - Mass Balancing is not yet working

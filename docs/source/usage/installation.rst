@@ -6,7 +6,7 @@ Installation
    :caption: Installation:
 
 
-The package is pip instalable.
+The package is pip installable.
 
 ..  code-block::
 
