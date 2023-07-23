@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Dict
@@ -133,7 +134,7 @@ class MCNode:
             obj_list = self.outputs
 
         if obj_list:
-            obj_agg: MassComposition = obj_list[0]
+            obj_agg: MassComposition = deepcopy(obj_list[0])
             for o in obj_list[1:]:
                 obj_agg = obj_agg.add(o)
             obj_agg.name = f"{self.node_name}_{direction}"
