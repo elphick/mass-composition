@@ -1,0 +1,92 @@
+datasets:
+- citation: ''
+  description: A cleaned dataset from the WAMEX database.
+  download: :download:`zip <../_static/A072391_assay.zip>`
+  filename: A072391_assay.csv
+  link: '`link <../_static/A072391_assay.html>`_'
+  maintainer: Greg Elphick
+  title: A072391 Assays
+  url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+- citation: ''
+  description: A dataset from the WAMEX database.
+  download: :download:`zip <../_static/A072391_collars.zip>`
+  filename: A072391_collars.csv
+  link: '`link <../_static/A072391_collars.html>`_'
+  maintainer: Greg Elphick
+  title: A072391 Collars
+  url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+- citation: ''
+  description: A dataset from the WAMEX database.
+  download: :download:`zip <../_static/A072391_geo.zip>`
+  filename: A072391_geo.csv
+  link: '`link <../_static/A072391_geo.html>`_'
+  maintainer: Greg Elphick
+  title: A072391 Geology
+  url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+- citation: ''
+  description: A cleaned dataset from the WAMEX database.  More cleaning necessary.
+  download: :download:`zip <../_static/A072391_met.zip>`
+  filename: A072391_met.csv
+  link: '`link <../_static/A072391_met.html>`_'
+  maintainer: Greg Elphick
+  title: A072391 Metallurgy
+  url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+- citation: ''
+  description: A dataset from the WAMEX database.
+  download: :download:`zip <../_static/A072391_wireline.zip>`
+  filename: A072391_wireline.csv
+  link: '`link <../_static/A072391_wireline.html>`_'
+  maintainer: Greg Elphick
+  title: A072391 Wireline
+  url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+- citation: Sarkar, Biswajit & Das, Avimanyu & Roy, Subrata & Rai, Satish. (2007).
+    In depth analysis of alumina removal from iron ore fines using teetered bed gravity
+    separator. Mineral Processing and Extractive Metallurgy (Trans. Inst. Min Metall.
+    C). 117. 10.1179/174328508X251851.
+  description: A small (single sample) iron ore size x assay dataset
+  download: :download:`zip <../_static/demo_data.zip>`
+  filename: demo_data.csv
+  link: '`link <../_static/demo_data.html>`_'
+  maintainer: Greg Elphick
+  title: Demo Data
+  url: https://www.researchgate.net/publication/231575341_In_depth_analysis_of_alumina_removal_from_iron_ore_fines_using_teetered_bed_gravity_separator
+- citation: null
+  description: A cleaned subset of A072391_assay.csv from the WAMEX database.
+  download: :download:`zip <../_static/iron_ore_sample_A072391.zip>`
+  filename: iron_ore_sample_A072391.csv
+  link: '`link <../_static/iron_ore_sample_A072391.html>`_'
+  maintainer: Greg Elphick
+  title: Iron Ore Sample
+  url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+- author: ''
+  citation: null
+  copyright_holder: ''
+  copyright_year: ''
+  creator: ''
+  description: A cleaned subset of A072391_assay.csv merged with A072391_collars.csv
+    to get position (x,y,z). From the WAMEX database.
+  download: :download:`zip <../_static/iron_ore_sample_data_xyz_A072391.zip>`
+  filename: iron_ore_sample_data_xyz_A072391.csv
+  link: '`link <../_static/iron_ore_sample_data_xyz_A072391.html>`_'
+  maintainer: Greg Elphick
+  title: Iron Ore Sample xyz
+  url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+- citation: Sarkar, Biswajit & Das, Avimanyu & Roy, Subrata & Rai, Satish. (2007).
+    In depth analysis of alumina removal from iron ore fines using teetered bed gravity
+    separator. Mineral Processing and Extractive Metallurgy (Trans. Inst. Min Metall.
+    C). 117. 10.1179/174328508X251851.
+  description: A small (single sample) iron ore size x assay dataset
+  download: :download:`zip <../_static/size_by_assay.zip>`
+  filename: size_by_assay.csv
+  link: '`link <../_static/size_by_assay.html>`_'
+  maintainer: Greg Elphick
+  title: Size by Assay
+  url: https://www.researchgate.net/publication/231575341_In_depth_analysis_of_alumina_removal_from_iron_ore_fines_using_teetered_bed_gravity_separator
+- citation: null
+  description: A particle size distribution, no assays.  Source unknown.
+  download: :download:`zip <../_static/size_distribution.zip>`
+  filename: size_distribution.csv
+  link: '`link <../_static/size_distribution.html>`_'
+  maintainer: Greg Elphick
+  title: Size Distribution
+  url: Unknown
