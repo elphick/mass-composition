@@ -9,7 +9,8 @@ import numpy as np
 import pandas as pd
 
 from elphick.mass_composition.utils.components import is_compositional
-from elphick.mass_composition.datasets import load_size_by_assay
+from elphick.mass_composition.datasets import load_size_by_assay, load_iron_ore_sample_a072391, load_size_distribution, \
+    load_a072391_met
 
 
 def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,
@@ -68,7 +69,8 @@ def dh_intervals(n: int = 5,
 
     """
 
-    df_data: pd.DataFrame = pd.read_csv('../sample_data/iron_ore_sample_data.csv', index_col='index')
+    df_data: pd.DataFrame = load_iron_ore_sample_a072391()
+    # df_data: pd.DataFrame = pd.read_csv('../sample_data/iron_ore_sample_data.csv', index_col='index')
 
     drillholes: List[str] = []
     for i in range(0, n_dh):
@@ -110,21 +112,24 @@ def size_by_assay() -> pd.DataFrame:
 
 
 def size_distribution() -> pd.DataFrame:
-    d: Path = Path(__file__).parent
-    print(d)
-    df_psd: pd.DataFrame = pd.read_csv(d / 'size_distribution_ore_1.csv', index_col=0)
-    return df_psd
+    df: pd.DataFrame = load_size_distribution()
+    # d: Path = Path(__file__).parent
+    # print(d)
+    # df_psd: pd.DataFrame = pd.read_csv(d / 'size_distribution_ore_1.csv', index_col=0)
+    return df
 
 
 def iron_ore_sample_data() -> pd.DataFrame:
-    d: Path = Path(__file__).parent
-    df_psd: pd.DataFrame = pd.read_csv(d / 'iron_ore_sample_data_A072391.csv', index_col=0)
-    return df_psd
+    df: pd.DataFrame = load_iron_ore_sample_a072391().set_index('index')
+    # d: Path = Path(__file__).parent
+    # df_psd: pd.DataFrame = pd.read_csv(d / 'iron_ore_sample_data_A072391.csv', index_col=0)
+    return df
 
 
 def iron_ore_met_sample_data() -> pd.DataFrame:
-    d: Path = Path(__file__).parent
-    df_met: pd.DataFrame = pd.read_csv(d / 'A072391_met.csv', index_col=0)
+    df_met: pd.DataFrame = load_a072391_met()
+    # d: Path = Path(__file__).parent
+    # df_met: pd.DataFrame = pd.read_csv(d / 'A072391_met.csv', index_col=0)
     df_met.dropna(subset=['Dry Weight Lump (kg)'], inplace=True)
     df_met['Dry Weight Lump (kg)'] = df_met['Dry Weight Lump (kg)'].apply(lambda x: x.replace('..', '.')).astype('float64')
     df_met['Fe'] = df_met['Fe'].replace('MISSING', np.nan).astype('float64')

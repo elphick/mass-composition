@@ -13,7 +13,7 @@ import pandas as pd
 import plotly
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.demo_data.sample_data import iron_ore_sample_data
+from elphick.mass_composition.datasets.sample_data import iron_ore_sample_data
 
 import xarray as xr
 

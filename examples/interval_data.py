@@ -18,7 +18,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.demo_data.sample_data import iron_ore_sample_data
+from elphick.mass_composition.datasets.sample_data import iron_ore_sample_data
 
 
 # %%

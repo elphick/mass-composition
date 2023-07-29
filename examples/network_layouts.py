@@ -12,7 +12,7 @@ import plotly
 import pandas as pd
 
 from elphick.mass_composition.mc_network import MCNetwork
-from elphick.mass_composition.demo_data.sample_data import size_by_assay
+from elphick.mass_composition.datasets.sample_data import size_by_assay
 from elphick.mass_composition import MassComposition
 
 # sphinx_gallery_thumbnail_number = -1
