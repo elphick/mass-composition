@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
 
-from elphick.mass_composition.demo_data.sample_data import size_by_assay, sample_data
-
+from elphick.mass_composition.datasets.sample_data import sample_data
+from elphick.mass_composition.datasets.datasets import load_size_by_assay
 
 @pytest.fixture
 def demo_data():
@@ -20,5 +20,5 @@ def demo_data_2():
 
 @pytest.fixture
 def size_assay_data():
-    data: pd.DataFrame = size_by_assay()
+    data: pd.DataFrame = load_size_by_assay()
     return data
