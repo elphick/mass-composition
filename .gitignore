@@ -7,3 +7,8 @@
 /.coverage.*
 /test/data/*.html
 /elphick/mass_composition/demo_data/A072391_assay_report.html
+/dev/dataset_curator/register.csv
+/dev/dataset_curator/table_content.yaml
+/datasets/**/*.html
+/datasets/**/*.md5
+/datasets/**/*.zip

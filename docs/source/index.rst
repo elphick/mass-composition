@@ -14,6 +14,7 @@ Welcome to mass-composition documentation!
    usage/installation
    usage/quickstart
    auto_examples/index
+   datasets/datasets
    glossary/*
    api/modules
    license/*

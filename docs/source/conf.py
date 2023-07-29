@@ -50,6 +50,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',  # to document the
               'sphinx_autodoc_typehints',
               'myst_parser',  # for parsing md files
               "pyvista.ext.plot_directive",
+              'sphinxcontrib.datatemplates',
               # 'jupyter_sphinx'  # interactive pyvista
               ]
 
