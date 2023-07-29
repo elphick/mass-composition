@@ -23,10 +23,13 @@ class Downloader:
                                               version_dev=None,
                                               registry={**self.dataset_hashes})
 
-    def load_data(self, datafile: str = '231575341_size_by_assay.zip', show_report: bool = False) -> pd.DataFrame:
+    def load_data(self, datafile: str = 'size_by_assay.zip', show_report: bool = False) -> pd.DataFrame:
         """
         Load the 231575341_size_by_assay data as a pandas.DataFrame.
         """
+        if datafile not in self.dataset_hashes.keys():
+            raise KeyError(f"The file {datafile} is not in the registry containing: {self.dataset_hashes.keys()}")
+
         fnames = self.downloader.fetch(datafile, processor=Unzip())
         if show_report:
             webbrowser.open(str(Path(fnames[0]).with_suffix('.html')))
