@@ -88,11 +88,6 @@ def dh_intervals(n: int = 5,
 
 def size_by_assay() -> pd.DataFrame:
     """ Sample Size x Assay dataset
-    REF: https://www.researchgate.net/publication/231575341_In_depth_analysis_of_alumina_removal_from_iron_ore_fines_
-    using_teetered_bed_gravity_separator
-
-    Returns:
-
     """
 
     df_data: pd.DataFrame = load_size_by_assay()
