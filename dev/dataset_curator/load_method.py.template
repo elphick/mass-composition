@@ -1,0 +1,4 @@
+
+def load_${dataset}(show_report: bool = False) -> pd.DataFrame:
+    return Downloader().load_data(datafile='${datafile}', show_report=show_report)
+
