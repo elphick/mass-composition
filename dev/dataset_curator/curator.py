@@ -62,8 +62,9 @@ class DatasetCurator:
             record['report'] = datafile.with_suffix('.html') in files
             record['archive'] = datafile.with_suffix('.zip') in files
             record['datafile_md5'] = read_hash_file(datafile.with_suffix('.md5'))
-            record['target'] = datafile.with_suffix('.zip') if record['archive'] else record['datafile']
-            record['target_sha256'] = file_hash(record['target'])
+            record['target_filepath'] = datafile.with_suffix('.zip') if record['archive'] else record['datafile']
+            record['target'] = Path(record['target_filepath']).name
+            record['target_sha256'] = file_hash(record['target_filepath'])
             records.append(pd.Series(record))
 
         df_register: pd.DataFrame = pd.concat(records, axis=1).T

@@ -38,5 +38,5 @@ class Downloader:
 
     def _create_register_dict(self) -> Dict:
         df_reg: pd.DataFrame = self.register[['target', 'target_sha256']]
-        df_reg.loc[:, 'target'] = df_reg['target'].apply(lambda x: Path(x).name)
+        # df_reg.loc[:, 'target'] = df_reg['target'].apply(lambda x: Path(x).name)
         return df_reg.set_index('target').to_dict()['target_sha256']
