@@ -1,4 +1,4 @@
-filename: iron_ore_sample_data_xyz_A072391.csv
+filename: iron_ore_sample_xyz_A072391.csv
 title: Iron Ore Sample xyz
 description: A cleaned subset of A072391_assay.csv merged with A072391_collars.csv to get position (x,y,z).
   From the WAMEX database.
