@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.mc_network import MCNetwork
-from elphick.mass_composition.demo_data.sample_data import sample_data
+from elphick.mass_composition.datasets.sample_data import sample_data
 
 
 # %%
