@@ -17,7 +17,7 @@ class Downloader:
         self.dataset_hashes: Dict = self._create_register_dict()
 
         self.downloader: Pooch = pooch.create(path=pooch.os_cache("elphick/mass_composition"),
-                                              base_url="https://github.com/elphick/mass_composition/raw/main/docs"
+                                              base_url="https://github.com/elphick/mass-composition/raw/main/docs"
                                                        "/source/_static/",
                                               version=None,
                                               version_dev=None,
