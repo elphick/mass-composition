@@ -58,23 +58,23 @@ datasets:
   maintainer: Greg Elphick
   title: Iron Ore Sample
   url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
-- author: ''
-  citation: null
-  copyright_holder: ''
-  copyright_year: ''
-  creator: ''
+- citation: null
   description: A cleaned subset of A072391_assay.csv merged with A072391_collars.csv
     to get position (x,y,z). From the WAMEX database.
-  download: :download:`zip <../_static/iron_ore_sample_data_xyz_A072391.zip>`
-  filename: iron_ore_sample_data_xyz_A072391.csv
-  link: '`link <../_static/iron_ore_sample_data_xyz_A072391.html>`_'
+  download: :download:`zip <../_static/iron_ore_sample_xyz_A072391.zip>`
+  filename: iron_ore_sample_xyz_A072391.csv
+  link: '`link <../_static/iron_ore_sample_xyz_A072391.html>`_'
   maintainer: Greg Elphick
   title: Iron Ore Sample xyz
   url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
-- citation: Sarkar, Biswajit & Das, Avimanyu & Roy, Subrata & Rai, Satish. (2007).
+- author: ''
+  citation: Sarkar, Biswajit & Das, Avimanyu & Roy, Subrata & Rai, Satish. (2007).
     In depth analysis of alumina removal from iron ore fines using teetered bed gravity
     separator. Mineral Processing and Extractive Metallurgy (Trans. Inst. Min Metall.
     C). 117. 10.1179/174328508X251851.
+  copyright_holder: ''
+  copyright_year: ''
+  creator: ''
   description: A small (single sample) iron ore size x assay dataset
   download: :download:`zip <../_static/size_by_assay.zip>`
   filename: size_by_assay.csv

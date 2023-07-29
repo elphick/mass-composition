@@ -48,7 +48,7 @@ def solve_mass_moisture(mass_wet: Optional[Union[pd.Series, xr.DataArray]] = Non
 
 
 if __name__ == '__main__':
-    from elphick.mass_composition.demo_data.sample_data import sample_data
+    from elphick.mass_composition.datasets.sample_data import sample_data
     import numpy as np
 
     data = sample_data()
