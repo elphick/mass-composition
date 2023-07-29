@@ -23,10 +23,13 @@ class Downloader:
                                               version_dev=None,
                                               registry={**self.dataset_hashes})
 
-    def load_data(self, datafile: str = '231575341_size_by_assay.zip', show_report: bool = False) -> pd.DataFrame:
+    def load_data(self, datafile: str = 'size_by_assay.zip', show_report: bool = False) -> pd.DataFrame:
         """
         Load the 231575341_size_by_assay data as a pandas.DataFrame.
         """
+        if datafile not in self.dataset_hashes.keys():
+            raise KeyError(f"The file {datafile} is not in the registry containing: {self.dataset_hashes.keys()}")
+
         fnames = self.downloader.fetch(datafile, processor=Unzip())
         if show_report:
             webbrowser.open(str(Path(fnames[0]).with_suffix('.html')))
@@ -35,5 +38,5 @@ class Downloader:
 
     def _create_register_dict(self) -> Dict:
         df_reg: pd.DataFrame = self.register[['target', 'target_sha256']]
-        df_reg.loc[:, 'target'] = df_reg['target'].apply(lambda x: Path(x).name)
+        # df_reg.loc[:, 'target'] = df_reg['target'].apply(lambda x: Path(x).name)
         return df_reg.set_index('target').to_dict()['target_sha256']
