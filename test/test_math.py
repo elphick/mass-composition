@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import xarray.tests
 import xarray as xr

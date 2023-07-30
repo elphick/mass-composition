@@ -5,7 +5,6 @@ Splitting and Partitioning Objects
 Demonstrate splitting by mass and partitioning along dimensions.
 """
 import plotly
-import xarray.tests
 import pandas as pd
 from functools import partial
 
@@ -60,7 +59,7 @@ obj_mc_sum.aggregate()
 #
 # Confirm the sum of the splits is materially equivalent to the starting object.
 
-xarray.tests.assert_allclose(obj_mc.data, obj_mc_sum.data)
+pd.testing.assert_frame_equal(obj_mc.data.to_dataframe(), obj_mc_sum.data.to_dataframe())
 
 # %%
 #
