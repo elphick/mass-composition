@@ -92,17 +92,17 @@ plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
 # %%
 # What is the balance threshold set at?
 
-print('Node error tolerance:', mcn.nodes[1]['mc']._tolerance)
+print('Node error tolerance:', mcn.graph.nodes[1]['mc']._tolerance)
 
 # %%
 # That plot does not reveal the problem, so we'll resort to another report.
 
-mcn.nodes[1]['mc']._balance_errors
+mcn.graph.nodes[1]['mc']._balance_errors
 
 # %%
 # Let's change the node error tolerance.
 
-mcn.nodes[1]['mc']._tolerance = 0.001
+mcn.graph.nodes[1]['mc']._tolerance = 0.001
 fig = mcn.table_plot()
 fig
 
