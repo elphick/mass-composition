@@ -112,7 +112,7 @@ class MCBalance:
         """
         pass
         # stream_map: Dict = {n: i for i, n in enumerate(self.mcn.get_edge_names())}
-        # nodes = [n for n in self.mcn.nodes.data() if n[1]['mc'].node_type == NodeType.BALANCE]
+        # nodes = [n for n in self.mcn.graph.nodes.data() if n[1]['mc'].node_type == NodeType.BALANCE]
         # node_ins_outs: List = []
         # for n in nodes:
         #     inputs, outputs = self.mcn.get_node_input_outputs(n[0])
