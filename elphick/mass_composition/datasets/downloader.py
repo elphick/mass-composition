@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict
 
 import pandas as pd
+import platformdirs
 import pooch
 from pooch import Unzip, Pooch
 
@@ -14,9 +15,10 @@ class Downloader:
 
         self.register: pd.DataFrame = pd.read_csv(Path(__file__).parent / 'register.csv', index_col=False)
 
-        self.dataset_hashes: Dict = self._create_register_dict()
+        self.dataset_hashes: Dict = self.register[['target', 'target_sha256']].set_index('target').to_dict()[
+            'target_sha256']
 
-        self.downloader: Pooch = pooch.create(path=pooch.os_cache("elphick/mass_composition"),
+        self.downloader: Pooch = pooch.create(path=Path(platformdirs.user_cache_dir('mass_composition', 'elphick')),
                                               base_url="https://github.com/elphick/mass-composition/raw/main/docs"
                                                        "/source/_static/",
                                               version=None,
@@ -36,7 +38,3 @@ class Downloader:
         data = pd.read_csv(Path(fnames[0]).with_suffix('.csv'))
         return data
 
-    def _create_register_dict(self) -> Dict:
-        df_reg: pd.DataFrame = self.register[['target', 'target_sha256']]
-        # df_reg.loc[:, 'target'] = df_reg['target'].apply(lambda x: Path(x).name)
-        return df_reg.set_index('target').to_dict()['target_sha256']
