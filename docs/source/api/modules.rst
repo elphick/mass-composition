@@ -9,7 +9,7 @@ API Reference
    :recursive:
 
     mass_composition
-    mc_network
+    network
     mc_node
     mc_xarray
 
