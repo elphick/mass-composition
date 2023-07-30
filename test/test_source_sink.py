@@ -1,6 +1,6 @@
 import pandas as pd
 
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 # noinspection PyUnresolvedReferences
 from test.fixtures import demo_data
 from elphick.mass_composition import MassComposition

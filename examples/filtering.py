@@ -11,7 +11,7 @@ Both individual objects can be filtered, as can multiple objects contained withi
 import pandas as pd
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.datasets.sample_data import sample_data
 
 # %%

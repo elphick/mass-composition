@@ -20,7 +20,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.datasets.sample_data import sample_data
 
 logging.basicConfig(level=logging.INFO,
@@ -106,7 +106,7 @@ mcn.get_edge_by_name('stream_2').status.oor
 #
 # The red node is caused by the mass not balancing across that node - we would expect the imbalance to be in Fe.
 
-mcn.nodes[1]['mc'].node_balance()
+mcn.graph.nodes[1]['mc'].node_balance()
 
 # %%
 # We have confirmed the imbalance is in Fe by inspecting the balance across node 1.

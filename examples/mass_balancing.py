@@ -21,7 +21,7 @@ import plotly
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.balance import MCBalance
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.partition import napier_munn
 from elphick.mass_composition.datasets.sample_data import size_by_assay
 
