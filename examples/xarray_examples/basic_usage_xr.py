@@ -6,7 +6,6 @@ A simple example demonstrating how to use mass-composition.
 """
 
 import xarray as xr
-import xarray.tests
 import pandas as pd
 
 from elphick.mass_composition import MassComposition
@@ -40,7 +39,7 @@ print(xr_ds_mass.mc.data())
 xr_ds_chem = xr_ds_mass.mc.mass_to_composition()
 print(xr_ds_chem.mc.data())
 
-xarray.tests.assert_allclose(xr_ds, xr_ds_chem)
+pd.testing.assert_frame_equal(xr_ds.to_dataframe(), xr_ds_chem.to_dataframe())
 
 # %%
 #
@@ -81,12 +80,12 @@ print(xr_ds.mc.aggregate(group_var='group', as_dataframe=True))
 xr_ds_added: xr.Dataset = xr_1.mc.add(xr_2)
 print(xr_ds_added.mc.data())
 
-xarray.tests.assert_allclose(xr_ds, xr_ds_added)
+pd.testing.assert_frame_equal(xr_ds.to_dataframe(), xr_ds_added.to_dataframe())
 
 xr_ds_add_sub: xr.Dataset = xr_ds.mc.add(xr_1).mc.sub(xr_1)
 print(xr_ds_added.mc.data())
 
-xarray.tests.assert_allclose(xr_ds, xr_ds_add_sub)
+pd.testing.assert_frame_equal(xr_ds.to_dataframe(), xr_ds_add_sub.to_dataframe())
 
 
 print('done')

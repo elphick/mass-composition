@@ -7,7 +7,6 @@ Demonstrate splitting and math operations that preserve the mass balance of comp
 
 # %%
 
-import xarray.tests
 import pandas as pd
 
 from elphick.mass_composition.datasets.sample_data import sample_data
@@ -52,7 +51,7 @@ print(obj_mc_sum)
 #
 # Confirm the sum of the splits is materially equivalent to the starting object.
 
-xarray.tests.assert_allclose(obj_mc.data, obj_mc_sum.data)
+pd.testing.assert_frame_equal(obj_mc.data.to_dataframe(), obj_mc_sum.data.to_dataframe())
 
 # %%
 #
@@ -60,7 +59,7 @@ xarray.tests.assert_allclose(obj_mc.data, obj_mc_sum.data)
 
 obj_mc_sum: MassComposition = obj_mc + obj_mc_split
 obj_mc_minus: MassComposition = obj_mc_sum - obj_mc_split
-xarray.tests.assert_allclose(obj_mc_minus.data, obj_mc.data)
+pd.testing.assert_frame_equal(obj_mc_minus.data.to_dataframe(), obj_mc.data.to_dataframe())
 print(obj_mc_minus)
 
 
