@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from pandas import Interval
 
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.partition import napier_munn
 # noinspection PyUnresolvedReferences
 from test.fixtures import demo_data, size_assay_data

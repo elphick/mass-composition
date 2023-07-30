@@ -11,7 +11,7 @@ This example demonstrates layouts of such networks.
 import plotly
 import pandas as pd
 
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.datasets.sample_data import size_by_assay
 from elphick.mass_composition import MassComposition
 

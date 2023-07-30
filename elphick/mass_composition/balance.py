@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.mc_node import NodeType
 
 

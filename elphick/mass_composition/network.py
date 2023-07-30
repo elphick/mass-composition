@@ -2,7 +2,7 @@ import logging
 import webbrowser
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, Iterable
 
 import matplotlib
 import networkx as nx
@@ -24,9 +24,10 @@ from elphick.mass_composition.utils.geometry import midpoint
 from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
 
 
-class MCNetwork(nx.DiGraph):
-    def __init__(self, **attr):
-        super().__init__(**attr)
+class MCNetwork:
+    def __init__(self, name: str = 'Flowsheet'):
+        self.name: str = name
+        self.graph: nx.DiGraph = nx.DiGraph()
         self._logger: logging.Logger = logging.getLogger(__class__.__name__)
 
     @classmethod
@@ -51,7 +52,7 @@ class MCNetwork(nx.DiGraph):
             # add the objects to the edges
             bunch_of_edges.append((nodes[0], nodes[1], {'mc': stream}))
 
-        graph = cls(name=name)
+        graph = nx.DiGraph(name=name)
         graph.add_edges_from(bunch_of_edges)
         d_node_objects: Dict = {}
         for node in graph.nodes:
@@ -66,8 +67,9 @@ class MCNetwork(nx.DiGraph):
         # update the temporary nodes on the mc object property to match the renumbered integers
         for node1, node2, data in graph.edges(data=True):
             data['mc'].nodes = [node1, node2]
-
-        return graph
+        obj = cls()
+        obj.graph = graph
+        return obj
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame,
@@ -119,7 +121,7 @@ class MCNetwork(nx.DiGraph):
 
     @property
     def balanced(self) -> bool:
-        bal_vals: List = [self.nodes[n]['mc'].balanced for n in self.nodes]
+        bal_vals: List = [self.graph.nodes[n]['mc'].balanced for n in self.graph.nodes]
         bal_vals = [bv for bv in bal_vals if bv is not None]
         return all(bal_vals)
 
@@ -127,7 +129,7 @@ class MCNetwork(nx.DiGraph):
     def edge_status(self) -> Tuple:
         d_edge_status_ok: Dict = {}
         d_failing_edges: Dict = {}
-        for u, v, data in self.edges(data=True):
+        for u, v, data in self.graph.edges(data=True):
             d_edge_status_ok[data['mc'].name] = data['mc'].status.ok
             if not data['mc'].status.ok:
                 d_failing_edges[data['mc'].name] = data['mc'].status.failing_components
@@ -144,7 +146,7 @@ class MCNetwork(nx.DiGraph):
         """
 
         res: Optional[MassComposition] = None
-        for u, v, a in self.edges(data=True):
+        for u, v, a in self.graph.edges(data=True):
             if a['mc'].name == name:
                 res = a['mc']
 
@@ -161,7 +163,7 @@ class MCNetwork(nx.DiGraph):
         """
 
         res: List = []
-        for u, v, a in self.edges(data=True):
+        for u, v, a in self.graph.edges(data=True):
             res.append(a['mc'].name)
         return res
 
@@ -172,8 +174,8 @@ class MCNetwork(nx.DiGraph):
             List of MassComposition objects
         """
 
-        degrees = [d for n, d in self.degree()]
-        res: List[MassComposition] = [d['mc'] for u, v, d in self.edges(data=True) if degrees[u] == 1]
+        degrees = [d for n, d in self.graph.degree()]
+        res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[u] == 1]
         return res
 
     def get_output_edges(self) -> List[MassComposition]:
@@ -183,8 +185,8 @@ class MCNetwork(nx.DiGraph):
             List of MassComposition objects
         """
 
-        degrees = [d for n, d in self.degree()]
-        res: List[MassComposition] = [d['mc'] for u, v, d in self.edges(data=True) if degrees[v] == 1]
+        degrees = [d for n, d in self.graph.degree()]
+        res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[v] == 1]
         return res
 
     def get_column_formats(self, columns: List[str], strip_percent: bool = False) -> Dict[str, str]:
@@ -216,7 +218,7 @@ class MCNetwork(nx.DiGraph):
 
         """
         chunks: List[pd.DataFrame] = []
-        for n, nbrs in self.adj.items():
+        for n, nbrs in self.graph.adj.items():
             for nbr, eattr in nbrs.items():
                 chunks.append(eattr['mc'].aggregate().assign(name=eattr['mc'].name))
         rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('name')
@@ -227,7 +229,7 @@ class MCNetwork(nx.DiGraph):
         return rpt
 
     def imbalance_report(self, node: int):
-        mc_node: MCNode = self.nodes[node]['mc']
+        mc_node: MCNode = self.graph.nodes[node]['mc']
         rpt: Path = mc_node.imbalance_report()
         webbrowser.open(str(rpt))
 
@@ -252,7 +254,7 @@ class MCNetwork(nx.DiGraph):
 
         # iterate through all other objects on the edges and filter them to the same indexes
         mc_objects: List[MassComposition] = []
-        for u, v, a in self.edges(data=True):
+        for u, v, a in self.graph.edges(data=True):
             if a['mc'].name == mc_name:
                 mc_objects.append(mc_obj_ref)
             else:
@@ -265,10 +267,10 @@ class MCNetwork(nx.DiGraph):
         return res
 
     def get_node_input_outputs(self, node) -> Tuple:
-        in_edges = self.in_edges(node)
-        in_mc = [self.get_edge_data(oe[0], oe[1])['mc'] for oe in in_edges]
-        out_edges = self.out_edges(node)
-        out_mc = [self.get_edge_data(oe[0], oe[1])['mc'] for oe in out_edges]
+        in_edges = self.graph.in_edges(node)
+        in_mc = [self.graph.get_edge_data(oe[0], oe[1])['mc'] for oe in in_edges]
+        out_edges = self.graph.out_edges(node)
+        out_mc = [self.graph.get_edge_data(oe[0], oe[1])['mc'] for oe in out_edges]
         return in_mc, out_mc
 
     def plot(self, orientation: str = 'horizontal') -> plt.Figure:
@@ -283,29 +285,29 @@ class MCNetwork(nx.DiGraph):
 
         hf, ax = plt.subplots()
         # pos = nx.spring_layout(self, seed=1234)
-        pos = digraph_linear_layout(self, orientation=orientation)
+        pos = digraph_linear_layout(self.graph, orientation=orientation)
 
         edge_labels: Dict = {}
         edge_colors: List = []
         node_colors: List = []
 
-        for node1, node2, data in self.edges(data=True):
+        for node1, node2, data in self.graph.edges(data=True):
             edge_labels[(node1, node2)] = data['mc'].name
             if data['mc'].status.ok:
                 edge_colors.append('gray')
             else:
                 edge_colors.append('red')
 
-        for n in self.nodes:
-            if self.nodes[n]['mc'].node_type == NodeType.BALANCE:
-                if self.nodes[n]['mc'].balanced:
+        for n in self.graph.nodes:
+            if self.graph.nodes[n]['mc'].node_type == NodeType.BALANCE:
+                if self.graph.nodes[n]['mc'].balanced:
                     node_colors.append('green')
                 else:
                     node_colors.append('red')
             else:
                 node_colors.append('gray')
 
-        nx.draw(self, pos=pos, ax=ax, with_labels=True, font_weight='bold',
+        nx.draw(self.graph, pos=pos, ax=ax, with_labels=True, font_weight='bold',
                 node_color=node_colors, edge_color=edge_colors)
 
         nx.draw_networkx_edge_labels(self, pos=pos, ax=ax, edge_labels=edge_labels, font_color='black')
@@ -327,10 +329,10 @@ class MCNetwork(nx.DiGraph):
         # prepare the data
         chunks_in: List = []
         chunks_out: List = []
-        for n in self.nodes:
-            if self.nodes[n]['mc'].node_type == NodeType.BALANCE:
-                chunks_in.append(self.nodes[n]['mc'].add('in').assign(**{'direction': 'in', 'node': n}))
-                chunks_out.append(self.nodes[n]['mc'].add('out').assign(**{'direction': 'out', 'node': n}))
+        for n in self.graph.nodes:
+            if self.graph.nodes[n]['mc'].node_type == NodeType.BALANCE:
+                chunks_in.append(self.graph.nodes[n]['mc'].add('in').assign(**{'direction': 'in', 'node': n}))
+                chunks_out.append(self.graph.nodes[n]['mc'].add('out').assign(**{'direction': 'out', 'node': n}))
         df_in: pd.DataFrame = pd.concat(chunks_in)
         index_names = ['direction', 'node'] + df_in.index.names
         df_in = df_in.reset_index().melt(id_vars=index_names)
@@ -358,7 +360,7 @@ class MCNetwork(nx.DiGraph):
 
         """
         # pos = nx.spring_layout(self, seed=1234)
-        pos = digraph_linear_layout(self, orientation=orientation)
+        pos = digraph_linear_layout(self.graph, orientation=orientation)
 
         edge_traces, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
         title = self._plot_title()
@@ -485,7 +487,7 @@ class MCNetwork(nx.DiGraph):
 
         elif plot_type == 'network':
             # pos = nx.spring_layout(self, seed=1234)
-            pos = digraph_linear_layout(self, orientation=network_orientation)
+            pos = digraph_linear_layout(self.graph, orientation=network_orientation)
 
             edge_traces, node_trace, edge_annotation_trace = self._get_scatter_node_edges(pos)
             fig.add_traces(data=[*edge_traces, node_trace, edge_annotation_trace], **d_plot)
@@ -515,7 +517,7 @@ class MCNetwork(nx.DiGraph):
 
         """
         chunks: List[pd.DataFrame] = []
-        for u, v, data in self.edges(data=True):
+        for u, v, data in self.graph.edges(data=True):
             if (names is None) or ((names is not None) and (data['mc'].name in names)):
                 chunks.append(data['mc'].data.mc.to_dataframe().assign(name=data['mc'].name))
         return pd.concat(chunks, axis='index').set_index('name', append=True)
@@ -609,10 +611,10 @@ class MCNetwork(nx.DiGraph):
                 v_min = np.floor(rpt[color_var].min())
             if not v_max:
                 v_max = np.ceil(rpt[color_var].max())
-        if isinstance(list(self.nodes)[0], int):
-            labels = [str(n) for n in list(self.nodes)]
+        if isinstance(list(self.graph.nodes)[0], int):
+            labels = [str(n) for n in list(self.graph.nodes)]
         else:
-            labels = list(self.nodes)
+            labels = list(self.graph.nodes)
         # run the report for the hover data
         d_custom_data: Dict = self._rpt_to_html(df=rpt)
         source: List = []
@@ -623,16 +625,16 @@ class MCNetwork(nx.DiGraph):
         edge_labels: List = []
         node_colors: List = []
 
-        for n in self.nodes:
-            if self.nodes[n]['mc'].node_type == NodeType.BALANCE:
-                if self.nodes[n]['mc'].balanced:
+        for n in self.graph.nodes:
+            if self.graph.nodes[n]['mc'].node_type == NodeType.BALANCE:
+                if self.graph.nodes[n]['mc'].balanced:
                     node_colors.append('green')
                 else:
                     node_colors.append('red')
             else:
                 node_colors.append('blue')
 
-        for u, v, data in self.edges(data=True):
+        for u, v, data in self.graph.edges(data=True):
             edge_labels.append(data['mc'].name)
             source.append(u)
             target.append(v)
@@ -685,7 +687,7 @@ class MCNetwork(nx.DiGraph):
         edge_annotations: Dict = {}
 
         edge_traces = []
-        for u, v, data in self.edges(data=True):
+        for u, v, data in self.graph.edges(data=True):
             x0, y0 = pos[u]
             x1, y1 = pos[v]
             edge_annotations[data['mc'].name] = {'pos': midpoint(pos[u], pos[v])}
@@ -701,11 +703,11 @@ class MCNetwork(nx.DiGraph):
         node_y = []
         node_color = []
         node_text = []
-        for node in self.nodes():
+        for node in self.graph.nodes():
             x, y = pos[node]
             node_x.append(x)
             node_y.append(y)
-            node_color.append(node_color_map[self.nodes[node]['mc'].balanced])
+            node_color.append(node_color_map[self.graph.nodes[node]['mc'].balanced])
             node_text.append(node)
         node_trace = go.Scatter(
             x=node_x, y=node_y,

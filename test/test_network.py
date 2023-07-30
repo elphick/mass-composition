@@ -3,7 +3,7 @@ from typing import Dict
 
 import pandas as pd
 
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.partition import perfect
 # noinspection PyUnresolvedReferences
 from test.fixtures import demo_data, size_assay_data

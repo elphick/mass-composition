@@ -10,7 +10,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.mc_network import MCNetwork
+from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.datasets.sample_data import sample_data
 
 
@@ -44,8 +44,8 @@ mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2])
 # %%
 # Print the node object detail
 
-for node in mcn.nodes:
-    print(mcn.nodes[node]['mc'])
+for node in mcn.graph.nodes:
+    print(mcn.graph.nodes[node]['mc'])
 
 # %%
 # Note that the random node placeholder integers have been renumbered for readability.
