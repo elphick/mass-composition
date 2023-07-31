@@ -813,3 +813,16 @@ class MCNetwork:
             else:
                 raise KeyError("stream index shapes are not consistent")
         return streams
+
+    def set_stream_parent(self, stream: str, parent: str):
+        mc: MassComposition = self.get_edge_by_name(stream)
+        mc.set_parent(self.get_edge_by_name(parent))
+
+        # brutal approach - rebuild from streams
+        strms: List[MassComposition] = []
+        for u, v, a in self.graph.edges(data=True):
+            if a['mc'].name == stream:
+                strms.append(mc)
+            else:
+                strms.append(a['mc'])
+        self.graph = MCNetwork(name=self.name).from_streams(streams=strms).graph
