@@ -29,7 +29,7 @@ fig = mcn.table_plot(plot_type='sankey', table_pos='left', table_area=0.3)
 fig
 
 # %%
-# The network has no knowledge of the stream relationships, no we need to create those relationships.
+# The network has no knowledge of the stream relationships, so we need to create those relationships.
 
 mcn.set_stream_parent(stream='coarse', parent='feed')
 mcn.set_stream_parent(stream='fine', parent='feed')
