@@ -5,14 +5,16 @@ Network Basics
 Related MassComposition objects are managed as a network.
 
 """
+from copy import deepcopy
+from typing import Dict
 
 import pandas as pd
 from matplotlib import pyplot as plt
 
 from elphick.mass_composition import MassComposition
+from elphick.mass_composition.mc_node import MCNode
 from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.datasets.sample_data import sample_data
-
 
 # %%
 #
@@ -115,4 +117,42 @@ obj_mc_5 = obj_mc_1.add(obj_mc_3, name='stream 5')
 mcn2: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2, obj_mc_3, obj_mc_4, obj_mc_5])
 
 fig = mcn2.table_plot(plot_type='sankey', table_pos='left')
+fig
+
+# %%
+#
+# Setting Node names
+# ------------------
+
+nodes_before: Dict[int, MCNode] = mcn.nodes_to_dict()
+print({n: o.node_name for n, o in nodes_before.items()})
+
+# %%
+mcn.set_node_names(node_names={0: 'node_0', 1: 'node_1', 2: 'node_2', 3: 'node_3'})
+nodes_after: Dict[int, MCNode] = mcn.nodes_to_dict()
+print({n: o.node_name for n, o in nodes_after.items()})
+
+# %%
+#
+# Setting Stream data
+# -------------------
+#
+# First we show how to easily access the stream data as a dictionary
+
+stream_data: Dict[str, MassComposition] = mcn.streams_to_dict()
+print(stream_data.keys())
+
+# %%
+# We will replace stream 2 with the same data as stream 1.
+
+new_stream: MassComposition = deepcopy(mcn.get_edge_by_name('stream 1'))
+# we need to rename to avoid a creating a duplicate stream name
+new_stream.name = 'stream 1 copy'
+mcn.set_stream_data({'stream 2': new_stream})
+print(mcn.streams_to_dict().keys())
+
+# %%
+# Of course the network is now unbalanced as highlighted in the Sankey
+
+fig = mcn.table_plot()
 fig

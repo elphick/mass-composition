@@ -5,41 +5,6 @@ import numpy as np
 from networkx import DiGraph, multipartite_layout
 
 
-def linear_layout(g: DiGraph, orientation='horizontal') -> Dict:
-    """NOT IN USE - see digraph_linear_layout
-
-    Vertical layout is corrupt.
-
-    Args:
-        g:
-        orientation:
-
-    Returns:
-
-    """
-    d_node_pos: Dict = {0: np.array([0, 0])}
-    for x_dist in range(1, len(g.nodes) + 1):
-        # get the x position from the tree "depth" / distance from the source node.
-        nodes_at_x_dist: dict = nx.descendants_at_distance(g, 0, x_dist)
-        if not nodes_at_x_dist:
-            break
-        elif len(nodes_at_x_dist) == 1:
-            y_pos = d_node_pos[next(g.predecessors(list(nodes_at_x_dist)[0]))][0]
-            d_node_pos[list(nodes_at_x_dist)[0]] = np.array([x_dist, y_pos])
-        else:
-            y_candidates = list(range(-(len(nodes_at_x_dist) // 2), (len(nodes_at_x_dist) // 2) + 1))
-            if len(nodes_at_x_dist) % 2 == 0:
-                y_candidates.remove(0)
-
-            # TODO: need to assign the candidates to the closest precedent nodes, to avoid crossing.
-            d_node_pos = {**d_node_pos, **{k: np.array([x_dist, v]) for k, v in zip(nodes_at_x_dist, y_candidates)}}
-
-        if orientation == "vertical":
-            d_node_pos = {k: pos[::-1] for k, pos in d_node_pos.items()}  # swap x and y coords
-
-    return d_node_pos
-
-
 def digraph_linear_layout(g, orientation: str = "vertical", scale: float = -1.0):
     """Position nodes of a digraph in layers of straight lines.
 
