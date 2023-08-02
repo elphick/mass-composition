@@ -55,8 +55,6 @@ class MassComposition:
         self.config = read_yaml(config_file)
 
         # nodes become useful when multiple objects exist
-        self.nodes: List[int] = [random_int(), random_int()]
-
         self._name: str = name
         self._mass_units = self.config['units']['mass'] if not mass_units else None
         self._composition_units = self.config['units']['composition_rel'] if not composition_units else None
