@@ -752,33 +752,34 @@ class MassComposition:
 
     def _create_interval_indexes(self, data: pd.DataFrame) -> pd.DataFrame:
 
-        for pair in self.config['intervals']['suffixes']:
-            suffix_candidates: Dict = {n: n.split('_')[-1].lower() for n in data.index.names}
-            suffixes: Dict = {k: v for k, v in suffix_candidates.items() if v in pair}
-            if suffixes:
-                indexes_orig: List = data.index.names
-                data = data.reset_index()
-                num_intervals: int = int(len(suffixes.keys()) / 2)
-                for i in range(0, num_intervals):
-                    keys = list(suffixes.keys())[i: i + 2]
-                    base_name: str = '_'.join(keys[0].split('_')[:-1])
-                    data[base_name] = pd.arrays.IntervalArray.from_arrays(left=data[keys[0]], right=data[keys[1]],
-                                                                          closed=self.config['intervals']['closed'])
-                    # verbose but need to preserve index order...
-                    new_indexes: List = []
-                    index_edge_names: Dict = {base_name: {'left': keys[0].split('_')[-1],
-                                                          'right': keys[1].split('_')[-1]}}
-                    for index in indexes_orig:
-                        if index not in keys:
-                            new_indexes.append(index)
-                        if (index in keys) and (base_name not in new_indexes):
-                            new_indexes.append(base_name)
+        if (data.index.names is not None) and (data.index.names[0] is not None):
+            for pair in self.config['intervals']['suffixes']:
+                suffix_candidates: Dict = {n: n.split('_')[-1].lower() for n in data.index.names}
+                suffixes: Dict = {k: v for k, v in suffix_candidates.items() if v in pair}
+                if suffixes:
+                    indexes_orig: List = data.index.names
+                    data = data.reset_index()
+                    num_intervals: int = int(len(suffixes.keys()) / 2)
+                    for i in range(0, num_intervals):
+                        keys = list(suffixes.keys())[i: i + 2]
+                        base_name: str = '_'.join(keys[0].split('_')[:-1])
+                        data[base_name] = pd.arrays.IntervalArray.from_arrays(left=data[keys[0]], right=data[keys[1]],
+                                                                              closed=self.config['intervals']['closed'])
+                        # verbose but need to preserve index order...
+                        new_indexes: List = []
+                        index_edge_names: Dict = {base_name: {'left': keys[0].split('_')[-1],
+                                                              'right': keys[1].split('_')[-1]}}
+                        for index in indexes_orig:
+                            if index not in keys:
+                                new_indexes.append(index)
+                            if (index in keys) and (base_name not in new_indexes):
+                                new_indexes.append(base_name)
 
-                    # push the left and right names (suffixes) to the dataset attrs
-                    # (series attrs are lost when set to an index)
-                    data.attrs = index_edge_names
-                    data.set_index(new_indexes, inplace=True)
-                    data.drop(columns=keys, inplace=True)
+                        # push the left and right names (suffixes) to the dataset attrs
+                        # (series attrs are lost when set to an index)
+                        data.attrs = index_edge_names
+                        data.set_index(new_indexes, inplace=True)
+                        data.drop(columns=keys, inplace=True)
 
         return data
 

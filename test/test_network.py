@@ -1,24 +1,19 @@
+from copy import deepcopy
 from functools import partial
 from typing import Dict
 
 import pandas as pd
 
+from elphick.mass_composition.mc_node import MCNode
 from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.partition import perfect
 # noinspection PyUnresolvedReferences
-from test.fixtures import demo_data, size_assay_data
+from test.fixtures import demo_data, size_assay_data, demo_size_network
 from elphick.mass_composition import MassComposition
 
 
-def test_sankey_plot(size_assay_data):
-    df_data: pd.DataFrame = size_assay_data
-    mc_size: MassComposition = MassComposition(df_data, name='size sample')
-    partition = partial(perfect, d50=0.150, dim='size')
-    mc_coarse, mc_fine = mc_size.partition(definition=partition)
-    mc_coarse.name = 'coarse'
-    mc_fine.name = 'fine'
-
-    mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
+def test_sankey_plot(demo_size_network):
+    mcn: MCNetwork = demo_size_network
     # test both types of colormaps
     fig = mcn.plot_sankey(color_var='Fe', edge_colormap='copper_r', vmin=50, vmax=70)
     fig
@@ -116,3 +111,37 @@ def test_from_dataframe_wide(demo_data):
     df_res = df_res.loc[df_test.index, :]
 
     pd.testing.assert_frame_equal(df_test, df_res)
+
+
+def test_streams_to_dict(demo_size_network):
+    mcn: MCNetwork = demo_size_network
+    streams: Dict[str, MassComposition] = mcn.streams_to_dict()
+    for k, v in streams.items():
+        assert isinstance(v, MassComposition)
+        assert k == v.name
+
+
+def test_nodes_to_dict(demo_size_network):
+    mcn: MCNetwork = demo_size_network
+    nodes: Dict[int: MCNode] = mcn.nodes_to_dict()
+    assert list(nodes.keys()) == [0, 1, 2, 3]
+
+
+def test_set_node_names(demo_size_network):
+    mcn: MCNetwork = demo_size_network
+    mcn.set_node_names(node_names={0: 'new_feed_name'})
+    assert mcn.graph.nodes[0]['mc'].node_name == 'new_feed_name'
+
+
+def test_set_stream_data(demo_size_network):
+    mcn: MCNetwork = demo_size_network
+    streams_original: Dict = deepcopy(mcn.streams_to_dict())
+    coarse: MassComposition = deepcopy(mcn.get_edge_by_name('coarse'))
+    coarse.name = 'coarse_2'
+    mcn.set_stream_data(stream_data={'fine': coarse})
+    streams_modified: Dict = mcn.streams_to_dict()
+
+    assert list(streams_modified.keys()) == ['size sample', 'coarse', 'coarse_2']
+    df1: pd.DataFrame = mcn.get_edge_by_name('coarse').data.to_dataframe()
+    df2: pd.DataFrame = mcn.get_edge_by_name('coarse_2').data.to_dataframe()
+    pd.testing.assert_frame_equal(df1, df2)

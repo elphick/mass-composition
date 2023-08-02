@@ -555,6 +555,67 @@ class MCNetwork:
                             include_dims=include_dims, plot_interval_edges=plot_interval_edges)
         return fig
 
+    def set_stream_parent(self, stream: str, parent: str):
+        mc: MassComposition = self.get_edge_by_name(stream)
+        mc.set_parent(self.get_edge_by_name(parent))
+
+        # brutal approach - rebuild from streams
+        strms: List[MassComposition] = []
+        for u, v, a in self.graph.edges(data=True):
+            if a['mc'].name == stream:
+                strms.append(mc)
+            else:
+                strms.append(a['mc'])
+        self.graph = MCNetwork(name=self.name).from_streams(streams=strms).graph
+
+    def set_node_names(self, node_names: Dict[int, str]):
+        """Set the names of network nodes with a Dict
+        """
+        for node in node_names.keys():
+            if ('mc' in self.graph.nodes[node].keys()) and (node in node_names.keys()):
+                self.graph.nodes[node]['mc'].node_name = node_names[node]
+
+    def set_stream_data(self, stream_data: Dict[str, MassComposition]):
+        """Set the data (MassComposition) of network edges (streams) with a Dict
+        """
+        for stream_name, stream_data in stream_data.items():
+            for u, v, data in self.graph.edges(data=True):
+                if ('mc' in data.keys()) and (data['mc'].name == stream_name):
+                    self._logger.info(f'Setting data on stream {stream_name}')
+                    data['mc'] = stream_data
+                    # refresh the node status
+                    for node in [u, v]:
+                        self.graph.nodes[node]['mc'].inputs = [self.graph.get_edge_data(e[0], e[1])['mc'] for e in
+                                                               self.graph.in_edges(node)]
+                        self.graph.nodes[node]['mc'].outputs = [self.graph.get_edge_data(e[0], e[1])['mc'] for e in
+                                                                self.graph.out_edges(node)]
+
+    def streams_to_dict(self) -> Dict[str, MassComposition]:
+        """Export the Stream objects to a Dict
+
+        Returns:
+            A dictionary keyed by name containing MassComposition objects
+
+        """
+        streams: Dict[str, MassComposition] = {}
+        for u, v, data in self.graph.edges(data=True):
+            if 'mc' in data.keys():
+                streams[data['mc'].name] = data['mc']
+        return streams
+
+    def nodes_to_dict(self) -> Dict[int, MCNode]:
+        """Export the MCNode objects to a Dict
+
+        Returns:
+            A dictionary keyed by integer containing MCNode objects
+
+        """
+        nodes: Dict[int, MCNode] = {}
+        for node in self.graph.nodes.keys():
+            if 'mc' in self.graph.nodes[node].keys():
+                nodes[node] = self.graph.nodes[node]['mc']
+        return nodes
+
     @staticmethod
     def _get_position_kwargs(table_pos, table_area, plot_type):
         """Helper to manage location dependencies
@@ -813,16 +874,3 @@ class MCNetwork:
             else:
                 raise KeyError("stream index shapes are not consistent")
         return streams
-
-    def set_stream_parent(self, stream: str, parent: str):
-        mc: MassComposition = self.get_edge_by_name(stream)
-        mc.set_parent(self.get_edge_by_name(parent))
-
-        # brutal approach - rebuild from streams
-        strms: List[MassComposition] = []
-        for u, v, a in self.graph.edges(data=True):
-            if a['mc'].name == stream:
-                strms.append(mc)
-            else:
-                strms.append(a['mc'])
-        self.graph = MCNetwork(name=self.name).from_streams(streams=strms).graph
