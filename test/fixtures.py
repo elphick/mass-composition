@@ -1,4 +1,5 @@
 from functools import partial
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -38,3 +39,12 @@ def demo_size_network(size_assay_data):
     mc_fine.name = 'fine'
     mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
     return mcn
+
+
+@pytest.fixture()
+def script_loc(request):
+    """Return the directory of the currently running test script"""
+
+    # uses .join instead of .dirname, so we get a LocalPath object instead of
+    # a string. LocalPath.join calls normpath for us when joining the path
+    return Path(request.fspath.join('..'))
