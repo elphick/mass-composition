@@ -1,14 +1,15 @@
 from copy import deepcopy
 from functools import partial
+from pathlib import Path
 from typing import Dict
-
 import pandas as pd
+import pytest
 
 from elphick.mass_composition.mc_node import MCNode
 from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.partition import perfect
 # noinspection PyUnresolvedReferences
-from test.fixtures import demo_data, size_assay_data, demo_size_network
+from test.fixtures import demo_data, size_assay_data, demo_size_network, script_loc
 from elphick.mass_composition import MassComposition
 
 
@@ -16,10 +17,14 @@ def test_sankey_plot(demo_size_network):
     mcn: MCNetwork = demo_size_network
     # test both types of colormaps
     fig = mcn.plot_sankey(color_var='Fe', edge_colormap='copper_r', vmin=50, vmax=70)
-    fig
     fig2 = mcn.plot_sankey(color_var='Fe', edge_colormap='viridis')
-    fig2
 
+
+def test_network_plot(demo_size_network):
+    mcn: MCNetwork = demo_size_network
+    fig = mcn.plot_network()
+    fig.show()
+    pass
 
 def test_table_plot(demo_data):
     obj_mc: MassComposition = MassComposition(demo_data, name='Feed')
@@ -27,16 +32,9 @@ def test_table_plot(demo_data):
 
     mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_1, obj_mc_2])
     fig = mcn.table_plot()
-    fig
-
     fig = mcn.table_plot(plot_type='network', table_pos='right', table_area=0.3)
-    fig
-
     fig = mcn.table_plot(plot_type='network', table_pos='top', table_area=0.3)
-    fig
-
     fig = mcn.table_plot(table_pos='bottom', table_area=0.2)
-    fig
 
 
 def test_to_dataframe(demo_data):
@@ -111,6 +109,14 @@ def test_from_dataframe_wide(demo_data):
     df_res = df_res.loc[df_test.index, :]
 
     pd.testing.assert_frame_equal(df_test, df_res)
+
+
+def test_from_yaml(script_loc):
+    mcn: MCNetwork = MCNetwork().from_yaml(flowsheet_file=Path(script_loc / 'config/flowsheet_example.yaml'))
+    with pytest.raises(KeyError):
+        mcn.report()
+    with pytest.raises(KeyError):
+        mcn.plot_sankey()
 
 
 def test_streams_to_dict(demo_size_network):
