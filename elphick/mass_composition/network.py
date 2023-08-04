@@ -17,6 +17,8 @@ import seaborn as sns
 from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
+from elphick.mass_composition.config import read_yaml
+from elphick.mass_composition.config.config_read import read_flowsheet_yaml
 from elphick.mass_composition.layout import digraph_linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
@@ -119,6 +121,38 @@ class MCNetwork:
 
         return cls().from_streams(streams=res, name=name)
 
+    @classmethod
+    def from_yaml(cls, flowsheet_file: Path) -> 'MCNetwork':
+        """Construct a flowsheet defined in a yaml file
+
+        Args:
+            flowsheet_file: The yaml file following the prescribed format
+
+        Returns:
+
+        """
+        config = read_flowsheet_yaml(flowsheet_file)
+        obj = cls(name=config['flowsheet']['name'])
+
+        bunch_of_edges: List = []
+        for stream, nodes in config['streams'].items():
+            # add the objects to the edges
+            bunch_of_edges.append(
+                (nodes['node_in'], nodes['node_out'],
+                 {'mc': MassComposition(name=stream, data=pd.DataFrame(columns=['mass_wet', 'mass_dry', 'H2O']))}))
+
+        graph = nx.DiGraph(name=config['flowsheet']['name'])
+        graph.add_edges_from(bunch_of_edges)
+
+        d_node_objects: Dict = {}
+        for node in graph.nodes:
+            d_node_objects[node] = MCNode(node_id=int(node), node_name=config['nodes'][node]['name'],
+                                          node_subset=config['nodes'][node]['subset'])
+        nx.set_node_attributes(graph, d_node_objects, 'mc')
+
+        obj.graph = graph
+        return obj
+
     @property
     def balanced(self) -> bool:
         bal_vals: List = [self.graph.nodes[n]['mc'].balanced for n in self.graph.nodes]
@@ -220,6 +254,8 @@ class MCNetwork:
         chunks: List[pd.DataFrame] = []
         for n, nbrs in self.graph.adj.items():
             for nbr, eattr in nbrs.items():
+                if eattr['mc'].data.to_dataframe().empty:
+                    raise KeyError("Cannot generate report on empty dataset")
                 chunks.append(eattr['mc'].aggregate().assign(name=eattr['mc'].name))
         rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('name')
         if apply_formats:
@@ -402,6 +438,8 @@ class MCNetwork:
         Returns:
 
         """
+        if self.get_input_edges()[0].data.to_dataframe().empty:
+            raise KeyError("Cannot generate Sankey for an empty dataset")
         d_sankey: Dict = self._generate_sankey_args(color_var, edge_colormap, width_var, vmin, vmax)
         node, link = self._get_sankey_node_link_dicts(d_sankey)
         fig = go.Figure(data=[go.Sankey(node=node, link=link)])
@@ -672,10 +710,7 @@ class MCNetwork:
                 v_min = np.floor(rpt[color_var].min())
             if not v_max:
                 v_max = np.ceil(rpt[color_var].max())
-        if isinstance(list(self.graph.nodes)[0], int):
-            labels = [str(n) for n in list(self.graph.nodes)]
-        else:
-            labels = list(self.graph.nodes)
+
         # run the report for the hover data
         d_custom_data: Dict = self._rpt_to_html(df=rpt)
         source: List = []
@@ -685,8 +720,14 @@ class MCNetwork:
         edge_color: List = []
         edge_labels: List = []
         node_colors: List = []
+        node_labels: List = []
 
         for n in self.graph.nodes:
+            if self.graph.nodes[n]['mc'].node_name != 'Node':
+                node_labels.append(self.graph.nodes[n]['mc'].node_name)
+            else:
+                node_labels.append(str(n))  # the integer string
+
             if self.graph.nodes[n]['mc'].node_type == NodeType.BALANCE:
                 if self.graph.nodes[n]['mc'].balanced:
                     node_colors.append('green')
@@ -713,7 +754,7 @@ class MCNetwork:
                           'edge_color': edge_color,
                           'edge_custom_data': edge_custom_data,
                           'edge_labels': edge_labels,
-                          'labels': labels,
+                          'labels': node_labels,
                           'source': source,
                           'target': target,
                           'value': value}
@@ -755,8 +796,15 @@ class MCNetwork:
             edge_traces.append(go.Scatter(x=[x0, x1], y=[y0, y1],
                                           line=dict(width=2, color=edge_color_map[data['mc'].status.ok]),
                                           hoverinfo='text',
-                                          mode='lines',
-                                          text=data['mc'].name))
+                                          mode='lines+markers',
+                                          text=data['mc'].name,
+                                          marker=dict(
+                                              symbol="arrow",
+                                              color="grey",
+                                              size=16,
+                                              angleref="previous",
+                                              standoff=15)
+                                          ))
 
         # nodes
         node_color_map: Dict = {None: 'grey', True: 'green', False: 'red'}
