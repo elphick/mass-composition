@@ -1,6 +1,5 @@
 import json
 from copy import deepcopy
-from functools import partial
 from pathlib import Path
 from typing import Dict
 
@@ -11,7 +10,6 @@ from networkx import cytoscape_graph
 
 from elphick.mass_composition.mc_node import MCNode
 from elphick.mass_composition.network import MCNetwork
-from elphick.mass_composition.utils.partition import perfect
 # noinspection PyUnresolvedReferences
 from test.fixtures import demo_data, size_assay_data, demo_size_network, script_loc
 from elphick.mass_composition import MassComposition
