@@ -12,4 +12,6 @@ API Reference
     network
     mc_node
     mc_xarray
+    datasets
+    utils
 

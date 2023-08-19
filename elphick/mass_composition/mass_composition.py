@@ -167,8 +167,16 @@ class MassComposition:
             self._data[v].values = values[v].values
         self.status = Status(self._check_constraints())
 
-    def set_parent(self, parent: 'MassComposition') -> 'MassComposition':
+    def set_parent_node(self, parent: 'MassComposition') -> 'MassComposition':
         self.nodes = [parent.nodes[1], self.nodes[1]]
+        return self
+
+    def set_child_node(self, child: 'MassComposition') -> 'MassComposition':
+        self.nodes = [self.nodes[0], child.nodes[0]]
+        return self
+
+    def set_stream_nodes(self, nodes: Tuple[int, int]) -> 'MassComposition':
+        self.nodes = nodes
         return self
 
     def to_xarray(self) -> xr.Dataset:

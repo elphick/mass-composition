@@ -15,7 +15,7 @@ from elphick.mass_composition import MassComposition
 
 def test_indexes(demo_data):
     obj_mc: MassComposition = MassComposition(demo_data, name='one')
-    obj_mc_2: MassComposition = MassComposition(demo_data.drop(index=[0]), name='two').set_parent(obj_mc)
+    obj_mc_2: MassComposition = MassComposition(demo_data.drop(index=[0]), name='two').set_parent_node(obj_mc)
 
     with pytest.raises(KeyError):
         mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_2])

@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import matplotlib.cm as cm
 import seaborn as sns
+from networkx import cytoscape_data
 
 from plotly.subplots import make_subplots
 
@@ -24,6 +25,7 @@ from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils.geometry import midpoint
 from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
+from elphick.mass_composition.utils.sampling import random_int
 
 
 class MCNetwork:
@@ -169,6 +171,10 @@ class MCNetwork:
                 d_failing_edges[data['mc'].name] = data['mc'].status.failing_components
         return all(d_edge_status_ok.values()), d_failing_edges
 
+    def to_json(self) -> Dict:
+        json_graph: Dict = cytoscape_data(self.graph)
+        return json_graph
+
     def get_edge_by_name(self, name: str) -> MassComposition:
         """Get the MC object from the network by its name
 
@@ -189,8 +195,8 @@ class MCNetwork:
 
         return res
 
-    def get_edge_names(self) -> List[str]:
-        """Get the names of the MC objects on the edges
+    def get_stream_names(self) -> List[str]:
+        """Get the names of the streams (MC objects on the edges)
 
         Returns:
 
@@ -201,8 +207,8 @@ class MCNetwork:
             res.append(a['mc'].name)
         return res
 
-    def get_input_edges(self) -> List[MassComposition]:
-        """Get the input (feed) edge objects
+    def get_input_streams(self) -> List[MassComposition]:
+        """Get the input (feed) streams (edge objects)
 
         Returns:
             List of MassComposition objects
@@ -212,8 +218,8 @@ class MCNetwork:
         res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[u] == 1]
         return res
 
-    def get_output_edges(self) -> List[MassComposition]:
-        """Get the output (product) edge objects
+    def get_output_streams(self) -> List[MassComposition]:
+        """Get the output (product) streams (edge objects)
 
         Returns:
             List of MassComposition objects
@@ -233,7 +239,7 @@ class MCNetwork:
         Returns:
 
         """
-        variables = self.get_input_edges()[0].variables
+        variables = self.get_input_streams()[0].variables
         d_format: Dict = {}
         for col in columns:
             for v in variables.vars.variables:
@@ -438,7 +444,7 @@ class MCNetwork:
         Returns:
 
         """
-        if self.get_input_edges()[0].data.to_dataframe().empty:
+        if self.get_input_streams()[0].data.to_dataframe().empty:
             raise KeyError("Cannot generate Sankey for an empty dataset")
         d_sankey: Dict = self._generate_sankey_args(color_var, edge_colormap, width_var, vmin, vmax)
         node, link = self._get_sankey_node_link_dicts(d_sankey)
@@ -595,12 +601,54 @@ class MCNetwork:
 
     def set_stream_parent(self, stream: str, parent: str):
         mc: MassComposition = self.get_edge_by_name(stream)
-        mc.set_parent(self.get_edge_by_name(parent))
+        mc.set_parent_node(self.get_edge_by_name(parent))
+        self._update_graph(mc)
 
+    def set_stream_child(self, stream: str, child: str):
+        mc: MassComposition = self.get_edge_by_name(stream)
+        mc.set_child_node(self.get_edge_by_name(child))
+        self._update_graph(mc)
+
+    def set_stream_nodes(self, stream: str, nodes: Tuple[int, int]):
+        mc: MassComposition = self.get_edge_by_name(stream)
+        mc.set_stream_nodes(nodes=nodes)
+        self._update_graph(mc)
+
+    def reset_stream_nodes(self, stream: Optional[str] = None):
+
+        """Reset stream nodes to break relationships
+
+        Args:
+            stream: The optional stream (edge) within the network.
+              If None all streams nodes on the network will be reset.
+
+
+        Returns:
+
+        """
+        if stream is None:
+            streams: Dict[str, MassComposition] = self.streams_to_dict()
+            for k, v in streams.items():
+                streams[k] = v.set_stream_nodes((random_int(), random_int()))
+            self.graph = MCNetwork(name=self.name).from_streams(streams=list(streams.values())).graph
+        else:
+            mc: MassComposition = self.get_edge_by_name(stream)
+            mc.set_stream_nodes((random_int(), random_int()))
+            self._update_graph(mc)
+
+    def _update_graph(self, mc: MassComposition):
+        """Update the graph with an existing stream object
+
+        Args:
+            mc: The stream object
+
+        Returns:
+
+        """
         # brutal approach - rebuild from streams
         strms: List[MassComposition] = []
         for u, v, a in self.graph.edges(data=True):
-            if a['mc'].name == stream:
+            if a['mc'].name == mc.name:
                 strms.append(mc)
             else:
                 strms.append(a['mc'])
@@ -800,7 +848,7 @@ class MCNetwork:
                                           text=data['mc'].name,
                                           marker=dict(
                                               symbol="arrow",
-                                              color="grey",
+                                              color=edge_color_map[data['mc'].status.ok],
                                               size=16,
                                               angleref="previous",
                                               standoff=15)

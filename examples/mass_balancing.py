@@ -91,7 +91,7 @@ fig
 
 df_coarse_2 = mc_coarse.data.to_dataframe().apply(lambda x: np.random.normal(loc=x, scale=np.std(x)))
 mc_coarse_2: MassComposition = MassComposition(data=df_coarse_2, name='coarse')
-mc_coarse_2 = mc_coarse_2.set_parent(mc_size)
+mc_coarse_2 = mc_coarse_2.set_parent_node(mc_size)
 
 # create a new network - which does not balance
 mcn_ub: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse_2, mc_fine])

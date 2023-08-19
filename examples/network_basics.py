@@ -2,7 +2,8 @@
 Network Basics
 ==============
 
-Related MassComposition objects are managed as a network.
+Related MassComposition objects can be managed as a network.  In the Process Engineering/Metallurgy
+disciplines the network will often be called a _flowsheet_.
 
 """
 from copy import deepcopy
@@ -68,7 +69,7 @@ print(mcn.balanced)
 # Imbalanced Nodes will appear red.  Later, Imbalanced Edges will also appear red.
 
 mcn.plot()
-plt.show()
+plt
 
 # %%
 # Display the weight averages for all edges (streams) in the network (flowsheet)
@@ -109,7 +110,6 @@ fig
 # Expand the Network with Math Operators
 # --------------------------------------
 #
-
 
 obj_mc_3, obj_mc_4 = obj_mc_2.split(0.8, name_1='stream 3', name_2='stream 4')
 obj_mc_5 = obj_mc_1.add(obj_mc_3, name='stream 5')
@@ -154,5 +154,43 @@ print(mcn.streams_to_dict().keys())
 # %%
 # Of course the network is now unbalanced as highlighted in the Sankey
 
+fig = mcn.table_plot()
+fig
+
+# %%
+#
+# Methods to modify relationships
+# -------------------------------
+#
+# Sometimes the network that is automatically created may not be what you are after - for example flow may be in
+# the wrong direction.  We'll learn how to modify an existing network, by picking up the network above.
+#
+# Let's break the links for the _stream 1_.
+
+mcn.reset_stream_nodes(stream="stream 1")
+fig = mcn.table_plot()
+fig
+
+# %%
+# We'll now break all remaining connections (we could have done this from the start).
+
+mcn.reset_stream_nodes()
+fig = mcn.table_plot()
+fig
+
+# %%
+# Now we'll create some linkages - of course they will be completely rubbish and not balance.
+
+mcn.set_stream_parent(stream="stream 1", parent="Feed")
+mcn.set_stream_child(stream="stream 1", child="stream 1 copy")
+fig = mcn.table_plot()
+fig
+
+# %%
+# Perhaps less useful, but possible, we can build relationships by setting nodes directly.
+
+mcn.reset_stream_nodes()
+mcn.set_stream_nodes(stream="stream 1", nodes=(1, 2))
+mcn.set_stream_nodes(stream="stream 1 copy", nodes=(2, 3))
 fig = mcn.table_plot()
 fig
