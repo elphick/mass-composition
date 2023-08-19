@@ -28,7 +28,9 @@ pyvista = { version = "^0.37.0", optional = true }
 pyvista-xarray = { version = "^0.1.2", optional = true }
 networkx = { version = ">2.0,<4.0", optional = true }
 omfvista = { version = "^0.2.5", optional = true }
+
 pooch = "^1.7.0"
+jsonpickle = "^3.0.1"
 
 [tool.poetry.extras]
 viz = ["kaleido", "pyvista", "pyvista-xarray"]
@@ -47,6 +49,7 @@ myst-parser = "^0.18.0"
 orca = "^1.8"  # for plotly thumbnails in docs
 ydata-profiling = "^4.3.2"
 sphinxcontrib-datatemplates = "^0.9.2"
+
 
 
 [build-system]

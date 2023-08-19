@@ -17,7 +17,7 @@ from typing import Optional, List, Callable, Dict
 
 import numpy as np
 import pandas as pd
-from scipy.optimize import minimize
+from scipy.optimize import minimize, LinearConstraint
 
 from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.mc_node import NodeType
@@ -47,7 +47,7 @@ class MCBalance:
         # xi: pd.DataFrame = df_x[[col for col in df_x.columns if col != 'mass_wet']]
         # sd: pd.DataFrame = self.sd
 
-        stream_map: Dict = {n: i for i, n in enumerate(self.mcn.get_edge_names())}
+        stream_map: Dict = {n: i for i, n in enumerate(self.mcn.get_stream_names())}
         nodes = [n for n in self.mcn.graph.nodes.data() if n[1]['mc'].node_type == NodeType.BALANCE]
         node_ins_outs: List = []
         for n in nodes:
@@ -89,11 +89,33 @@ class MCBalance:
         d_fns: Dict = {}
         df_network: pd.DataFrame = self.mcn.to_dataframe()
         cols = [col for col in df_network.columns if col != 'mass_wet']
-        for i in self.mcn.get_input_edges()[0].data.to_dataframe().index:
+        for i in self.mcn.get_input_streams()[0].data.to_dataframe().index:
             df_x: pd.DataFrame = df_network.loc[i, :][cols]
             d_fns[i] = partial(cost_fn, xm=df_x.values, sd=self.sd.values, node_relationships=node_ins_outs)
 
         return d_fns
+
+    def _create_constraints(self) -> List[LinearConstraint]:
+        """Prepare the optimisation constraints
+
+        The constraints ensure that the optimised component values stay within range post optimisation.
+
+        The values are extracted from the MassComposition objects on the network.
+
+        Returns:
+
+        """
+        xm: pd.DataFrame = self.mcn.to_dataframe().drop(columns=['mass_wet'])
+
+        streams = self.mcn.streams_to_dict()
+        linear_constraints: List[LinearConstraint] = []
+        for i, (s, mc) in enumerate(streams.items()):
+            cons = mc.constraints
+            for col in xm.columns:
+                cons_matrix = np.zeros([len(streams.keys()), xm.shape[1]])
+                cons_matrix[i, :] = (xm.columns == col) * 1
+                linear_constraints.append(LinearConstraint([cons_matrix.ravel()], [cons[col][0]], [cons[col][1]]))
+        return linear_constraints
 
     def _get_constraints(self, x) -> Callable:
         """Prepare the constraint function
@@ -150,10 +172,10 @@ class MCBalance:
         if best_measurements:
             tight_sd: float = 0.001 if best_locked else 0.1
             if best_measurements == 'input':
-                for strm in [e.name for e in self.mcn.get_input_edges()]:
+                for strm in [e.name for e in self.mcn.get_input_streams()]:
                     df_sd.loc[strm, :] = tight_sd
             elif best_measurements == 'output':
-                for strm in [e.name for e in self.mcn.get_output_edges()]:
+                for strm in [e.name for e in self.mcn.get_output_streams()]:
                     df_sd.loc[strm, :] = tight_sd
             else:
                 raise KeyError("best_measurements argument must be 'input'|'output'")
@@ -170,14 +192,16 @@ class MCBalance:
         """
 
         d_cost_fns: Dict[str, Callable] = self._create_cost_functions()
-        df_measured: pd.DataFrame = self.mcn.to_dataframe()
+        constraints: List[LinearConstraint] = self._create_constraints()
+        df_measured: pd.DataFrame = self.mcn.to_dataframe().fillna(0)
         cols: List[str] = [col for col in df_measured.columns if col != 'mass_wet']
 
         chunks: List = []
         for k, fn in d_cost_fns.items():
             df_x0: pd.DataFrame = df_measured.loc[k, cols]
-            res = minimize(fn, df_x0.values.ravel(), method='nelder-mead',
-                           options={'xatol': 1e-8, 'disp': True})
+            res = minimize(fn, df_x0.values.ravel(), method='powell',  #method='nelder-mead',
+                           options={'xatol': 1e-5, 'disp': True, 'maxfev': 100000},
+                           constraints=constraints)
             df_res: pd.DataFrame = pd.DataFrame(res.x.reshape(df_x0.shape),
                                                 index=df_x0.index, columns=df_x0.columns).assign(
                 **{df_measured.index.names[0]: k})

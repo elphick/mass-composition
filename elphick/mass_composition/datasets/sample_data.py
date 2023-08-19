@@ -14,7 +14,7 @@ from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.components import is_compositional
 from elphick.mass_composition.datasets import load_size_by_assay, load_iron_ore_sample_a072391, load_size_distribution, \
     load_a072391_met
-from elphick.mass_composition.utils.partition import napier_munn
+from elphick.mass_composition.utils.partition import napier_munn, perfect
 
 
 def sample_data(include_wet_mass: bool = True, include_dry_mass: bool = True,
@@ -129,7 +129,7 @@ def size_by_assay_3() -> pd.DataFrame:
     # add error to the coarse stream to create an imbalance
     df_coarse_2 = mc_coarse.data.to_dataframe().apply(lambda x: np.random.normal(loc=x, scale=np.std(x)))
     mc_coarse_2: MassComposition = MassComposition(data=df_coarse_2, name='coarse')
-    mc_coarse_2 = mc_coarse_2.set_parent(mc_size)
+    mc_coarse_2 = mc_coarse_2.set_parent_node(mc_size)
     mcn_ub: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse_2, mc_fine])
     return mcn_ub.to_dataframe()
 
@@ -153,10 +153,18 @@ def iron_ore_met_sample_data() -> pd.DataFrame:
     return df_met
 
 
-if __name__ == '__main__':
+def demo_size_network() -> MCNetwork:
+    mc_size: MassComposition = MassComposition(size_by_assay(), name='size sample')
+    partition = partial(perfect, d50=0.150, dim='size')
+    mc_coarse, mc_fine = mc_size.partition(definition=partition)
+    mc_coarse.name = 'coarse'
+    mc_fine.name = 'fine'
+    mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
+    return mcn
 
+
+if __name__ == '__main__':
     df1: pd.DataFrame = size_by_assay()
     df2: pd.DataFrame = size_by_assay_2()
     df3: pd.DataFrame = size_by_assay_3()
     print('done')
-

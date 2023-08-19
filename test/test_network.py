@@ -1,9 +1,13 @@
+import json
 from copy import deepcopy
 from functools import partial
 from pathlib import Path
 from typing import Dict
+
+import jsonpickle
 import pandas as pd
 import pytest
+from networkx import cytoscape_graph
 
 from elphick.mass_composition.mc_node import MCNode
 from elphick.mass_composition.network import MCNetwork
@@ -25,6 +29,7 @@ def test_network_plot(demo_size_network):
     fig = mcn.plot_network()
     fig.show()
     pass
+
 
 def test_table_plot(demo_data):
     obj_mc: MassComposition = MassComposition(demo_data, name='Feed')
@@ -151,3 +156,15 @@ def test_set_stream_data(demo_size_network):
     df1: pd.DataFrame = mcn.get_edge_by_name('coarse').data.to_dataframe()
     df2: pd.DataFrame = mcn.get_edge_by_name('coarse_2').data.to_dataframe()
     pd.testing.assert_frame_equal(df1, df2)
+
+
+def test_to_json(script_loc):
+    mcn: MCNetwork = MCNetwork().from_yaml(flowsheet_file=Path(script_loc / 'config/flowsheet_example.yaml'))
+    json_graph: Dict = mcn.to_json()
+    pickled_obj = jsonpickle.encode(json_graph)
+    unpickled_obj = jsonpickle.decode(pickled_obj)
+    mcn2: MCNetwork = cytoscape_graph(unpickled_obj)
+
+    with open('test_graph.json', 'w') as f:
+        json.dump(pickled_obj, f)
+    print('done')
