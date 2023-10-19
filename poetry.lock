@@ -4064,4 +4064,4 @@ viz = ["kaleido", "pyvista", "pyvista-xarray"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "34592f5d82e09d844d759cdf648fd2a2348d145ea8c771f59038987e236fdb0c"
+content-hash = "1ef69b5c9b640e091087998c127edf21ad0e12721cde6c47d232da695f6e3333"
