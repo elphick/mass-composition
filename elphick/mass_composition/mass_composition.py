@@ -13,7 +13,7 @@ import xarray as xr
 import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
 from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.mc_status import Status
-from elphick.mass_composition.plot import parallel_plot
+from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils import solve_mass_moisture
 from elphick.mass_composition.utils.sampling import random_int
 
@@ -605,6 +605,64 @@ class MassComposition:
 
         fig = parallel_plot(data=df, color=color, vars_include=vars_include, vars_exclude=vars_exclude, title=title,
                             include_dims=include_dims, plot_interval_edges=plot_interval_edges)
+        return fig
+
+    def plot_comparison(self, other: 'MassComposition',
+                        color: Optional[str] = None,
+                        vars_include: Optional[List[str]] = None,
+                        vars_exclude: Optional[List[str]] = None,
+                        facet_col_wrap: int = 3,
+                        title: Optional[str] = None) -> go.Figure:
+        """Create an interactive parallel plot
+
+        Useful to compare the difference in component values between two objects.
+
+        Args:
+            other: the object to compare with self.
+            color: Optional color variable
+            vars_include: Optional List of variables to include in the plot
+            vars_exclude: Optional List of variables to exclude in the plot
+            title: Optional plot title
+            facet_col_wrap: The number of subplot columns per row.
+
+        Returns:
+
+        """
+        df_self: pd.DataFrame = self.data.to_dataframe()
+        df_other: pd.DataFrame = other.data.to_dataframe()
+
+        if vars_include is not None:
+            missing_vars = set(vars_include).difference(set(df_self.columns))
+            if len(missing_vars) > 0:
+                raise KeyError(f'var_subset provided contains variable not found in the data: {missing_vars}')
+            df_self = df_self[vars_include]
+        if vars_exclude:
+            df_self = df_self[[col for col in df_self.columns if col not in vars_exclude]]
+        df_other = df_other[df_self.columns]
+        # Supplementary variables are the same for each stream and so will be unstacked.
+        supp_cols: List[str] = [col for col in df_self.columns if col in self.variables.supplementary.get_col_names()]
+        if supp_cols:
+            df_self.set_index(supp_cols, append=True, inplace=True)
+            df_other.set_index(supp_cols, append=True, inplace=True)
+
+        index_names = list(df_self.index.names)
+        cols = list(df_self.columns).copy()
+
+        df_self = df_self[cols].assign(name=self.name).reset_index().melt(id_vars=index_names + ['name'])
+        df_other = df_other[cols].assign(name=other.name).reset_index().melt(id_vars=index_names + ['name'])
+
+        df_plot: pd.DataFrame = pd.concat([df_self, df_other])
+        df_plot = df_plot.set_index(index_names + ['name', 'variable'], drop=True).unstack(['name'])
+        df_plot.columns = df_plot.columns.droplevel(0)
+        df_plot.reset_index(level=list(np.arange(-1, -len(index_names) - 1, -1)), inplace=True)
+
+        # set variables back to standard order
+        variable_order: Dict = {col: i for i, col in enumerate(cols)}
+        df_plot = df_plot.sort_values(by=['variable'], key=lambda x: x.map(variable_order))
+
+        fig: go.Figure = comparison_plot(data=df_plot, x=self.name, y=other.name, facet_col_wrap=facet_col_wrap,
+                                         color=color)
+        fig.update_layout(title=title)
         return fig
 
     def plot_ternary(self, variables: List[str], color: Optional[str] = None,

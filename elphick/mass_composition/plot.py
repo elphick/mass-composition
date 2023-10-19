@@ -86,8 +86,11 @@ def comparison_plot(data: pd.DataFrame,
                      facet_col='variable', facet_col_wrap=facet_col_wrap,
                      hover_data=['residual'])
 
+    # fig.print_grid()
     # add y=x based on data per subplot
-    d_subplots = subplot_index_by_title(fig)
+    variable_order = list(data['variable'].unique())
+    d_subplots = subplot_index_by_title(fig, variable_order)
+
     for k, v in d_subplots.items():
         tmp_df = data.query('variable==@k')
         limits = [min([tmp_df[x].min(), tmp_df[y].min()]),
@@ -106,20 +109,25 @@ def comparison_plot(data: pd.DataFrame,
     return fig
 
 
-def subplot_index_by_title(fig) -> Dict['str', Tuple[int, int]]:
+def subplot_index_by_title(fig, variable_order: List[str]) -> Dict['str', Tuple[int, int]]:
     """Map of subplot index by title
 
     Assumes consistency by plotly between axes numbering and annotation order.
 
     Args:
         fig: The figure including subplots with unique titles
+        variable_order: the variables in order top-left to bottom-right
 
     Returns:
         Dict keyed by title with tuple of subplot positions
     """
-    variable_order = [a.text.split("=")[-1] for a in fig.layout.annotations]
-    d_subplots = {}
-    for ri, r in enumerate(fig._grid_ref):
-        for ci, c in enumerate(r):
-            d_subplots[variable_order.pop(0)] = (ri + 1, ci + 1)
+
+    d_subplots: Dict = {}
+    i = 0
+    for r in range(len(fig._grid_ref), 0, -1):
+        for c in range(1, len(fig._grid_ref[0]) + 1, 1):
+            if i < len(variable_order):
+                d_subplots[variable_order[i]] = (r, c)
+            i += 1
+
     return d_subplots
