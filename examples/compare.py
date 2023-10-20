@@ -13,6 +13,7 @@ Comparison can be performed by:
 """
 
 import pandas as pd
+import plotly
 import xarray as xr
 
 from elphick.mass_composition import MassComposition
@@ -87,3 +88,19 @@ rec_4
 
 rec_5: pd.DataFrame = obj_mc.compare(comparison='divide', other=obj_mc_ref)
 rec_5
+
+# %%
+# Comparison Plot
+# ---------------
+#
+# This plot compares one stream against another, with one component per subplot.
+
+fig = obj_mc.plot_comparison(other=obj_mc_ref, color='group')
+fig.update_layout(height=600)
+fig
+
+# %%
+fig = obj_mc.plot_comparison(other=obj_mc_ref, vars_exclude=['H2O'], color='group')
+fig.update_layout(height=600)
+# noinspection PyArgumentList,PyTypeChecker
+plotly.io.show(fig)

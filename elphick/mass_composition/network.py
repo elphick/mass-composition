@@ -359,7 +359,7 @@ class MCNetwork:
 
     def plot_balance(self, facet_col_wrap: int = 3,
                      color: Optional[str] = 'node') -> go.Figure:
-        """Plot input verus output across all nodes in the network
+        """Plot input versus output across all nodes in the network
 
         Args:
             facet_col_wrap: the number of subplots per row before wrapping
