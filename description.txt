@@ -1,0 +1,2 @@
+MassComposition is a python package that allows Geoscientists and Metallurgists to easily work with, and visualise
+mass-compositional data.
