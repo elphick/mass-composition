@@ -9,6 +9,8 @@ def test_examples():
     import examples.basic_usage
     import examples.math_operations
 
+    import examples.data_examples
+
     import examples.iron_ore_assays
 
     import examples.interval_data
