@@ -26,7 +26,6 @@ df_data: pd.DataFrame = sample_data()
 df_data
 
 # %%
-#
 # Construct a MassComposition object
 
 obj_mc: MassComposition = MassComposition(df_data)
@@ -71,17 +70,14 @@ obj_3: MassComposition = obj_mc.constrain(relative_mass=(0.0, 0.1), other=obj_ot
 obj_3.data.to_dataframe()
 
 # %%
-#
 # Here we constrain Fe to 10% recovery of 2 x the original object...
 
-# %%
 obj_4: MassComposition = obj_mc.constrain(relative_composition={'Fe': (0.0, 0.1)}, other=obj_other)
 obj_4.data.to_dataframe()
 
 # %%
 # Arguments can be combined to perform multiple constraints in one call.
 
-# %%
 obj_5: MassComposition = obj_mc.constrain(clip_mass=(85, 100),
                                           relative_composition={'Fe': (0.0, 0.1)}, other=obj_other)
 obj_5.data.to_dataframe()

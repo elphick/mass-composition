@@ -16,6 +16,8 @@ from functools import partial
 from pathlib import Path
 
 import pandas as pd
+# noinspection PyUnresolvedReferences
+import numpy as np
 import plotly
 
 from elphick.mass_composition import MassComposition
@@ -43,6 +45,6 @@ df_data
 # The dataset contains size x assay, plus size x density x assay data.  We'll drop the size x assay data to leave the
 # sink / float data.
 
-df_sink_float: pd.DataFrame = df_data.query('density_lo != np.nan and density_hi != np.nan')
-df_sink_float
+# df_sink_float: pd.DataFrame = df_data.query('density_lo != np.nan and density_hi != np.nan')
+# df_sink_float
 
