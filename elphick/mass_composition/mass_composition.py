@@ -577,6 +577,61 @@ class MassComposition:
 
         return fig
 
+    def plot_deportment(self,
+                        variables: List[str],
+                        min_x: Optional[float] = None) -> go.Figure:
+        """Plot deportment - the components by the dimensions.
+
+        Visualise component values relative to the dimensions
+
+        Args:
+            variables: List of variables to include in the plot
+            min_x: Optional minimum value for the x-axis, useful to set reasonable visual range with a log
+            scaled x-axis when plotting size data
+        """
+
+        # TODO: modify this method.
+
+        res: xr.Dataset = self.data
+
+        plot_kwargs: Dict = dict(line_shape='vh')
+
+        interval_data: pd.DataFrame = res.mc.to_dataframe()
+
+        df_intervals: pd.DataFrame = self._intervals_to_columns(interval_index=interval_data.index)
+        df = pd.concat([df_intervals, interval_data], axis='columns')
+        x_var: str = interval_data.index.name
+
+        # append on the largest fraction right edge for display purposes
+        df_end: pd.DataFrame = df.loc[df.index.max(), list(df_intervals.columns) + variables].to_frame().T
+        df_end[df_intervals.columns[0]] = df_end[df_intervals.columns[1]]
+        df_end[df_intervals.columns[1]] = np.inf
+        df = pd.concat([df_end, df], axis='index')
+        df[interval_data.index.name] = df[df_intervals.columns[0]]
+
+        if 'size' in x_var:
+            if not min_x:
+                min_x = interval_data.index.min().right / 2.0
+            # set zero to the minimum x value (for display only) to enable the tooltips on that point.
+            df.loc[df[x_var] == df[x_var].min(), x_var] = min_x
+            hover_data = {'component': True,  # add other column, default formatting
+                          x_var: ':.3f',  # add other column, customized formatting
+                          'value': ':.2f'
+                          }
+            plot_kwargs = {**plot_kwargs,
+                           **dict(log_x=True,
+                                  range_x=[min_x, interval_data.index.max().right],
+                                  hover_data=hover_data)}
+
+        df = df[[x_var] + variables].melt(id_vars=[x_var], var_name='component')
+
+        fig = px.line(df, x=x_var, y='value', facet_row='component', **plot_kwargs)
+        fig.for_each_annotation(lambda a: a.update(text=a.text.replace("component=", "")))
+        fig.update_yaxes(matches=None)
+        fig.update_layout(title=self.name)
+
+        return fig
+
     def plot_parallel(self, color: Optional[str] = None,
                       vars_include: Optional[List[str]] = None,
                       vars_exclude: Optional[List[str]] = None,
