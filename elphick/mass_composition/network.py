@@ -24,6 +24,7 @@ from elphick.mass_composition.layout import digraph_linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils.geometry import midpoint
+from elphick.mass_composition.utils.loader import streams_from_dataframe
 from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
 from elphick.mass_composition.utils.sampling import random_int
 
@@ -90,38 +91,8 @@ class MCNetwork:
         Returns:
 
         """
-        logger: logging.Logger = logging.getLogger(__class__.__name__)
-
-        res: List = []
-        index_names: List = []
-        if mc_name_col:
-            if mc_name_col in df.index.names:
-                index_names = df.index.names
-                df.reset_index(mc_name_col, inplace=True)
-            if mc_name_col not in df.columns:
-                raise KeyError(f'{mc_name_col} is not in the columns or indexes.')
-            names = df[mc_name_col].unique()
-            for obj_name in names:
-                res.append(MassComposition(
-                    data=df.query(f'{mc_name_col} == @obj_name')[[col for col in df.columns if col != mc_name_col]],
-                    name=obj_name))
-            if index_names:  # reinstate the index on the original dataframe
-                df.reset_index(inplace=True)
-                df.set_index(index_names, inplace=True)
-        else:
-            # wide case - find prefixes where there are at least 3 columns
-            prefix_counts = column_prefix_counts(df.columns)
-            prefix_cols = column_prefixes(df.columns)
-            for prefix, n in prefix_counts.items():
-                if n >= 3:
-                    logger.info(f"Creating object for {prefix}")
-                    cols = prefix_cols[prefix]
-                    res.append(MassComposition(
-                        data=df[[col for col in df.columns if col in cols]].rename(
-                            columns={col: col.replace(f'{prefix}_', '') for col in df.columns}),
-                        name=prefix))
-
-        return cls().from_streams(streams=res, name=name)
+        streams: Dict = streams_from_dataframe(df=df, mc_name_col=mc_name_col)
+        return cls().from_streams(streams=list(streams.values()), name=name)
 
     @classmethod
     def from_yaml(cls, flowsheet_file: Path) -> 'MCNetwork':
