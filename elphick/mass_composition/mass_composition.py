@@ -276,7 +276,7 @@ class MassComposition:
             xr_ds = self._copy_all_attrs(xr_ds, self.data)
 
         if relative_composition:
-            xr_relative: xr.Dataset = self.compare(other=other, comparison='recovery', explicit_names=False,
+            xr_relative: xr.Dataset = self.compare(other=other, comparisons='recovery', explicit_names=False,
                                                    as_dataframe=False)
             if isinstance(relative_composition, Dict):
                 for k, v in relative_composition.items():
@@ -294,29 +294,39 @@ class MassComposition:
 
         return res
 
-    def compare(self, other: 'MassComposition', comparison: str = 'recovery',
+    def compare(self, other: 'MassComposition', comparisons: Union[str, List[str]] = 'recovery',
                 explicit_names: bool = True, as_dataframe: bool = True) -> Union[pd.DataFrame, xr.Dataset]:
 
-        valid_comparisons: Set = {'recovery', 'difference', 'divide'}
+        comparisons = [comparisons] if isinstance(comparisons, str) else comparisons
+        valid_comparisons: Set = {'recovery', 'difference', 'divide', 'all'}
+
+        def set_explicit_names(xrds, comparison) -> xr.Dataset:
+            xrds = xrds.rename_vars(
+                {col: f"{self.name}_{col}_{self.config['comparisons'][comparison]}_{other.name}" for col in
+                 xrds.data_vars})
+            return xrds
 
         cols = [col for col in self.data.data_vars if col not in self.data.mc.mc_vars_attrs]
 
-        if comparison == 'recovery':
-            res: xr.Dataset = self.data.mc.composition_to_mass()[cols] / other.data.mc.composition_to_mass()[cols]
-        elif comparison == 'difference':
-            res: xr.Dataset = self.data[cols] - other.data[cols]
-        elif comparison == 'divide':
-            res: xr.Dataset = self.data[cols] / other.data[cols]
-        else:
+        chunks: List[xr.Dataset] = []
+        if 'recovery' in comparisons or comparisons == ['all']:
+            ds: xr.Dataset = self.data.mc.composition_to_mass()[cols] / other.data.mc.composition_to_mass()[cols]
+            ds = set_explicit_names(ds, comparison='recovery') if explicit_names else ds
+            chunks.append(ds)
+        if 'difference' in comparisons or comparisons == ['all']:
+            ds: xr.Dataset = self.data[cols] - other.data[cols]
+            ds = set_explicit_names(ds, comparison='difference') if explicit_names else ds
+            chunks.append(ds)
+        if 'divide' in comparisons or comparisons == ['all']:
+            ds: xr.Dataset = self.data[cols] / other.data[cols]
+            ds = set_explicit_names(ds, comparison='divide') if explicit_names else ds
+            chunks.append(ds)
+
+        if not chunks:
             raise ValueError(f"The comparison argument is not valid: {valid_comparisons}")
 
-        if explicit_names:
-            res = res.rename_vars(
-                {col: f"{self.name}_{col}_{self.config['comparisons'][comparison]}_{other.name}" for col in
-                 res.data_vars})
-
-        if as_dataframe:
-            res: pd.DataFrame = res.to_dataframe()
+        res: xr.Dataset = xr.merge(chunks)
+        res: pd.DataFrame = res.to_dataframe() if as_dataframe else res
 
         return res
 

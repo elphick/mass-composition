@@ -51,21 +51,20 @@ obj_mc_ref: MassComposition = obj_mc.add(obj_mc, name='feed')
 obj_mc_ref.data.to_dataframe()
 
 # %%
-rec_1: pd.DataFrame = obj_mc.compare(comparison='recovery', other=obj_mc_ref)
+rec_1: pd.DataFrame = obj_mc.compare(comparisons='recovery', other=obj_mc_ref)
 rec_1
 
 # %%
 # By default the variable names are explicit for clarity, though the basic variables names can be preserved.
 
-rec_2: pd.DataFrame = obj_mc.compare(comparison='recovery', other=obj_mc_ref, explicit_names=False)
+rec_2: pd.DataFrame = obj_mc.compare(comparisons='recovery', other=obj_mc_ref, explicit_names=False)
 rec_2
 
 # %%
-# The xarray Dataset can be returned if desired.
+# An xarray Dataset can be returned if desired.
 
-rec_3: xr.Dataset = obj_mc.compare(comparison='recovery', other=obj_mc_ref, explicit_names=False, as_dataframe=False)
+rec_3: xr.Dataset = obj_mc.compare(comparisons='recovery', other=obj_mc_ref, explicit_names=False, as_dataframe=False)
 rec_3
-
 
 # %%
 #
@@ -75,7 +74,7 @@ rec_3
 # Comparing by difference simply subtracts mass and composition.  No conversion of composition to mass units is made.
 #
 
-rec_4: pd.DataFrame = obj_mc.compare(comparison='difference', other=obj_mc_ref)
+rec_4: pd.DataFrame = obj_mc.compare(comparisons='difference', other=obj_mc_ref)
 rec_4
 
 # %%
@@ -86,8 +85,25 @@ rec_4
 # Comparing by simply dividing mass and composition.  No conversion of composition to mass units is made.
 # In the mineral processing context, the result may be described as the "upgrade ratio".
 
-rec_5: pd.DataFrame = obj_mc.compare(comparison='divide', other=obj_mc_ref)
+rec_5: pd.DataFrame = obj_mc.compare(comparisons='divide', other=obj_mc_ref)
 rec_5
+
+
+# %%
+#
+# Multiple Comparisons
+# --------------------
+#
+# More than one comparison can be performed at once.
+
+rec_6: pd.DataFrame = obj_mc.compare(comparisons=['recovery', 'divide'], other=obj_mc_ref)
+rec_6.T
+
+# %%
+# Or using "all"
+
+rec_7: pd.DataFrame = obj_mc.compare(comparisons='all', other=obj_mc_ref)
+rec_7.T
 
 # %%
 # Comparison Plot
@@ -95,11 +111,13 @@ rec_5
 #
 # This plot compares one stream against another, with one component per subplot.
 
-fig = obj_mc.plot_comparison(other=obj_mc_ref, color='group')
+fig = obj_mc.plot_comparison(other=obj_mc_ref)
 fig.update_layout(height=600)
 fig
 
 # %%
+# With color and excluded variable.
+
 fig = obj_mc.plot_comparison(other=obj_mc_ref, vars_exclude=['H2O'], color='group')
 fig.update_layout(height=600)
 # noinspection PyArgumentList,PyTypeChecker
