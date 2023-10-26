@@ -6,7 +6,7 @@ MC:
       format: '%.0f'  # cannot use %d, use %.0f
     mass_dry:
       standard_name: mass_dry
-      search_regex: '(mass_dry)|(dry_mass)|(dmt)'
+      search_regex: '(mass_dry)|(dry_mass)|(dmt)|(mass_pct)'
       format: '%.0f'
     moisture:
       standard_name: H2O
@@ -27,6 +27,8 @@ MC:
       - [from, to]
       - [retained, passing]
       - [sink, float]
+      - [lo, hi]
+      - [low, high]
   comparisons:
     recovery: 'rec'
     difference: 'diff'
