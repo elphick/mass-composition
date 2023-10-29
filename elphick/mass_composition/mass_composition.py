@@ -622,6 +622,8 @@ class MassComposition:
                         vars_include: Optional[List[str]] = None,
                         vars_exclude: Optional[List[str]] = None,
                         facet_col_wrap: int = 3,
+                        trendline: bool = False,
+                        trendline_kwargs: Optional[Dict] = None,
                         title: Optional[str] = None) -> go.Figure:
         """Create an interactive parallel plot
 
@@ -632,6 +634,8 @@ class MassComposition:
             color: Optional color variable
             vars_include: Optional List of variables to include in the plot
             vars_exclude: Optional List of variables to exclude in the plot
+            trendline: If True and trendlines
+            trendline_kwargs: Allows customising the trendline: ref: https://plotly.com/python/linear-fits/
             title: Optional plot title
             facet_col_wrap: The number of subplot columns per row.
 
@@ -671,7 +675,7 @@ class MassComposition:
         df_plot = df_plot.sort_values(by=['variable'], key=lambda x: x.map(variable_order))
 
         fig: go.Figure = comparison_plot(data=df_plot, x=self.name, y=other.name, facet_col_wrap=facet_col_wrap,
-                                         color=color)
+                                         color=color, trendline=trendline, trendline_kwargs=trendline_kwargs)
         fig.update_layout(title=title)
         return fig
 
