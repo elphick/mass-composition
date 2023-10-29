@@ -32,7 +32,6 @@ jobs:
           pip install orca
           pip install pytest
           pip install sphinxcontrib-datatemplates
-          pip install statsmodels
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
