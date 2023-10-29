@@ -12,6 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v3
+      with:
+        python-version: 3.11
     - name: Install dependencies
       run: |
         pip install mass-composition -e ".[viz,network,omf]"
@@ -22,6 +24,7 @@ jobs:
         pip install orca
         pip install pytest
         pip install sphinxcontrib-datatemplates
+        pip install statsmodels
     - name: Sphinx build
       run: |
         sphinx-build docs/source _build

@@ -88,7 +88,6 @@ rec_4
 rec_5: pd.DataFrame = obj_mc.compare(comparisons='divide', other=obj_mc_ref)
 rec_5
 
-
 # %%
 #
 # Multiple Comparisons
@@ -116,9 +115,10 @@ fig.update_layout(height=600)
 fig
 
 # %%
-# With color and excluded variable.
+# With color, excluded variable, and trendline. The trendline is per color (group).  Since grp2 is a single point, no
+# trendline applies.
 
-fig = obj_mc.plot_comparison(other=obj_mc_ref, vars_exclude=['H2O'], color='group')
+fig = obj_mc.plot_comparison(other=obj_mc_ref, vars_exclude=['H2O'], color='group', trendline=True)
 fig.update_layout(height=600)
 # noinspection PyArgumentList,PyTypeChecker
 plotly.io.show(fig)

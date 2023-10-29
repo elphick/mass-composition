@@ -67,7 +67,9 @@ def parallel_plot(data: pd.DataFrame,
 def comparison_plot(data: pd.DataFrame,
                     x: str, y: str,
                     facet_col_wrap: int = 3,
-                    color: Optional[str] = None) -> go.Figure:
+                    color: Optional[str] = None,
+                    trendline: bool = False,
+                    trendline_kwargs: Optional[Dict] = None) -> go.Figure:
     """Comparison Plot with multiple x-y scatter plots
 
     Args:
@@ -76,15 +78,27 @@ def comparison_plot(data: pd.DataFrame,
         y: The y column
         facet_col_wrap: the number of subplots per row before wrapping
         color: The optional variable to color by. If None color will be by Node
+        trendline: If True add trendlines
+        trendline_kwargs: Allows customising the trendline: ref: https://plotly.com/python/linear-fits/.  Note: Axis
+         scaling across components can be affected if using {'trendline_scope': 'trendline_scope'}.
 
     Returns:
         plotly Figure
     """
+    if trendline:
+        if trendline_kwargs is None:
+            trendline_kwargs = {'trendline': 'ols'}
+        else:
+            if 'trendline' not in trendline_kwargs:
+                trendline_kwargs['trendline'] = "ols"
+    else:
+        trendline_kwargs = {'trendline': None}
 
     data['residual'] = data[x] - data[y]
     fig = px.scatter(data, x=x, y=y, color=color,
                      facet_col='variable', facet_col_wrap=facet_col_wrap,
-                     hover_data=['residual'])
+                     hover_data=['residual'],
+                     **trendline_kwargs)
 
     # fig.print_grid()
     # add y=x based on data per subplot
@@ -97,7 +111,7 @@ def comparison_plot(data: pd.DataFrame,
                   max([tmp_df[x].max(), tmp_df[y].max()])]
 
         equal_trace = go.Scatter(x=limits, y=limits,
-                                 line_color="gray", name="y=x", mode='lines', showlegend=False)
+                                 line_color="gray", name="y=x", mode='lines', legendgroup='y=x', showlegend=False)
         fig.add_trace(equal_trace, row=v[0], col=v[1], exclude_empty_subplots=True)
         sp = fig.get_subplot(v[0], v[1])
         fig.update_xaxes(scaleanchor=sp.xaxis.anchor, scaleratio=1, row=v[0], col=v[1])
