@@ -286,7 +286,7 @@ class MassComposition:
                                          limits=relative_composition)
 
             # convert back to relative composition (mass/grades)
-            xr_ds = other.data.mc.composition_to_mass() * xr_relative
+            xr_ds = other.data.mc.mul(xr_relative)
             xr_ds = xr.merge([xr_ds, self.data[self.data.mc.mc_vars_attrs]])
             xr_ds = self._copy_all_attrs(xr_ds, self.data)
 
