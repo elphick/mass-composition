@@ -111,18 +111,19 @@ def test_constrain_relative_composition_tuple(demo_data):
     df_expected: pd.DataFrame = pd.DataFrame.from_dict({'mass_wet': [100., 90., 110.],
                                                         'mass_dry': [90., 80., 90.],
                                                         'H2O': [10., 11.1111, 18.181818],
-                                                        'Fe': [10.26, 9.44, 10.98],
-                                                        'SiO2': [0.9359999999999999, 0.496, 0.3960000000000001],
-                                                        'Al2O3': [0.5400000000000001, 0.272, 0.16200000000000003],
-                                                        'LOI': [0.9, 0.6400000000000001, 0.5400000000000001],
+                                                        'Fe': [11.4, 11.8, 12.2],
+                                                        'SiO2': [1.04, 0.62, 0.4400],
+                                                        'Al2O3': [0.6, 0.34, 0.18],
+                                                        'LOI': [1.0, 0.8, 0.6],
                                                         'group': ['grp_1', 'grp_1', 'grp_2']})
     df_expected.index.name = 'index'
     pd.testing.assert_frame_equal(df_expected, df_clipped)
 
 
-def test_constrain_relative_composition_dict(demo_data):
+def test_constrain_composition_dict(demo_data):
     obj_mc: MassComposition = MassComposition(demo_data, name='name_test_constrain')
-    obj_mc2: MassComposition = obj_mc.constrain(clip_composition={'Fe': (0., np.inf), 'Al2O3': (1.0, 100.)}, other=obj_mc.add(obj_mc, name='feed'))
+    obj_mc2: MassComposition = obj_mc.constrain(clip_composition={'Fe': (0., np.inf), 'Al2O3': (1.0, 100.)},
+                                                other=obj_mc.add(obj_mc, name='feed'))
     df_clipped: pd.DataFrame = obj_mc2.data.to_dataframe()
     df_expected: pd.DataFrame = pd.DataFrame.from_dict({'mass_wet': [100., 90., 110.],
                                                         'mass_dry': [90., 80., 90.],

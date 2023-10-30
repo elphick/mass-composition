@@ -58,7 +58,7 @@ obj_2.data.to_dataframe()
 # ---------------------------------------
 #
 # Sometimes constraining relative to another object is useful.  This can be described as "constraining by recovery".
-# The object os converted to absolute mass (where components are converted to mass units) and divided by the
+# The object is converted to absolute mass (where components are converted to mass units) and divided by the
 # reference (other) object, also converted to mass units.  In mineral processing, this is known as recovery.
 #
 # First we'll make another object to act as our reference.
