@@ -1,7 +1,7 @@
 import logging
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set
+from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set, Literal
 
 import numpy as np
 import pandas as pd
@@ -369,6 +369,31 @@ class MassComposition:
             res = res.mc.data()
 
         return res
+
+    def ideal_incremental_separation(self, direction: Union[str, Literal['increasing', 'decreasing']]) -> pd.DataFrame:
+        """Incrementally separate a fractionated sample.
+
+        This method sorts by the provided direction prior to incrementally removing and discarding the first fraction
+         (of the remaining fractions) and recalculating the mass-composition and recovery of the portion remaining.
+         This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        Args:
+            direction: Direction to sort, which sets the direction of the discarded fraction.
+
+        Returns:
+            A pandas DataFrame
+        """
+        if len(self.data.dims) > 1:
+            raise NotImplementedError(f"This object is {len(self.data.dims)} dimensional. "
+                                      f"Only 1D interval objects are valid")
+        index_var: str = str(list(self.data.dims.keys())[0])
+        if not isinstance(self.data[index_var].data[0], pd.Interval):
+            raise NotImplementedError(f"The dim {index_var} of this object is not a pd.Interval. "
+                                      f" Only 1D interval objects are valid")
+        xrds: xr.Dataset = self.data
+        return xrds.to_dataframe()
 
     def split(self,
               fraction: float,
