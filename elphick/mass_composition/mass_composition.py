@@ -726,11 +726,18 @@ class MassComposition:
         title = title if title is not None else 'Ideal Grade - Recovery'
 
         df: pd.DataFrame = self.ideal_incremental_separation(discard_from=discard_from)
-        fig = px.line(df, x=df.loc[(slice(None), 'composition'), target_analyte],
-                      y=df.loc[(slice(None), 'recovery'), target_analyte],
+        df_recovery: pd.DataFrame = df.loc[(slice(None), 'recovery'), [target_analyte, 'mass_dry']].droplevel('attribute').rename(
+            columns={'mass_dry': 'Yield', target_analyte: f"{target_analyte}_recovery"})
+        df_composition: pd.DataFrame = df.loc[(slice(None), 'composition'), :].droplevel('attribute').drop(
+            columns=['mass_wet', 'mass_dry', 'H2O'])
+
+        df_plot: pd.DataFrame = pd.concat([df_recovery, df_composition], axis=1).reset_index()
+        fig = px.line(df_plot, x=target_analyte,
+                      y=f"{target_analyte}_recovery",
+                      hover_data=df_plot.columns,
                       title=title)
-        fig.update_layout(xaxis_title=f"Grade of {target_analyte}", yaxis_title=f"Recovery of {target_analyte}",
-                          title=title)
+        # fig.update_layout(xaxis_title=f"Grade of {target_analyte}", yaxis_title=f"Recovery of {target_analyte}",
+        #                   title=title)
 
         return fig
 
@@ -759,27 +766,24 @@ class MassComposition:
         df: pd.DataFrame = self.ideal_incremental_recovery(discard_from=discard_from)
         amenability_indices: pd.Series = amenability_index(df, col_target=target_analyte, col_mass_recovery='mass')
 
-        if gangue_analytes is None:
-            gangue_analytes = [col for col in df.columns if
-                               col not in [target_analyte, "mass"]]
+        analytes = [col for col in df.columns if col != "mass"] if gangue_analytes is None else [
+            target_analyte + gangue_analytes]
 
         mass_rec: pd.DataFrame = df["mass"]
+        df = df[analytes]
 
-        df = df[[target_analyte] + gangue_analytes]
-
-        # id_var: str = df.index.name
-        # df_plot: pd.DataFrame = df.reset_index().melt(id_vars=id_var).set_index(id_var)
-        # df_plot = mass_rec.merge(df_plot, left_index=True, right_index=True)
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=mass_rec, y=df[target_analyte], mode="lines", name=f"{target_analyte} (target)"))
-        for analyte in gangue_analytes:
+        for analyte in analytes:
             fig.add_trace(
                 go.Scatter(x=mass_rec, y=df[analyte], mode="lines",
-                           name=f"{analyte} ({round(amenability_indices[analyte], 2)})"))
+                           name=f"{analyte} ({round(amenability_indices[analyte], 2)})",
+                           customdata=df.index.values,
+                           hovertemplate='<b>Recovery: %{y:.3f}</b><br>Cut-point: %{customdata:.3f} '))
         fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name='y=x',
                                  line=dict(shape='linear', color='gray', dash='dash'),
                                  ))
-        fig.update_layout(xaxis_title='Yield (Mass Recovery)', yaxis_title='Recovery', title=title)
+        fig.update_layout(xaxis_title='Yield (Mass Recovery)', yaxis_title='Recovery', title=title,
+                          hovermode='x')
         return fig
 
     def plot_parallel(self, color: Optional[str] = None,
