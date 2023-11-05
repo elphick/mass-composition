@@ -8,8 +8,8 @@ def amenability_index(df_recovery: pd.DataFrame,
                       col_mass_recovery: str):
     """Calculate the Amenability Index
 
-    Implementation of the Amenability Index as presented in the paper by G. Elphick and Dr. T.F. Mason at the
-    DMS Powers Conference,
+    Implementation of the Amenability Index as presented in the paper titled APPLICATIONS OF INDIVIDUAL PARTICLE
+    PYKNOMETRY by G. Elphick and Dr. T.F. Mason at the DMS POWDERS’ 10th FERROSILICON CONFERENCE.
 
     The amenability Index for a particular gangue analyte is the complement of the relative recovery to the target
      analyte across the full sample.  It is process / operating point independent, hence characterises the ore,
@@ -23,13 +23,13 @@ def amenability_index(df_recovery: pd.DataFrame,
     Returns:
         A pd.Series containing the Amenability Indices for the gangue analytes
     """
-    cols_gangue: List[str] = [col for col in df_recovery.columns if col not in [col_target, col_mass_recovery]]
+    cols: List[str] = [col for col in df_recovery.columns if col not in [col_mass_recovery]]
     area_target = area_trapezoid(xs=df_recovery[col_mass_recovery], ys=df_recovery[col_target])
     results: List = []
-    for analyte in cols_gangue:
+    for analyte in cols:
         area = area_trapezoid(xs=df_recovery[col_mass_recovery], ys=df_recovery[analyte])
         results.append(1 - (area / area_target))
-    return pd.Series(results, index=cols_gangue, name='amenability_index')
+    return pd.Series(results, index=cols, name='amenability_index')
 
 
 def pairwise(iterable):

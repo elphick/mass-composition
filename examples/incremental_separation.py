@@ -17,10 +17,9 @@ import logging
 
 import pandas as pd
 import plotly
-import xarray as xr
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.datasets.sample_data import sample_data, size_by_assay
+from elphick.mass_composition.datasets.sample_data import size_by_assay
 
 # %%
 logging.basicConfig(level=logging.INFO,
@@ -62,14 +61,36 @@ results_2
 # -------------------
 
 fig = mc_size.plot_grade_recovery(target_analyte='Fe')
-fig.update_layout(width=900)
-# noinspection PyTypeChecker
-plotly.io.show(fig)
+fig.update_layout(height=800)
+fig
+
+# %%
+# Discard the highest (coarsest) sizes.  As expected the response differs.
+
+fig = mc_size.plot_grade_recovery(target_analyte='Fe', discard_from="highest")
+fig.update_layout(height=800)
 
 # %%
 # Plot Amenability
 # ----------------
+#
+# The Amenability Index (AI) will generally range between zero and one, but can in fact be legitimately negative.
+# The closer the AI is to 1.0, the more amenable the ore is to separation of that particular gangue component relative
+# to the target analyte.  The AI is shown in the legend (in brackets).
+#
+# The plot below suggests that SiO2 is marginally more amenable than Al2O3 across the
+# spectrum of yield for this sample.
 
 fig = mc_size.plot_amenability(target_analyte='Fe')
-fig.update_layout(width=900)
+fig.update_layout(height=800)
+# noinspection PyTypeChecker
+plotly.io.show(fig)
+
+# %%
+# Discard the highest (coarsest) sizes.  As expected the response differs.  The Amenability indices are negative
+# indicating a downgrade, rather than an upgrade.  This demonstrates that desliming is a plausible pathway to
+# beneficiating this sample, while "coarse scalping" is not.
+
+fig = mc_size.plot_amenability(target_analyte='Fe', discard_from="highest")
+fig.update_layout(height=800)
 fig
