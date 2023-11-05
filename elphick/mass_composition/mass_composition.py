@@ -15,6 +15,8 @@ from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.mc_status import Status
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils import solve_mass_moisture
+from elphick.mass_composition.utils.amenability import amenability_index
+from elphick.mass_composition.utils.pd_utils import weight_average, recovery
 from elphick.mass_composition.utils.sampling import random_int
 
 # noinspection PyUnresolvedReferences
@@ -370,7 +372,7 @@ class MassComposition:
 
         return res
 
-    def ideal_incremental_separation(self, direction: Union[str, Literal['increasing', 'decreasing']]) -> pd.DataFrame:
+    def ideal_incremental_separation(self, discard_from: Literal["lowest", "highest"] = "lowest") -> pd.DataFrame:
         """Incrementally separate a fractionated sample.
 
         This method sorts by the provided direction prior to incrementally removing and discarding the first fraction
@@ -379,8 +381,11 @@ class MassComposition:
 
         This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
 
+        See also: ideal_incremental_composition, ideal_incremental_recovery.
+
         Args:
-            direction: Direction to sort, which sets the direction of the discarded fraction.
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
 
         Returns:
             A pandas DataFrame
@@ -392,8 +397,93 @@ class MassComposition:
         if not isinstance(self.data[index_var].data[0], pd.Interval):
             raise NotImplementedError(f"The dim {index_var} of this object is not a pd.Interval. "
                                       f" Only 1D interval objects are valid")
-        xrds: xr.Dataset = self.data
-        return xrds.to_dataframe()
+        sample: pd.DataFrame = self.data.to_dataframe()
+
+        is_decreasing: bool = sample.index.is_monotonic_decreasing
+        if discard_from == "lowest":
+            sample.sort_index(ascending=True, inplace=True)
+            new_index: pd.Index = pd.Index(sample.index.left)
+        else:
+            sample.sort_index(ascending=False, inplace=True)
+            new_index: pd.Index = pd.Index(sample.index.right)
+        new_index.name = f"{sample.index.name}_cut-point"
+
+        aggregated_chunks: List = []
+        recovery_chunks: List = []
+        head: pd.DataFrame = sample.pipe(weight_average)
+
+        for i, indx in enumerate(sample.index):
+            tmp_composition: pd.DataFrame = sample.iloc[i:, :].pipe(weight_average)
+            aggregated_chunks.append(tmp_composition)
+            recovery_chunks.append(tmp_composition.pipe(recovery, df_ref=head))
+
+        res_composition: pd.DataFrame = pd.concat(aggregated_chunks).assign(attribute="composition").set_index(
+            new_index)
+        res_recovery: pd.DataFrame = pd.concat(recovery_chunks).assign(attribute="recovery").set_index(
+            new_index)
+
+        if is_decreasing:
+            res_composition.sort_index(ascending=False, inplace=True)
+            res_recovery.sort_index(ascending=False, inplace=True)
+
+        res: pd.DataFrame = pd.concat([res_composition, res_recovery]).reset_index().set_index(
+            [new_index.name, 'attribute'])
+
+        return res
+
+    def ideal_incremental_composition(self, discard_from: Literal["lowest", "highest"] = "lowest") -> pd.DataFrame:
+        """Incrementally separate a fractionated sample.
+
+        This method sorts by the provided direction prior to incrementally removing and discarding the first fraction
+         (of the remaining fractions) and recalculating the mass-composition of the portion remaining.
+         This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        See also: ideal_incremental_separation, ideal_incremental_recovery.
+
+        Args:
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+
+        Returns:
+            A pandas DataFrame
+        """
+        df: pd.DataFrame = self.ideal_incremental_separation(discard_from=discard_from).query(
+            'attribute=="composition"').droplevel('attribute')
+        return df
+
+    def ideal_incremental_recovery(self, discard_from: Literal["lowest", "highest"] = "lowest",
+                                   apply_closure: bool = True) -> pd.DataFrame:
+        """Incrementally separate a fractionated sample.
+
+        This method sorts by the provided direction prior to incrementally removing and discarding the first fraction
+         (of the remaining fractions) and recalculating the recovery of the portion remaining.
+         This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        See also: ideal_incremental_separation, ideal_incremental_composition.
+
+        Args:
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+            apply_closure: If True, Add the missing record (zero recovery) that closes the recovery envelope.
+
+        Returns:
+            A pandas DataFrame
+        """
+
+        df: pd.DataFrame = self.ideal_incremental_separation(discard_from=discard_from).query(
+            'attribute=="recovery"').droplevel('attribute').rename(columns={'mass_dry': 'mass'}).drop(
+            columns=["mass_wet", 'H2O'])
+        if apply_closure:
+            # add zero recovery record to close the envelope.
+            indx = np.inf if df.index.min() == 0.0 else 0.0
+            indx_name: str = df.index.name
+            df = pd.concat([df, pd.Series(0, index=df.columns, name=indx).to_frame().T]).sort_index(ascending=True)
+            df.index.name = indx_name
+        return df
 
     def split(self,
               fraction: float,
@@ -610,6 +700,86 @@ class MassComposition:
         fig.update_yaxes(matches=None)
         fig.update_layout(title=self.name)
 
+        return fig
+
+    def plot_grade_recovery(self, target_analyte,
+                            discard_from: Literal["lowest", "highest"] = "lowest",
+                            title: Optional[str] = None,
+                            ) -> go.Figure:
+        """The grade-recovery plot.
+
+        The grade recovery curve is generated by assuming an ideal separation (for the chosen property, or dimension)
+        at each fractional interval.  It defines the theoretical maximum performance, which can only be improved if
+        liberation is improved by comminution.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        Args:
+            target_analyte: The analyte of value.
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+            title: Optional plot title
+
+        Returns:
+            A plotly.GraphObjects figure
+        """
+        title = title if title is not None else 'Ideal Grade - Recovery'
+
+        df: pd.DataFrame = self.ideal_incremental_separation(discard_from=discard_from)
+        fig = px.line(df, x=df.loc[(slice(None), 'composition'), target_analyte],
+                      y=df.loc[(slice(None), 'recovery'), target_analyte],
+                      title=title)
+        fig.update_layout(xaxis_title=f"Grade of {target_analyte}", yaxis_title=f"Recovery of {target_analyte}",
+                          title=title)
+
+        return fig
+
+    def plot_amenability(self, target_analyte: str,
+                         discard_from: Literal["lowest", "highest"] = "lowest",
+                         gangue_analytes: Optional[str] = None,
+                         title: Optional[str] = None,
+                         ) -> go.Figure:
+        """The yield-recovery plot.
+
+        The yield recovery curve provides an understanding of the amenability of a sample.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        Args:
+            target_analyte: The analyte of value.
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+            gangue_analytes: The analytes to be rejected
+            title: Optional plot title
+
+        Returns:
+            A plotly.GraphObjects figure
+        """
+        title = title if title is not None else 'Amenability Plot'
+        df: pd.DataFrame = self.ideal_incremental_recovery(discard_from=discard_from)
+        amenability_indices: pd.Series = amenability_index(df, col_target=target_analyte, col_mass_recovery='mass')
+
+        if gangue_analytes is None:
+            gangue_analytes = [col for col in df.columns if
+                               col not in [target_analyte, "mass"]]
+
+        mass_rec: pd.DataFrame = df["mass"]
+
+        df = df[[target_analyte] + gangue_analytes]
+
+        # id_var: str = df.index.name
+        # df_plot: pd.DataFrame = df.reset_index().melt(id_vars=id_var).set_index(id_var)
+        # df_plot = mass_rec.merge(df_plot, left_index=True, right_index=True)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=mass_rec, y=df[target_analyte], mode="lines", name=f"{target_analyte} (target)"))
+        for analyte in gangue_analytes:
+            fig.add_trace(
+                go.Scatter(x=mass_rec, y=df[analyte], mode="lines",
+                           name=f"{analyte} ({round(amenability_indices[analyte], 2)})"))
+        fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name='y=x',
+                                 line=dict(shape='linear', color='gray', dash='dash'),
+                                 ))
+        fig.update_layout(xaxis_title='Yield (Mass Recovery)', yaxis_title='Recovery', title=title)
         return fig
 
     def plot_parallel(self, color: Optional[str] = None,

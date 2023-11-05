@@ -46,6 +46,30 @@ mc_size.data.to_dataframe
 # ----------------------
 #
 # Leverage the method to return the incremental perfect separation in the size dimension.
+# Here we will "de-slime" by discarding the smallest (lowest) sizes incrementally.
 
-results: pd.DataFrame = mc_size.ideal_incremental_separation(direction='ascending')
+results: pd.DataFrame = mc_size.ideal_incremental_separation(discard_from="lowest")
 results
+
+# %%
+# Repeat the process but by discarding the coarser sizes.
+
+results_2: pd.DataFrame = mc_size.ideal_incremental_separation(discard_from="highest")
+results_2
+
+# %%
+# Plot Grade-Recovery
+# -------------------
+
+fig = mc_size.plot_grade_recovery(target_analyte='Fe')
+fig.update_layout(width=900)
+# noinspection PyTypeChecker
+plotly.io.show(fig)
+
+# %%
+# Plot Amenability
+# ----------------
+
+fig = mc_size.plot_amenability(target_analyte='Fe')
+fig.update_layout(width=900)
+fig
