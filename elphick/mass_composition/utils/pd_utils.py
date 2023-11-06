@@ -128,5 +128,5 @@ def _detect_non_float_columns(df):
     _logger: logging.Logger = logging.getLogger(inspect.stack()[1].function)
     non_float_cols: List = [col for col in df.columns if col not in df.select_dtypes(include=[float]).columns]
     if len(non_float_cols) > 0:
-        _logger.warning(f"The following columns are not float columns and will be ignored: {non_float_cols}")
+        _logger.info(f"The following columns are not float columns and will be ignored: {non_float_cols}")
     return non_float_cols
