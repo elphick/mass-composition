@@ -34,7 +34,7 @@ def size_assay_data():
 def demo_size_network(size_assay_data):
     mc_size: MassComposition = MassComposition(size_assay_data, name='size sample')
     partition = partial(perfect, d50=0.150, dim='size')
-    mc_coarse, mc_fine = mc_size.partition(definition=partition)
+    mc_coarse, mc_fine = mc_size.apply_partition(definition=partition)
     mc_coarse.name = 'coarse'
     mc_fine.name = 'fine'
     mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])

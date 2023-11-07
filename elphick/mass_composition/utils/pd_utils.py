@@ -10,6 +10,7 @@ from pandas import DataFrame
 from pandas.core.dtypes.common import is_float_dtype
 
 from elphick.mass_composition.utils import solve_mass_moisture
+from elphick.mass_composition.utils.size import mean_size
 
 
 def column_prefixes(columns: List[str]) -> Dict[str, List[str]]:
@@ -101,26 +102,51 @@ def weight_average(df: pd.DataFrame,
     return pd.concat([mass_sum[[mass_wet, mass_dry]], moisture, weighted_composition], axis=1)
 
 
-def recovery(df: pd.DataFrame,
-             df_ref: pd.DataFrame,
-             mass_wet: str = 'mass_wet',
-             mass_dry: str = 'mass_dry') -> pd.DataFrame:
+def calculate_recovery(df: pd.DataFrame,
+                       df_ref: pd.DataFrame,
+                       mass_wet: str = 'mass_wet',
+                       mass_dry: str = 'mass_dry') -> pd.DataFrame:
     """Calculate recovery of mass-composition for two DataFrames
 
     Args:
         df: The pd.DataFrame containing mass-composition.  H2O if provided will be ignored.  All columns other than the
          mass_wet and mass_dry are assumed to be `additive`, that is, dry mass weighting is valid.
          Assumes composition is in %w/w units.
-        df_ref: Of the form consistent with df.  This variable represents the denominator in the recovery calculation.
         mass_wet: The wet mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.
         mass_dry: The dry mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.
 
     Returns:
-        A pd.DataFrame containing the total mass and weight averaged composition.
+        A pd.Series containing the total mass and weight averaged composition.
     """
 
     res: pd.DataFrame = df.pipe(composition_to_mass, mass_wet=mass_wet, mass_dry=mass_dry) / df_ref.pipe(
         composition_to_mass, mass_wet=mass_wet, mass_dry=mass_dry)
+    return res
+
+def calculate_partition(df_feed: pd.DataFrame,
+                        df_ref: pd.DataFrame,
+                        col_mass_dry: str = 'mass_dry') -> pd.DataFrame:
+    """Calculate the partition curve from two streams
+
+    Applicable to the one dimensional case only.  The PN is bounded [0, 1].
+    The interval mean for size is the geometric mean, otherwise the arithmetic mean.
+    The interval mean is named `da`, which can be interpreted as `diameter-average` or `density-average`.
+    TODO: consider a generalised name, fraction-average -> fa?
+
+    Args:
+        df_feed: The pd.DataFrame containing mass-composition representing the fractionated feed.
+        df_ref: The pd.DataFrame containing mass-composition representing the fractionated reference stream.
+        col_mass_dry: The dry mass column, not optional.
+
+    Returns:
+        A pd.DataFrame containing the partition data.
+    """
+
+    res: pd.DataFrame = df_ref[[col_mass_dry]].div(df_feed[[col_mass_dry]]).rename(columns={col_mass_dry: 'PN'})
+    if df_ref.index.name.lower() == 'size':
+        res.insert(loc=0, column='da', value=mean_size(res.index))
+    else:
+        res.insert(loc=0, column='da', value=res.index.mid)
     return res
 
 

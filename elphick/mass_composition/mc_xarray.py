@@ -264,7 +264,7 @@ class MassCompositionAccessor:
 
         return out._obj, comp._obj
 
-    def partition(self, definition: Callable) -> Tuple[xr.Dataset, xr.Dataset]:
+    def apply_partition(self, definition: Callable) -> Tuple[xr.Dataset, xr.Dataset]:
         """Partition the object along a given dimension.
 
         This method applies the defined partition resulting in two new objects.

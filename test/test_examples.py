@@ -14,6 +14,11 @@ def test_examples():
     import examples.iron_ore_assays
 
     import examples.interval_data
+    import examples.interval_data_advanced
+    import examples.interval_data_sink_float
+
+    import examples.partition_models
+    import examples.compare_partitions
 
     import examples.grade_tonnage
 

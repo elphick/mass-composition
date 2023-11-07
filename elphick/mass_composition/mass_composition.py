@@ -16,7 +16,7 @@ from elphick.mass_composition.mc_status import Status
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils import solve_mass_moisture
 from elphick.mass_composition.utils.amenability import amenability_index
-from elphick.mass_composition.utils.pd_utils import weight_average, recovery
+from elphick.mass_composition.utils.pd_utils import weight_average, calculate_recovery, calculate_partition
 from elphick.mass_composition.utils.sampling import random_int
 
 # noinspection PyUnresolvedReferences
@@ -390,13 +390,8 @@ class MassComposition:
         Returns:
             A pandas DataFrame
         """
-        if len(self.data.dims) > 1:
-            raise NotImplementedError(f"This object is {len(self.data.dims)} dimensional. "
-                                      f"Only 1D interval objects are valid")
-        index_var: str = str(list(self.data.dims.keys())[0])
-        if not isinstance(self.data[index_var].data[0], pd.Interval):
-            raise NotImplementedError(f"The dim {index_var} of this object is not a pd.Interval. "
-                                      f" Only 1D interval objects are valid")
+        self._check_one_dim_interval()
+
         sample: pd.DataFrame = self.data.to_dataframe()
 
         is_decreasing: bool = sample.index.is_monotonic_decreasing
@@ -415,7 +410,7 @@ class MassComposition:
         for i, indx in enumerate(sample.index):
             tmp_composition: pd.DataFrame = sample.iloc[i:, :].pipe(weight_average)
             aggregated_chunks.append(tmp_composition)
-            recovery_chunks.append(tmp_composition.pipe(recovery, df_ref=head))
+            recovery_chunks.append(tmp_composition.pipe(calculate_recovery, df_ref=head))
 
         res_composition: pd.DataFrame = pd.concat(aggregated_chunks).assign(attribute="composition").set_index(
             new_index)
@@ -513,10 +508,10 @@ class MassComposition:
 
         return out, comp
 
-    def partition(self,
-                  definition: Callable,
-                  name_1: Optional[str] = None,
-                  name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+    def apply_partition(self,
+                        definition: Callable,
+                        name_1: Optional[str] = None,
+                        name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
         """Partition the object along a given dimension.
 
         This method applies the defined separation resulting in two new objects.
@@ -534,7 +529,7 @@ class MassComposition:
         out = deepcopy(self)
         comp = deepcopy(self)
 
-        xr_ds_1, xr_ds_2 = self._data.mc.partition(definition=definition)
+        xr_ds_1, xr_ds_2 = self._data.mc.apply_partition(definition=definition)
 
         out._data = xr_ds_1
         comp._data = xr_ds_2
@@ -542,6 +537,12 @@ class MassComposition:
         self._post_process_split(out, comp, name_1, name_2)
 
         return out, comp
+
+    def calculate_partition(self, ref: 'MassComposition') -> pd.DataFrame:
+        """Calculate the partition of the ref stream relative to self"""
+        self._check_one_dim_interval()
+        return calculate_partition(df_feed=self.data.to_dataframe(), df_ref=ref.data.to_dataframe(),
+                                   col_mass_dry='mass_dry')
 
     def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> 'MassComposition':
         res = deepcopy(self)
@@ -726,7 +727,8 @@ class MassComposition:
         title = title if title is not None else 'Ideal Grade - Recovery'
 
         df: pd.DataFrame = self.ideal_incremental_separation(discard_from=discard_from)
-        df_recovery: pd.DataFrame = df.loc[(slice(None), 'recovery'), [target_analyte, 'mass_dry']].droplevel('attribute').rename(
+        df_recovery: pd.DataFrame = df.loc[(slice(None), 'recovery'), [target_analyte, 'mass_dry']].droplevel(
+            'attribute').rename(
             columns={'mass_dry': 'Yield', target_analyte: f"{target_analyte}_recovery"})
         df_composition: pd.DataFrame = df.loc[(slice(None), 'composition'), :].droplevel('attribute').drop(
             columns=['mass_wet', 'mass_dry', 'H2O'])
@@ -1128,3 +1130,12 @@ class MassComposition:
             chunks.append(df.loc[(df[variable] < bounds[0]) | (df[variable] > bounds[1]), variable])
         oor: pd.DataFrame = pd.concat(chunks, axis='columns')
         return oor
+
+    def _check_one_dim_interval(self):
+        if len(self.data.dims) > 1:
+            raise NotImplementedError(f"This object is {len(self.data.dims)} dimensional. "
+                                      f"Only 1D interval objects are valid")
+        index_var: str = str(list(self.data.dims.keys())[0])
+        if not isinstance(self.data[index_var].data[0], pd.Interval):
+            raise NotImplementedError(f"The dim {index_var} of this object is not a pd.Interval. "
+                                      f" Only 1D interval objects are valid")
