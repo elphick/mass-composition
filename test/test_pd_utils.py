@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.utils.pd_utils import column_prefixes, column_prefix_counts, weight_average, \
-    composition_to_mass, mass_to_composition, recovery
+    composition_to_mass, mass_to_composition, calculate_recovery
 
 # noinspection PyUnresolvedReferences
 from test.fixtures import demo_data
@@ -43,7 +43,7 @@ def test_recovery(demo_data):
     obj_mc: MassComposition = MassComposition(demo_data, name='Feed')
     obj_mc_1, obj_mc_2 = obj_mc.split(0.4, name_1='Split-1', name_2='Split-2')
 
-    df_recovery: pd.DataFrame = obj_mc_1.data.to_dataframe().pipe(recovery, df_ref=obj_mc.data.to_dataframe())
+    df_recovery: pd.DataFrame = obj_mc_1.data.to_dataframe().pipe(calculate_recovery, df_ref=obj_mc.data.to_dataframe())
     df_expected: pd.DataFrame = obj_mc_1.compare(obj_mc, comparisons='recovery', as_dataframe=True,
                                                  explicit_names=False)
     pd.testing.assert_frame_equal(df_recovery, df_expected)
