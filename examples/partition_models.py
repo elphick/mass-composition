@@ -15,17 +15,18 @@ the Underflow (UF), since that is the "stream of value" in our simple example.
     Add a reference to partition curves.
 
 """
-import numpy as np
-import plotly
-import pandas as pd
 from functools import partial
-import plotly.express as px
-import plotly.graph_objects as go
 
-from elphick.mass_composition.network import MCNetwork
-from elphick.mass_composition.utils.partition import perfect, napier_munn
-from elphick.mass_composition.datasets.sample_data import size_by_assay
+import numpy as np
+import pandas as pd
+import plotly
+import plotly.graph_objects as go
+from scipy.interpolate import PchipInterpolator
+
 from elphick.mass_composition import MassComposition
+from elphick.mass_composition.datasets.sample_data import size_by_assay
+from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.utils.partition import napier_munn
 from elphick.mass_composition.utils.pd_utils import calculate_partition
 
 # sphinx_gallery_thumbnail_number = -1
@@ -67,18 +68,33 @@ df_partition: pd.DataFrame = mc_feed.calculate_partition(ref=mc_uf)
 df_partition
 
 # %%
-# Plot the extracted data on the input partition curve used to generate the output streams.
+# Create an interpolator from the data.  As a Callable, the spline can be used to split a MassComposition object.
 
 da = np.linspace(0.01, df_partition.index.right.max(), num=500)
-pn = part_cyclone(da) / 100
+spline_partition = PchipInterpolator(x=df_partition.sort_index()['da'], y=df_partition.sort_index()['PN'])
+pn_extracted = spline_partition(da)
 
-fig = go.Figure(go.Scatter(x=da, y=pn, name='Input Partition'))
-fig.add_trace(go.Scatter(x=df_partition['da'], y=df_partition['PN'], name='Calculated Partition', mode='markers'))
+# %%
+# Plot the extracted data, and the spline on the input partition curve to visually validate.
+
+pn_original = part_cyclone(da) / 100
+
+fig = go.Figure(go.Scatter(x=da, y=pn_original, name='Input Partition', line=dict(width=5, color='DarkSlateGrey')))
+fig.add_trace(go.Scatter(x=df_partition['da'], y=df_partition['PN'], name='Extracted Partition Data', mode='markers',
+                         marker=dict(size=12, color='red', line=dict(width=2, color='DarkSlateGrey'))))
+fig.add_trace(
+    go.Scatter(x=da, y=pn_extracted, name='Extracted Partition Curve', line=dict(width=2, color='red', dash='dash')))
+
 fig.update_xaxes(type="log")
-fig.update_layout(title='Partition Round Trip Check', xaxis_title='da', yaxis_title='PN')
+fig.update_layout(title='Partition Round Trip Check', xaxis_title='da', yaxis_title='PN', yaxis_range=[0, 1.05])
 
 # noinspection PyTypeChecker
 plotly.io.show(fig)
+
+# %%
+# There are differences in the re-created partition at the coarser sizes.  It would be interesting to
+# investigate if up-sampling is advance of partition generation would reduce this difference.  Alternatively,
+# the parameteric partition function of the form defined by the `napier_munn` form could be fitted.
 
 # %%
 # Pandas Function

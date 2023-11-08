@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mass-composition"
-version = "0.3.2"
+version = "0.3.3"
 description = "For managing multi-dimensional mass-composition datasets, supporting weighted mathematical operations and visualisation."
 authors = ["Greg <greg@elphick.com.au>"]
 packages = [{ include = "elphick/mass_composition" }]
@@ -44,7 +44,7 @@ omf = ["omfvista"]
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.0.5"
 notebook = "^6.5.2"
-pytest = "^7.1.3"
+pytest = "^7.2.0"
 Sphinx = "^5.0.2"
 sphinx-rtd-theme = "^1.0.0"
 sphinx-gallery = "^0.11.1"

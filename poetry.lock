@@ -4262,4 +4262,4 @@ viz = ["kaleido", "pyvista", "pyvista-xarray", "statsmodels"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "2a3b54e4cef56b242887255cff207b192394beb9e64697ceadb0dc951c37f9cc"
+content-hash = "828c4a803292838c1d9a1c09cfb80a501f63e7c37d3f75b4d3a5970fa8c9f13a"
