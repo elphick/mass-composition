@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -39,3 +40,21 @@ def test_resample_fraction_validation(size_assay_data):
     df_check.index.name = 'size'
 
     pd.testing.assert_frame_equal(df_check, mc_size.data.to_dataframe())
+
+
+def test_fractal():
+    """Kudos Ben Chi - Fractal GeoAnalytics"""
+
+    axis = 0
+
+    for i in ((2, 3, 2, 2), (4, 3, 2), (8, 3), (1, 24), (24)):
+        A = np.arange(0, 24).reshape(i)
+        pre_0 = list(A.shape)
+        pre_0[axis] = 1
+        B = np.cumsum(A, 0)
+        C = np.diff(B, axis=axis, prepend=np.zeros(pre_0))
+
+        assert np.isclose(A, C).all()
+
+        print('Success with \n')
+        print(A.shape)
