@@ -24,6 +24,7 @@ jobs:
         pip install orca
         pip install pytest
         pip install sphinxcontrib-datatemplates
+        pip install sphinxemoji
     - name: Sphinx build
       run: |
         sphinx-build docs/source _build
