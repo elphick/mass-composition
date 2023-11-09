@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mass-composition"
-version = "0.3.3"
+version = "0.3.4"
 description = "For managing multi-dimensional mass-composition datasets, supporting weighted mathematical operations and visualisation."
 authors = ["Greg <greg@elphick.com.au>"]
 packages = [{ include = "elphick/mass_composition" }]
@@ -53,6 +53,7 @@ myst-parser = "^0.18.0"
 orca = "^1.8"  # for plotly thumbnails in docs
 ydata-profiling = "^4.3.2"
 sphinxcontrib-datatemplates = "^0.9.2"
+sphinxemoji = "^0.2.0"
 
 
 

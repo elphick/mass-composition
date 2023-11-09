@@ -3654,6 +3654,19 @@ lint = ["docutils-stubs", "flake8", "mypy"]
 test = ["pytest"]
 
 [[package]]
+name = "sphinxemoji"
+version = "0.2.0"
+description = "An extension to use emoji codes in your Sphinx documentation"
+optional = false
+python-versions = "*"
+files = [
+    {file = "sphinxemoji-0.2.0.tar.gz", hash = "sha256:27861d1dd7c6570f5e63020dac9a687263f7481f6d5d6409eb31ecebcc804e4c"},
+]
+
+[package.dependencies]
+sphinx = ">=1.8"
+
+[[package]]
 name = "stack-data"
 version = "0.6.3"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -4262,4 +4275,4 @@ viz = ["kaleido", "pyvista", "pyvista-xarray", "statsmodels"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "828c4a803292838c1d9a1c09cfb80a501f63e7c37d3f75b4d3a5970fa8c9f13a"
+content-hash = "75d098f252c24985fbee3d422d5616d6a17d36378e83a7146039110b7f23a846"

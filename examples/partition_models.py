@@ -93,8 +93,8 @@ plotly.io.show(fig)
 
 # %%
 # There are differences in the re-created partition at the coarser sizes.  It would be interesting to
-# investigate if up-sampling is advance of partition generation would reduce this difference.  Alternatively,
-# the parameteric partition function of the form defined by the `napier_munn` form could be fitted.
+# investigate if up-sampling in advance of partition generation would reduce this difference.  Alternatively,
+# the `napier_munn` parameteric partition function could be fitted to reduce the difference.
 
 # %%
 # Pandas Function

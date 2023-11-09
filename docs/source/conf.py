@@ -52,6 +52,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',  # to document the
               "pyvista.ext.plot_directive",
               'sphinxcontrib.datatemplates',
               # 'jupyter_sphinx'  # interactive pyvista
+              'sphinxemoji.sphinxemoji',
               ]
 
 autosummary_generate = True
