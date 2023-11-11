@@ -25,6 +25,6 @@ def mean_size(size_intervals: IntervalArray) -> np.ndarray:
     geomean_mean_ratio: float = float(np.mean((res[0:-1] / intervals.mid[0:-1])))
 
     if np.isclose(size_intervals.min().left, 0.0):
-        res[-1] = size_intervals.min().mid * geomean_mean_ratio
+        res[np.isclose(size_intervals.left, 0.0)] = size_intervals.min().mid * geomean_mean_ratio
 
     return res
