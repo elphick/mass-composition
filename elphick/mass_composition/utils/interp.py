@@ -146,7 +146,8 @@ def mass_preserving_interp(df_intervals: pd.DataFrame, grid_vals,
     #  interpolate with a pchip spline to preserve mass
     chunks = []
     for col in mass_cum:
-        new_vals = pchip_interpolate(mass_cum.index.values, mass_cum[col].values, grid_vals)
+        tmp = mass_cum[col].dropna()  # drop any missing values
+        new_vals = pchip_interpolate(tmp.index.values, tmp.values, grid_vals)
         chunks.append(new_vals)
     mass_cum_upsampled: pd.DataFrame = pd.DataFrame(chunks, index=mass_in.columns, columns=grid_vals).T
     # diff to recover the original fractional data
