@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.interp.interp\_monotonic
+========================================================
+
+.. currentmodule:: elphick.mass_composition.utils.interp
+
+.. autofunction:: interp_monotonic

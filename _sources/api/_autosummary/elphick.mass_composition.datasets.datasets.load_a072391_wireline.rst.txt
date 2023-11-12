@@ -1,0 +1,6 @@
+elphick.mass\_composition.datasets.datasets.load\_a072391\_wireline
+===================================================================
+
+.. currentmodule:: elphick.mass_composition.datasets.datasets
+
+.. autofunction:: load_a072391_wireline

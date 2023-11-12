@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.viz.plot\_parallel
+==================================================
+
+.. currentmodule:: elphick.mass_composition.utils.viz
+
+.. autofunction:: plot_parallel

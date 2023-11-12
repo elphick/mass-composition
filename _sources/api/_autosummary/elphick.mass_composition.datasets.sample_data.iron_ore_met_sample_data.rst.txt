@@ -1,0 +1,6 @@
+elphick.mass\_composition.datasets.sample\_data.iron\_ore\_met\_sample\_data
+============================================================================
+
+.. currentmodule:: elphick.mass_composition.datasets.sample_data
+
+.. autofunction:: iron_ore_met_sample_data

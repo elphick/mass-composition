@@ -1,0 +1,41 @@
+elphick.mass\_composition.datasets.datasets
+===========================================
+
+.. automodule:: elphick.mass_composition.datasets.datasets
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      load_a072391_assay
+      load_a072391_collars
+      load_a072391_geo
+      load_a072391_met
+      load_a072391_wireline
+      load_demo_data
+      load_iron_ore_sample_a072391
+      load_iron_ore_sample_xyz_a072391
+      load_nordic_iron_ore_sink_float
+      load_size_by_assay
+      load_size_distribution
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

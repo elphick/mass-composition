@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.pd\_utils.calculate\_partition
+==============================================================
+
+.. currentmodule:: elphick.mass_composition.utils.pd_utils
+
+.. autofunction:: calculate_partition

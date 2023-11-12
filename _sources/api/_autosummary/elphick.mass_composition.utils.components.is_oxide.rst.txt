@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.components.is\_oxide
+====================================================
+
+.. currentmodule:: elphick.mass_composition.utils.components
+
+.. autofunction:: is_oxide

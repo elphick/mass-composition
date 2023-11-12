@@ -1,0 +1,33 @@
+elphick.mass\_composition.utils.amenability
+===========================================
+
+.. automodule:: elphick.mass_composition.utils.amenability
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      amenability_index
+      area_trapezoid
+      pairwise
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

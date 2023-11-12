@@ -1,0 +1,59 @@
+elphick.mass\_composition.network.MCNetwork
+===========================================
+
+.. currentmodule:: elphick.mass_composition.network
+
+.. autoclass:: MCNetwork
+   :members:
+   :special-members: __add__, __mul__
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MCNetwork.__init__
+      ~MCNetwork.from_dataframe
+      ~MCNetwork.from_streams
+      ~MCNetwork.from_yaml
+      ~MCNetwork.get_column_formats
+      ~MCNetwork.get_edge_by_name
+      ~MCNetwork.get_input_streams
+      ~MCNetwork.get_node_input_outputs
+      ~MCNetwork.get_output_streams
+      ~MCNetwork.get_stream_names
+      ~MCNetwork.imbalance_report
+      ~MCNetwork.nodes_to_dict
+      ~MCNetwork.plot
+      ~MCNetwork.plot_balance
+      ~MCNetwork.plot_network
+      ~MCNetwork.plot_parallel
+      ~MCNetwork.plot_sankey
+      ~MCNetwork.query
+      ~MCNetwork.report
+      ~MCNetwork.reset_stream_nodes
+      ~MCNetwork.set_node_names
+      ~MCNetwork.set_stream_child
+      ~MCNetwork.set_stream_data
+      ~MCNetwork.set_stream_nodes
+      ~MCNetwork.set_stream_parent
+      ~MCNetwork.streams_to_dict
+      ~MCNetwork.table_plot
+      ~MCNetwork.to_dataframe
+      ~MCNetwork.to_json
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MCNetwork.balanced
+      ~MCNetwork.edge_status
+   
+   

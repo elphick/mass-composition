@@ -1,0 +1,6 @@
+elphick.mass\_composition.datasets.datasets.load\_demo\_data
+============================================================
+
+.. currentmodule:: elphick.mass_composition.datasets.datasets
+
+.. autofunction:: load_demo_data

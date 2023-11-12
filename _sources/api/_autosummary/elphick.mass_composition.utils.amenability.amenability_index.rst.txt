@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.amenability.amenability\_index
+==============================================================
+
+.. currentmodule:: elphick.mass_composition.utils.amenability
+
+.. autofunction:: amenability_index

@@ -1,0 +1,6 @@
+elphick.mass\_composition.mc\_xarray.mc\_aggregate
+==================================================
+
+.. currentmodule:: elphick.mass_composition.mc_xarray
+
+.. autofunction:: mc_aggregate

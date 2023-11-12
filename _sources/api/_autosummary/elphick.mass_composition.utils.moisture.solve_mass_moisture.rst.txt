@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.moisture.solve\_mass\_moisture
+==============================================================
+
+.. currentmodule:: elphick.mass_composition.utils.moisture
+
+.. autofunction:: solve_mass_moisture

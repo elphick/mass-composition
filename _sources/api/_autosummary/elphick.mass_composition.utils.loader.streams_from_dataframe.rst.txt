@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.loader.streams\_from\_dataframe
+===============================================================
+
+.. currentmodule:: elphick.mass_composition.utils.loader
+
+.. autofunction:: streams_from_dataframe

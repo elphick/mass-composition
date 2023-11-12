@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.sampling.random\_int
+====================================================
+
+.. currentmodule:: elphick.mass_composition.utils.sampling
+
+.. autofunction:: random_int

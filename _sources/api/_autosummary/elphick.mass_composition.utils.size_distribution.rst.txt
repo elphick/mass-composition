@@ -1,0 +1,34 @@
+elphick.mass\_composition.utils.size\_distribution
+==================================================
+
+.. automodule:: elphick.mass_composition.utils.size_distribution
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      gaudin_schuhmann
+      lynch
+      modified_rosin_rammler
+      rosin_rammler
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

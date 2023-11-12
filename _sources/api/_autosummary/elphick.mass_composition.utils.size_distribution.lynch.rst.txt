@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.size\_distribution.lynch
+========================================================
+
+.. currentmodule:: elphick.mass_composition.utils.size_distribution
+
+.. autofunction:: lynch

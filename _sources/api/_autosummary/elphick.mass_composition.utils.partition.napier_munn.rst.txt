@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.partition.napier\_munn
+======================================================
+
+.. currentmodule:: elphick.mass_composition.utils.partition
+
+.. autofunction:: napier_munn

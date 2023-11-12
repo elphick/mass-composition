@@ -1,0 +1,38 @@
+elphick.mass\_composition.mc\_node.MCNode
+=========================================
+
+.. currentmodule:: elphick.mass_composition.mc_node
+
+.. autoclass:: MCNode
+   :members:
+   :special-members: __add__, __mul__
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MCNode.__init__
+      ~MCNode.add
+      ~MCNode.imbalance_report
+      ~MCNode.mass_sum
+      ~MCNode.node_balance
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MCNode.balanced
+      ~MCNode.inputs
+      ~MCNode.node_type
+      ~MCNode.output_node
+      ~MCNode.outputs
+   
+   

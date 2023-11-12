@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.size\_distribution.modified\_rosin\_rammler
+===========================================================================
+
+.. currentmodule:: elphick.mass_composition.utils.size_distribution
+
+.. autofunction:: modified_rosin_rammler

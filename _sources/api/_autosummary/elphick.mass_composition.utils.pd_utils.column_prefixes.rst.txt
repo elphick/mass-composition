@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.pd\_utils.column\_prefixes
+==========================================================
+
+.. currentmodule:: elphick.mass_composition.utils.pd_utils
+
+.. autofunction:: column_prefixes
