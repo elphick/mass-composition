@@ -16,6 +16,7 @@ from elphick.mass_composition.mc_status import Status
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils import solve_mass_moisture
 from elphick.mass_composition.utils.amenability import amenability_index
+from elphick.mass_composition.utils.interp import mass_preserving_interp
 from elphick.mass_composition.utils.pd_utils import weight_average, calculate_recovery, calculate_partition
 from elphick.mass_composition.utils.sampling import random_int
 
@@ -192,7 +193,7 @@ class MassComposition:
     def aggregate(self, group_var: Optional[str] = None,
                   group_bins: Optional[Union[int, Iterable]] = None,
                   as_dataframe: bool = True,
-                  original_column_names: bool = False) -> Union[xr.Dataset, pd.DataFrame]:
+                  original_column_names: bool = False) -> Union[pd.DataFrame, xr.Dataset]:
         """Calculate the weight average.
 
         Args:
@@ -216,6 +217,32 @@ class MassComposition:
         res: MassComposition = deepcopy(self)
         res._data = res._data.query(queries=queries)
         return res
+
+    def resample_1d(self, interval_edges: Union[Iterable, int],
+                    precision: Optional[int] = None,
+                    include_original_edges: bool = False) -> 'MassComposition':
+        """Resample a 1D fractional dim/index
+
+        Args:
+            interval_edges: The values of the new grid (interval edges).  If an int, will up-sample by that factor, for
+             example the value of 10 will automatically define edges that create 10 x the resolution (up-sampled).
+            precision: Optional integer for the number of decimal places to round the grid values to.
+            include_original_edges: If True include the original edges in the grid.
+
+        Returns:
+            A new object interpolated onto the new grid
+        """
+
+        # TODO: add support for supplementary variables
+
+        df_upsampled: pd.DataFrame = mass_preserving_interp(self.data.to_dataframe(),
+                                                            interval_edges=interval_edges, precision=precision,
+                                                            include_original_edges=include_original_edges)
+
+        obj: MassComposition = MassComposition(df_upsampled, name=self.name)
+        obj.nodes = self.nodes
+        obj.constraints = self.constraints
+        return obj
 
     def constrain(self,
                   clip_mass: Optional[Union[Tuple, Dict]] = None,
@@ -1076,14 +1103,14 @@ class MassComposition:
             raise KeyError(f"At least one mass variable must be supplied to solve mass-moisture: {d_mass_var_exists}")
         if sum(list(d_var_exists.values())) == 3:
             # TODO: add mass-moisture balance integrity check.
-            self._logger.warning(
+            self._logger.info(
                 'The mass-moisture variables are over-specified and not (yet) checked for balance. '
                 'Moisture is ignored and the mass variables assumed to be correct.')
 
         # assume zero moisture
         if sum(list(d_var_exists.values())) == 1:
             data[d_var_map['moisture']] = 0.0
-            self._logger.warning('Zero moisture has been assumed.')
+            self._logger.info('Zero moisture has been assumed.')
 
         if not d_var_exists['mass_wet']:
             data[d_var_map['mass_wet']] = solve_mass_moisture(mass_dry=data[d_var_map['mass_dry']],

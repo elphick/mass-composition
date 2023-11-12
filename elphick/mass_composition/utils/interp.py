@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Iterable, Union
 
 import numpy as np
 import pandas as pd
@@ -91,7 +91,7 @@ def interp_monotonic(ds: xr.Dataset, coords: Dict, include_original_coords: bool
     return ds_res
 
 
-def mass_preserving_interp(df_intervals: pd.DataFrame, grid_vals,
+def mass_preserving_interp(df_intervals: pd.DataFrame, interval_edges: Union[Iterable, int],
                            include_original_edges: bool = True, precision: Optional[int] = None,
                            mass_wet: str = 'mass_wet', mass_dry: str = 'mass_dry') -> pd.DataFrame:
     """Interpolate with zero mass loss using pchip
@@ -110,7 +110,8 @@ def mass_preserving_interp(df_intervals: pd.DataFrame, grid_vals,
 
     Args:
         df_intervals: A pd.DataFrame with a single interval index, with mass, composition context.
-        grid_vals: The values of the new grid (interval edges).
+        interval_edges: The values of the new grid (interval edges).  If an int, will up-sample by that factor, for
+         example the value of 10 will automatically define edges that create 10 x the resolution (up-sampled).
         include_original_edges: If True include the original index edges in the result
         precision: Number of decimal places to round the index (edge) values.
         mass_wet: The wet mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.
@@ -125,16 +126,24 @@ def mass_preserving_interp(df_intervals: pd.DataFrame, grid_vals,
                                   f" Only 1D interval indexes are valid")
 
     composition_in: pd.DataFrame = df_intervals.copy()
+
+    if isinstance(interval_edges, int):
+        grid_vals = _upsample_grid_by_factor(indx=composition_in.sort_index().index, factor=interval_edges)
+    else:
+        grid_vals = interval_edges
+
     if precision is not None:
         composition_in.index = pd.IntervalIndex.from_arrays(np.round(df_intervals.index.left, precision),
                                                             np.round(df_intervals.index.right, precision),
                                                             closed=df_intervals.index.closed,
                                                             name=df_intervals.index.name)
+
         grid_vals = np.round(grid_vals, precision)
 
     if include_original_edges:
         original_edges = np.hstack([df_intervals.index.left, df_intervals.index.right])
         grid_vals = np.sort(np.unique(np.hstack([grid_vals, original_edges])))
+
     # convert from relative composition (%) to absolute (mass)
     mass_in: pd.DataFrame = composition_to_mass(composition_in, mass_wet=mass_wet, mass_dry=mass_dry)
     # convert the index from interval to a float representing the right edge of the interval
@@ -143,6 +152,12 @@ def mass_preserving_interp(df_intervals: pd.DataFrame, grid_vals,
     mass_in = pd.concat([mass_in, pd.Series(0, index=mass_in.columns).to_frame().T], axis=0).sort_index(ascending=True)
     # cumsum to provide monotonic increasing data
     mass_cum: pd.DataFrame = mass_in.cumsum()
+    # if the new grid extrapolates (on the coarse side, mass will be lost, so we assume that when extrapolating.
+    # the mass in the extrapolated fractions is zero.  By inserting these records the spline will conform.
+    x_extra = grid_vals[grid_vals > mass_cum.index.max()]
+    cum_max: pd.Series = mass_cum.iloc[-1, :]
+    mass_cum = mass_cum.reindex(index=mass_cum.index.append(pd.Index(x_extra)))  # reindex to enable insert
+    mass_cum.loc[x_extra, :] = cum_max.values
     #  interpolate with a pchip spline to preserve mass
     chunks = []
     for col in mass_cum:
@@ -161,3 +176,14 @@ def mass_preserving_interp(df_intervals: pd.DataFrame, grid_vals,
     res = mass_to_composition(mass_fractions_upsampled, mass_wet=mass_wet, mass_dry=mass_dry).sort_index(
         ascending=False)
     return res
+
+
+def _upsample_grid_by_factor(indx: pd.IntervalIndex, factor):
+    # TODO: must be a better way than this - vectorised?
+    grid_vals: List = [indx.left.min()]
+    for interval in indx:
+        increment = (interval.right - interval.left) / factor
+        for i in range(0, factor):
+            grid_vals.append(interval.left + (i + 1) * increment)
+    grid_vals.sort()
+    return grid_vals
