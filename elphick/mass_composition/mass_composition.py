@@ -218,32 +218,6 @@ class MassComposition:
         res._data = res._data.query(queries=queries)
         return res
 
-    def resample_1d(self, interval_edges: Union[Iterable, int],
-                    precision: Optional[int] = None,
-                    include_original_edges: bool = False) -> 'MassComposition':
-        """Resample a 1D fractional dim/index
-
-        Args:
-            interval_edges: The values of the new grid (interval edges).  If an int, will up-sample by that factor, for
-             example the value of 10 will automatically define edges that create 10 x the resolution (up-sampled).
-            precision: Optional integer for the number of decimal places to round the grid values to.
-            include_original_edges: If True include the original edges in the grid.
-
-        Returns:
-            A new object interpolated onto the new grid
-        """
-
-        # TODO: add support for supplementary variables
-
-        df_upsampled: pd.DataFrame = mass_preserving_interp(self.data.to_dataframe(),
-                                                            interval_edges=interval_edges, precision=precision,
-                                                            include_original_edges=include_original_edges)
-
-        obj: MassComposition = MassComposition(df_upsampled, name=self.name)
-        obj.nodes = self.nodes
-        obj.constraints = self.constraints
-        return obj
-
     def constrain(self,
                   clip_mass: Optional[Union[Tuple, Dict]] = None,
                   clip_composition: Optional[Union[Tuple, Dict]] = None,
@@ -571,10 +545,36 @@ class MassComposition:
         return calculate_partition(df_feed=self.data.to_dataframe(), df_ref=ref.data.to_dataframe(),
                                    col_mass_dry='mass_dry')
 
-    def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> 'MassComposition':
-        res = deepcopy(self)
-        res._data = self._data.mc.resample(dim=dim, num_intervals=num_intervals, edge_precision=edge_precision)
-        return res
+    # def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> 'MassComposition':
+    #     res = deepcopy(self)
+    #     res._data = self._data.mc.resample(dim=dim, num_intervals=num_intervals, edge_precision=edge_precision)
+    #     return res
+
+    def resample_1d(self, interval_edges: Union[Iterable, int],
+                    precision: Optional[int] = None,
+                    include_original_edges: bool = False) -> 'MassComposition':
+        """Resample a 1D fractional dim/index
+
+        Args:
+            interval_edges: The values of the new grid (interval edges).  If an int, will up-sample by that factor, for
+             example the value of 10 will automatically define edges that create 10 x the resolution (up-sampled).
+            precision: Optional integer for the number of decimal places to round the grid values to.
+            include_original_edges: If True include the original edges in the grid.
+
+        Returns:
+            A new object interpolated onto the new grid
+        """
+
+        # TODO: add support for supplementary variables
+
+        df_upsampled: pd.DataFrame = mass_preserving_interp(self.data.to_dataframe(),
+                                                            interval_edges=interval_edges, precision=precision,
+                                                            include_original_edges=include_original_edges)
+
+        obj: MassComposition = MassComposition(df_upsampled, name=self.name)
+        obj.nodes = self.nodes
+        obj.constraints = self.constraints
+        return obj
 
     def add(self, other: 'MassComposition', name: Optional[str] = None) -> 'MassComposition':
         """Add two objects
@@ -669,6 +669,7 @@ class MassComposition:
                        variables: List[str],
                        cumulative: bool = True,
                        direction: str = 'descending',
+                       show_edges: bool = True,
                        min_x: Optional[float] = None) -> go.Figure:
         """Plot "The Grade-Tonnage" curve.
 
@@ -678,6 +679,7 @@ class MassComposition:
             variables: List of variables to include in the plot
             cumulative: If True, the results are cumulative weight averaged.
             direction: 'ascending'|'descending', if cumulative is True, the direction of accumulation
+            show_edges: If True, show the edges on the plot.  Applicable to cumulative plots only.
             min_x: Optional minimum value for the x-axis, useful to set reasonable visual range with a log
             scaled x-axis when plotting size data
         """
@@ -722,6 +724,9 @@ class MassComposition:
                                   hover_data=hover_data)}
 
         df = df[[x_var] + variables].melt(id_vars=[x_var], var_name='component')
+
+        if cumulative and show_edges:
+            plot_kwargs['markers'] = True
 
         fig = px.line(df, x=x_var, y='value', facet_row='component', **plot_kwargs)
         fig.for_each_annotation(lambda a: a.update(text=a.text.replace("component=", "")))
