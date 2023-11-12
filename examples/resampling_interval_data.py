@@ -13,14 +13,12 @@ import logging
 import numpy as np
 import pandas as pd
 import plotly
-import xarray as xr
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.utils.interp import interp_monotonic, mass_preserving_interp
 from elphick.mass_composition.datasets.sample_data import size_by_assay
 
 # %%
-logging.basicConfig(level=logging.WARNING,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s',
                     datefmt='%Y-%m-%dT%H:%M:%S%z',
                     )
@@ -49,14 +47,7 @@ mc_size.aggregate()
 
 # %%
 #
-# We'll first take an overall look at the dataset using the parallel plot.
-
-fig = mc_size.plot_parallel(color='Al2O3')
-fig
-
-# %%
-#
-# Size distributions are often plotted in the cumulative form, first we'll plot the intervals
+# First we'll plot the intervals
 
 fig = mc_size.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
                              cumulative=False)
@@ -64,7 +55,8 @@ fig
 
 # %%
 #
-# Cumulative passing
+# Size distributions are often plotted in the cumulative form. Cumulative passing is achieved by setting the
+# direction = ascending.
 
 fig = mc_size.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'],
                              cumulative=True, direction='ascending')
@@ -72,70 +64,52 @@ fig
 
 # %%
 #
-# Now we can resample and view the resampled fractions
+# Now we will resample on a defined grid (interval edges) and view the resampled fractions
+new_edges = np.unique(np.geomspace(1.0e-03, mc_size.data.to_dataframe().index.right.max() * 3, 50))
+new_coords = np.insert(new_edges, 0, 0)
 
-xr_ds: xr.Dataset = mc_size.data
-
-# define the new coordinates
-right_edges = pd.arrays.IntervalArray(xr_ds['size'].data).right
-new_coords = np.unique(np.round(np.geomspace(1.0e-03, right_edges.max(), 50), 3))
-new_coords = np.insert(new_coords, 0, 0)
-
-df_upsampled: pd.DataFrame = mass_preserving_interp(mc_size.data.to_dataframe(),
-                                                    grid_vals=new_coords, precision=3,
-                                                    include_original_edges=True)
-
-mc_upsampled: MassComposition = MassComposition(df_upsampled, name='Upsampled Sample')
+mc_upsampled: MassComposition = mc_size.resample_1d(interval_edges=new_edges, precision=3, include_original_edges=True)
 
 fig = mc_upsampled.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'], cumulative=False)
 # noinspection PyTypeChecker
 plotly.io.show(fig)
 
 # %%
+# Close inspection of the plot above reals some sharp dips for some mass intervals.  This is caused by those intervals
+# being narrower than the adjacent neighbours, hence they have less absolute mass.
+# This is a visual artefact only, numerically it is correct, as shown by the cumulative plot.
 
 fig = mc_upsampled.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'], cumulative=True, direction='ascending')
 fig
 
 # %%
-#
+# We can upsample each of the original fraction by a factor.  Since adjacent fractions are similar, the fractional
+# plot is reasonably smooth.  Note however, that fraction widths are still different, caused by the original sieve
+# selection.
+
+mc_upsampled_2: MassComposition = mc_size.resample_1d(interval_edges=10, precision=3)
+fig = mc_upsampled_2.plot_intervals(variables=['mass_dry', 'Fe', 'SiO2', 'Al2O3'], cumulative=False)
+fig
+
+# %%
 # Validate the head grade against the original sample
 
 pd.testing.assert_frame_equal(mc_size.aggregate().reset_index(drop=True),
                               mc_upsampled.aggregate().reset_index(drop=True))
 
-# %%
-#
-# .. note::
-#
-#    The code below needs to be reworked - work in progress.
+pd.testing.assert_frame_equal(mc_size.aggregate().reset_index(drop=True),
+                              mc_upsampled_2.aggregate().reset_index(drop=True))
 
 # %%
-# Next, validate the grade of the up-sampled sample grouped by the original intervals.
-# This will validate that mass has been preserved within the original fractions.
-# It's not pretty, but gives the answer we want.  |:disappointed_relieved:|
+# Complete a round trip by converting the up-sampled objects back to the original intervals and validate.
 
-# bins = [0] + list(pd.arrays.IntervalArray(mc_size.data['size'].data[::-1]).right)
-# original_sizes: pd.Series = pd.cut(
-#     pd.Series(pd.arrays.IntervalArray(mc_upsampled.data['size'].data).mid, name='original_size'),
-#     bins=bins, right=False, precision=8)
-# original_sizes.index = pd.arrays.IntervalArray(xr_upsampled['size'].data, closed='left')
-# original_sizes.index.name = 'size'
-# xr_upsampled = xr.merge([xr_upsampled, original_sizes.to_xarray()])
-#
-# mc_upsampled2: MassComposition = MassComposition(xr_upsampled.to_dataframe(), name='Upsampled Sample')
-#
-# df_check: pd.DataFrame = mc_upsampled2.aggregate(group_var='original_size').sort_index(ascending=False)
-# df_check.index = pd.IntervalIndex(df_check.index)
-# df_check.index.name = 'size'
-#
-# pd.testing.assert_frame_equal(df_check, mc_size.data.to_dataframe())
-#
-# # %%
-# # We passed the assertion above and so have validated that mass has been preserved for all the original intervals.
-# # We'll display the two datasets that were compared
-#
-# mc_size.data.to_dataframe()
-#
-# # %%
-#
-# df_check
+orig_index = mc_size.data.to_dataframe().index
+original_edges: np.ndarray = np.sort(np.unique(list(orig_index.left) + list(orig_index.right)))
+
+mc_downsampled: MassComposition = mc_upsampled.resample_1d(interval_edges=original_edges, precision=3)
+mc_downsampled_2: MassComposition = mc_upsampled_2.resample_1d(interval_edges=original_edges, precision=3)
+
+pd.testing.assert_frame_equal(mc_size.data.to_dataframe(), mc_downsampled.data.to_dataframe())
+pd.testing.assert_frame_equal(mc_size.data.to_dataframe(), mc_downsampled_2.data.to_dataframe())
+
+# %%

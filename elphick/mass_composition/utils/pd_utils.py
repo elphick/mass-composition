@@ -123,6 +123,7 @@ def calculate_recovery(df: pd.DataFrame,
         composition_to_mass, mass_wet=mass_wet, mass_dry=mass_dry)
     return res
 
+
 def calculate_partition(df_feed: pd.DataFrame,
                         df_ref: pd.DataFrame,
                         col_mass_dry: str = 'mass_dry') -> pd.DataFrame:
