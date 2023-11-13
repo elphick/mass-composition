@@ -62,7 +62,8 @@ def streams_from_dataframe(df: pd.DataFrame,
             all_edges = []
             for strm_data in stream_data.values():
                 all_edges.extend(list(np.sort(np.unique(list(strm_data.index.left) + list(strm_data.index.right)))))
-            all_edges = list(set(all_edges)).sort()
+            all_edges = list(set(all_edges))
+            all_edges.sort()
             indx = pd.IntervalIndex.from_arrays(left=all_edges[0:-1], right=all_edges[1:])
             interval_edges = _upsample_grid_by_factor(indx=indx, factor=interval_edges)
 
