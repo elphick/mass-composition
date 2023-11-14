@@ -144,6 +144,9 @@ def mass_preserving_interp(df_intervals: pd.DataFrame, interval_edges: Union[Ite
         original_edges = np.hstack([df_intervals.index.left, df_intervals.index.right])
         grid_vals = np.sort(np.unique(np.hstack([grid_vals, original_edges])))
 
+    if not isinstance(grid_vals, np.ndarray):
+        grid_vals = np.array(grid_vals)
+
     # convert from relative composition (%) to absolute (mass)
     mass_in: pd.DataFrame = composition_to_mass(composition_in, mass_wet=mass_wet, mass_dry=mass_dry)
     # convert the index from interval to a float representing the right edge of the interval
