@@ -38,13 +38,15 @@ def mass_to_composition(df: pd.DataFrame,
         A pd.Dataframe containing mass (wet and dry mass) and composition
     """
     non_float_cols = _detect_non_float_columns(df)
+    non_component_cols: List[str] = [mass_wet.lower(), mass_dry.lower(), 'h2o', 'moisture'] + [col.lower() for col in
+                                                                                               non_float_cols]
 
     mass: pd.DataFrame = df[[mass_wet, mass_dry]]
-    component_cols = [col for col in df.columns if
-                      col.lower() not in [mass_wet.lower(), mass_dry.lower(), 'h2o', 'moisture'] + non_float_cols]
+    component_cols = [col for col in df.columns if col.lower() not in non_component_cols]
     component_mass: pd.DataFrame = df[component_cols]
     composition: pd.DataFrame = component_mass.div(mass[mass_dry], axis=0) * 100.0
     moisture: pd.Series = solve_mass_moisture(mass_wet=mass[mass_wet], mass_dry=mass[mass_dry])
+
     return pd.concat([mass, moisture, composition], axis='columns')
 
 
@@ -64,10 +66,11 @@ def composition_to_mass(df: pd.DataFrame,
         A pd.Dataframe containing mass for all components
     """
     non_float_cols = _detect_non_float_columns(df)
+    non_component_cols: List[str] = [mass_wet.lower(), mass_dry.lower(), 'h2o', 'moisture'] + [col.lower() for col in
+                                                                                               non_float_cols]
 
     mass: pd.DataFrame = df[[mass_wet, mass_dry]]
-    component_cols = [col for col in df.columns if
-                      col.lower() not in [mass_wet.lower(), mass_dry.lower(), 'h2o', 'moisture'] + non_float_cols]
+    component_cols = [col for col in df.columns if col.lower() not in non_component_cols]
     composition: pd.DataFrame = df[component_cols]
     component_mass: pd.DataFrame = composition.mul(mass[mass_dry], axis=0) / 100.0
     moisture_mass: pd.Series = pd.Series(mass[mass_wet] - mass[mass_dry], name='H2O', index=mass.index)
