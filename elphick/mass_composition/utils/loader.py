@@ -53,7 +53,7 @@ def streams_from_dataframe(df: pd.DataFrame,
                 stream_data[prefix] = df[[col for col in df.columns if col in cols]].rename(
                     columns={col: col.replace(f'{prefix}_', '') for col in df.columns})
 
-    if interval_edges:
+    if interval_edges is not None:
         # unify the edges - this will also interp missing grades
         if not isinstance(df.index, pd.IntervalIndex):
             raise NotImplementedError(f"The index `{df.index}` of the dataframe is not a pd.Interval. "
