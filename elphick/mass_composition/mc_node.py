@@ -6,8 +6,7 @@ from typing import List, Optional, Dict
 import numpy as np
 import pandas as pd
 from elphick.mass_composition import MassComposition
-# noinspection PyUnresolvedReferences
-import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
+
 
 
 class NodeType(Enum):

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mass-composition"
-version = "0.3.7"
+version = "0.3.8"
 description = "For managing multi-dimensional mass-composition datasets, supporting weighted mathematical operations and visualisation."
 authors = ["Greg <greg@elphick.com.au>"]
 packages = [{ include = "elphick/mass_composition" }]

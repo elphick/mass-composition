@@ -9,8 +9,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import xarray as xr
 
-# noinspection PyUnresolvedReferences
-import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
+
 from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.mc_status import Status
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
