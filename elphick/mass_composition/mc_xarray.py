@@ -15,6 +15,7 @@ from elphick.mass_composition.utils.size import mean_size
 class CompositionContext(Enum):
     ABSOLUTE = 'mass'
     RELATIVE = "percent"
+    NONE = None
 
 
 @xr.register_dataset_accessor("mc")
@@ -67,7 +68,7 @@ class MassCompositionAccessor:
             else:
                 raise KeyError("Chemistry units do not conform")
         else:
-            raise KeyError("Chemistry units are inconsistent")
+            res = CompositionContext.NONE
         return res
 
     def rename(self, new_name: str):
@@ -194,13 +195,15 @@ class MassCompositionAccessor:
 
         dsm: xr.Dataset = self._obj.copy()
 
-        dsm[self._obj.mc_vars_chem] = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
         if 'H2O' in dsm.variables:
             dsm['H2O'] = self._obj['mass_wet'] - self._obj['mass_dry']
 
-        for da in dsm.values():
-            if da.attrs['mc_type'] == 'chemistry':
-                da.attrs['units'] = dsm['mass_wet'].attrs['units']
+        if self.composition_context == CompositionContext.RELATIVE:
+            dsm[self._obj.mc_vars_chem] = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
+
+            for da in dsm.values():
+                if da.attrs['mc_type'] == 'chemistry':
+                    da.attrs['units'] = dsm['mass_wet'].attrs['units']
 
         xr.set_options(keep_attrs='default')
 
@@ -218,13 +221,15 @@ class MassCompositionAccessor:
         xr.set_options(keep_attrs=True)
 
         dsc: xr.Dataset = self._obj.copy()
-        dsc[self._obj.mc_vars_chem] = dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100
         if 'H2O' in dsc.variables:
             dsc['H2O'] = (self._obj['mass_wet'] - self._obj['mass_dry']) / self._obj['mass_wet'] * 100
 
-        for da in dsc.values():
-            if da.attrs['mc_type'] == 'chemistry':
-                da.attrs['units'] = '%'
+        if self.composition_context == CompositionContext.ABSOLUTE:
+            dsc[self._obj.mc_vars_chem] = dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100
+
+            for da in dsc.values():
+                if da.attrs['mc_type'] == 'chemistry':
+                    da.attrs['units'] = '%'
 
         xr.set_options(keep_attrs='default')
 
@@ -457,7 +462,8 @@ class MassCompositionAccessor:
             raise NotImplementedError('Unexpected operator string')
 
         # protect grades from nans and infs - push them to zero
-        res[res.mc_vars_chem] = res[res.mc_vars_chem].where(res[res.mc_vars_chem].map(np.isfinite), 0.0)
+        if res.mc_vars_chem:
+            res[res.mc_vars_chem] = res[res.mc_vars_chem].where(res[res.mc_vars_chem].map(np.isfinite), 0.0)
 
         return res
 

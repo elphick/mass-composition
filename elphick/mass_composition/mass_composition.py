@@ -19,7 +19,6 @@ from elphick.mass_composition.utils.interp import mass_preserving_interp
 from elphick.mass_composition.utils.pd_utils import weight_average, calculate_recovery, calculate_partition
 from elphick.mass_composition.utils.sampling import random_int
 
-# noinspection PyUnresolvedReferences
 from elphick.mass_composition.variables import Variables, VariableGroups
 
 
