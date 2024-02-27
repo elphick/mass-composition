@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mass-composition"
-version = "0.3.10"
+version = "0.3.11"
 description = "For managing multi-dimensional mass-composition datasets, supporting weighted mathematical operations and visualisation."
 authors = ["Greg <greg@elphick.com.au>"]
 packages = [{ include = "elphick/mass_composition" }]
@@ -29,19 +29,19 @@ seaborn = ">0.11"  # "^0.12.2"
 pooch = "^1.7.0"
 jsonpickle = ">=3.0.1"
 
-pyvista = { version = "^0.37.0", optional = true }
-statsmodels = { version = "^0.14.0", optional = true }
-pyvista-xarray = { version = "^0.1.2", optional = true }
+kaleido = { version = "0.2.1", optional = true }
+pyvista = { version = ">=0.37.0", optional = true }
+statsmodels = { version = ">=0.14.0", optional = true }
+pyvista-xarray = { version = ">=0.1.2", optional = true }
 networkx = { version = ">2.0,<4.0", optional = true }
-omfvista = { version = "^0.2.5", optional = true }
+omfvista = { version = ">=0.2.5", optional = true }
 
 [tool.poetry.extras]
-viz = ["pyvista", "statsmodels", "pyvista-xarray"]
+viz = ["kaleido", "pyvista", "statsmodels", "pyvista-xarray"]
 network = ["networkx"]
 omf = ["omfvista"]
 
 [tool.poetry.group.dev.dependencies]
-kaleido = { version = "0.1.0.post1", markers = "sys_platform == 'win32'", optional = true }
 coverage = "^7.0.5"
 notebook = "^6.5.2"
 pytest = "^7.2.0"
