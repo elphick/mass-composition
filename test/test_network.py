@@ -1,20 +1,32 @@
-import json
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict
 
-import jsonpickle
-import jsonpickle.ext.numpy as jsonpickle_numpy
-import jsonpickle.ext.pandas as jsonpickle_pandas
 import pandas as pd
 import pytest
-from networkx import cytoscape_graph
 
+from dev.debugging_tools import pretty_print_graph
+from elphick.mass_composition import MassComposition
 from elphick.mass_composition.mc_node import MCNode
 from elphick.mass_composition.network import MCNetwork
 # noinspection PyUnresolvedReferences
 from test.fixtures import demo_data, size_assay_data, demo_size_network, script_loc
-from elphick.mass_composition import MassComposition
+
+
+def test_graph_object_types_and_attributes(demo_size_network):
+    mcn: MCNetwork = demo_size_network
+
+    pretty_print_graph(mcn.graph)
+
+    # Check that all nodes are of type MCNode and have the 'mc' attribute
+    for node in mcn.graph.nodes:
+        assert isinstance(node, (int, str))
+        assert 'mc' in mcn.graph.nodes[node]
+        assert isinstance(mcn.graph.nodes[node]['mc'], MCNode)
+
+    # Check that all edges are of type MassComposition and have the 'mc' attribute
+    for u, v, d in mcn.graph.edges(data=True):
+        assert isinstance(d['mc'], MassComposition)
 
 
 def test_sankey_plot(demo_size_network):

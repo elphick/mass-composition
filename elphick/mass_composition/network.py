@@ -2,7 +2,7 @@ import logging
 import webbrowser
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union, Iterable
+from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib
 import networkx as nx
@@ -18,14 +18,13 @@ from networkx import cytoscape_data
 from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.config.config_read import read_flowsheet_yaml
+from elphick.mass_composition.dag import DAG
 from elphick.mass_composition.layout import digraph_linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils.geometry import midpoint
 from elphick.mass_composition.utils.loader import streams_from_dataframe
-from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
 from elphick.mass_composition.utils.sampling import random_int
 
 
@@ -126,6 +125,39 @@ class MCNetwork:
         obj.graph = graph
         return obj
 
+    @classmethod
+    def from_dag(cls, dag: DAG) -> 'MCNetwork':
+        """Construct a flowsheet from a dag object
+
+        Args:
+            dag: The dag object that has been run previously.
+
+        Returns:
+
+        """
+
+        # Create a new instance of MCNetwork
+        mcn = cls(name=dag.name)
+
+        # Copy the nodes from the dag to the MCNetwork
+        for nid, (node, data) in enumerate(dag.graph.nodes(data=True)):
+            mcn.graph.add_node(data['name'], mc=MCNode(node_id=nid, node_name=data['name']))
+
+        # Copy the edges from the dag to the MCNetwork
+        for edge in dag.graph.edges:
+            # Retrieve the MassComposition object from the edge
+            mc = dag.graph.edges[edge]['mc']
+            # Use the name of the MassComposition object as the name of the edge
+            mcn.graph.add_edge(*edge, name=mc.name, **dag.graph.edges[edge])
+
+        # Populate the inputs and outputs properties of the MCNode objects
+        for node in mcn.graph.nodes:
+            mc_node = mcn.graph.nodes[node]['mc']
+            mc_node.inputs = [mcn.graph.edges[edge]['mc'] for edge in mcn.graph.in_edges(node)]
+            mc_node.outputs = [mcn.graph.edges[edge]['mc'] for edge in mcn.graph.out_edges(node)]
+
+        return mcn
+
     @property
     def balanced(self) -> bool:
         bal_vals: List = [self.graph.nodes[n]['mc'].balanced for n in self.graph.nodes]
@@ -185,7 +217,9 @@ class MCNetwork:
             List of MassComposition objects
         """
 
-        degrees = [d for n, d in self.graph.degree()]
+        # Create a dictionary that maps node names to their degrees
+        degrees = {n: d for n, d in self.graph.degree()}
+
         res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[u] == 1]
         return res
 
@@ -196,7 +230,9 @@ class MCNetwork:
             List of MassComposition objects
         """
 
-        degrees = [d for n, d in self.graph.degree()]
+        # Create a dictionary that maps node names to their degrees
+        degrees = {n: d for n, d in self.graph.degree()}
+
         res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[v] == 1]
         return res
 
@@ -415,9 +451,14 @@ class MCNetwork:
         Returns:
 
         """
-        if self.get_input_streams()[0].data.to_dataframe().empty:
-            raise KeyError("Cannot generate Sankey for an empty dataset")
-        d_sankey: Dict = self._generate_sankey_args(color_var, edge_colormap, width_var, vmin, vmax)
+        # Create a mapping of node names to indices, and the integer nodes
+        node_indices = {node: index for index, node in enumerate(self.graph.nodes)}
+        int_graph = nx.relabel_nodes(self.graph, node_indices)
+
+        # Generate the sankey diagram arguments using the new graph with integer nodes
+        d_sankey = self._generate_sankey_args(int_graph, color_var, edge_colormap, width_var, vmin, vmax)
+
+        # Create the sankey diagram
         node, link = self._get_sankey_node_link_dicts(d_sankey)
         fig = go.Figure(data=[go.Sankey(node=node, link=link)])
         title = self._plot_title()
@@ -492,11 +533,16 @@ class MCNetwork:
             **d_table)
 
         if plot_type == 'sankey':
-            d_sankey: Dict = self._generate_sankey_args(sankey_color_var,
-                                                        sankey_edge_colormap,
-                                                        sankey_width_var,
-                                                        sankey_vmin,
-                                                        sankey_vmax)
+            # Create a mapping of node names to indices, and the integer nodes
+            node_indices = {node: index for index, node in enumerate(self.graph.nodes)}
+            int_graph = nx.relabel_nodes(self.graph, node_indices)
+
+            # Generate the sankey diagram arguments using the new graph with integer nodes
+            d_sankey = self._generate_sankey_args(int_graph, sankey_color_var,
+                                                  sankey_edge_colormap,
+                                                  sankey_width_var,
+                                                  sankey_vmin,
+                                                  sankey_vmax)
             node, link = self._get_sankey_node_link_dicts(d_sankey)
             fig.add_trace(go.Sankey(node=node, link=link), **d_plot)
 
@@ -720,7 +766,7 @@ class MCNetwork:
 
         return subplot_kwargs, table_kwargs, plot_kwargs
 
-    def _generate_sankey_args(self, color_var, edge_colormap, width_var, v_min, v_max):
+    def _generate_sankey_args(self, int_graph, color_var, edge_colormap, width_var, v_min, v_max):
         rpt: pd.DataFrame = self.report()
         if color_var is not None:
             cmap = sns.color_palette(edge_colormap, as_cmap=True)
@@ -741,21 +787,21 @@ class MCNetwork:
         node_colors: List = []
         node_labels: List = []
 
-        for n in self.graph.nodes:
-            if self.graph.nodes[n]['mc'].node_name != 'Node':
-                node_labels.append(self.graph.nodes[n]['mc'].node_name)
+        for n in int_graph.nodes:
+            if int_graph.nodes[n]['mc'].node_name != 'Node':
+                node_labels.append(int_graph.nodes[n]['mc'].node_name)
             else:
                 node_labels.append(str(n))  # the integer string
 
-            if self.graph.nodes[n]['mc'].node_type == NodeType.BALANCE:
-                if self.graph.nodes[n]['mc'].balanced:
+            if int_graph.nodes[n]['mc'].node_type == NodeType.BALANCE:
+                if int_graph.nodes[n]['mc'].balanced:
                     node_colors.append('green')
                 else:
                     node_colors.append('red')
             else:
                 node_colors.append('blue')
 
-        for u, v, data in self.graph.edges(data=True):
+        for u, v, data in int_graph.edges(data=True):
             edge_labels.append(data['mc'].name)
             source.append(u)
             target.append(v)
