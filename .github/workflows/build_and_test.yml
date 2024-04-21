@@ -6,16 +6,14 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    container:
+      image: node:20  # Use a Docker container with Node.js 20
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v4  # Updated to v4
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3  # Updated to v3
         with:
