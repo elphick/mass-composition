@@ -38,16 +38,23 @@ def digraph_linear_layout(g, orientation: str = "vertical", scale: float = -1.0)
 
     """
 
-    g.nodes[0]['_dist'] = 0
+    src_nodes = [n for n, d in g.in_degree() if d == 0]
+    g.nodes[src_nodes[0]]['_dist'] = 0
     for x_dist in range(1, len(g.nodes) + 1):
-        # get the x position from the tree "depth" / distance from the source node.
-        nodes_at_x_dist: dict = nx.descendants_at_distance(g, 0, x_dist)
+        nodes_at_x_dist: dict = nx.descendants_at_distance(g, src_nodes[0], x_dist)
         if not nodes_at_x_dist:
             break
         else:
-            # add the distance to the graph node to enable calling the multipartite layout
             for node in nodes_at_x_dist:
                 g.nodes[node]['_dist'] = x_dist
+
+    # Ensure all nodes have a _dist attribute
+    for node in g.nodes:
+        if '_dist' not in g.nodes[node]:
+            try:
+                g.nodes[node]['_dist'] = nx.shortest_path_length(g, source=src_nodes[0], target=node)
+            except nx.NetworkXNoPath:
+                g.nodes[node]['_dist'] = 0.0  # or any other default distance
 
     if orientation == 'vertical':
         orientation = 'horizontal'

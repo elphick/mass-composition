@@ -18,7 +18,7 @@ data ready for injection into the package.  This keeps examples simple.
 
 This approach retains the integrity of the original datasets, but creates sample_data that simplifies examples.
 
-See the :ref:`sphx_glr_auto_examples_data_examples.py` example.
+See the :ref:`sphx_glr_auto_examples_002_data_examples.py` example.
 
 
 .. _Dataset Register:

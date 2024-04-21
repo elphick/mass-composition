@@ -1,14 +1,13 @@
 import logging
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set, Literal
+from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set, Literal, Any
 
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import xarray as xr
-
 
 from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.mc_status import Status
@@ -78,7 +77,7 @@ class MassComposition:
     def set_data(self, data: Union[pd.DataFrame, xr.Dataset],
                  constraints: Optional[Dict[str, List]] = None):
         if isinstance(data, xr.Dataset):
-            # we assume it is a complianct mc-xarray
+            # we assume it is a compliant mc-xarray
             self._data = data
             self.variables = Variables(config=self.config['vars'],
                                        supplied=[str(v) for v in data.variables if v not in data.dims],
@@ -108,6 +107,10 @@ class MassComposition:
         # explicitly define the constraints
         self.constraints: Dict = self.get_constraint_bounds(constraints=constraints)
         self.status = Status(self._check_constraints())
+
+    def rename(self, new_name: str) -> 'MassComposition':
+        self.name = new_name
+        return self
 
     def get_constraint_bounds(self, constraints: Optional[Dict[str, List]]) -> Dict[str, List]:
         d_constraints: Dict = {}
