@@ -359,7 +359,7 @@ class MCNetwork:
         nx.draw(self.graph, pos=pos, ax=ax, with_labels=True, font_weight='bold',
                 node_color=node_colors, edge_color=edge_colors)
 
-        nx.draw_networkx_edge_labels(self, pos=pos, ax=ax, edge_labels=edge_labels, font_color='black')
+        nx.draw_networkx_edge_labels(self.graph, pos=pos, ax=ax, edge_labels=edge_labels, font_color='black')
         ax.set_title(self._plot_title(html=False), fontsize=10)
 
         return hf
