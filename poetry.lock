@@ -4227,11 +4227,11 @@ docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.link
 testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy", "pytest-ruff (>=0.2.1)"]
 
 [extras]
-network = ["joblib", "networkx"]
+network = ["joblib", "networkx", "tqdm"]
 omf = ["omfvista"]
 viz = ["kaleido", "pyvista", "pyvista-xarray", "statsmodels"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "31b2c57af622b57989e4b118ce26a7c240bd31ee8c75f6cb3239bd02844a893a"
+content-hash = "105706cd38f8ca5f2c5ec6a9d747e0130a8ba23df6ec77f2da76d224f27821d0"
