@@ -78,7 +78,8 @@ class MCNetwork:
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame,
                        name: Optional[str] = 'Flowsheet',
-                       mc_name_col: Optional[str] = None) -> 'MCNetwork':
+                       mc_name_col: Optional[str] = None,
+                       n_jobs: int = 1) -> 'MCNetwork':
         """Instantiate from a DataFrame
 
         Args:
@@ -86,11 +87,14 @@ class MCNetwork:
             name: name of the network
             mc_name_col: The column specified contains the names of objects to create.
               If None the DataFrame is assumed to be wide and the mc objects will be extracted from column prefixes.
+            n_jobs: The number of parallel jobs to run.  If -1, will use all available cores.
 
         Returns:
+            MCNetwork: An instance of the MCNetwork class initialized from the provided DataFrame.
 
         """
-        streams: Dict = streams_from_dataframe(df=df, mc_name_col=mc_name_col)
+        streams: Dict[Union[int, str], MassComposition] = streams_from_dataframe(df=df, mc_name_col=mc_name_col,
+                                                                                 n_jobs=n_jobs)
         return cls().from_streams(streams=list(streams.values()), name=name)
 
     @classmethod

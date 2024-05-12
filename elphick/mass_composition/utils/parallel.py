@@ -4,8 +4,8 @@ from tqdm import tqdm
 
 class TqdmParallel(Parallel):
     def __init__(self, *args, **kwargs):
-        self._tqdm = tqdm(total=kwargs['total'])
-        kwargs.pop('total')
+        self._desc = kwargs.pop('desc', None)  # Get the description from kwargs
+        self._tqdm = tqdm(total=kwargs.pop('total', None), desc=self._desc)  # Pass the description to tqdm
         super().__init__(*args, **kwargs)
 
     def __call__(self, iterable):
