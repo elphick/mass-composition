@@ -3,7 +3,7 @@ import xarray as xr
 
 from elphick.mass_composition import MassComposition
 # noinspection PyUnresolvedReferences
-from test.fixtures import demo_data, size_assay_data, demo_size_network, script_loc
+from tests.fixtures import demo_data, size_assay_data, demo_size_network, script_loc
 
 
 def test_compare_single(demo_data):

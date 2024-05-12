@@ -5,7 +5,7 @@ import pandas as pd
 from numpy import inf
 
 # noinspection PyUnresolvedReferences
-from test.fixtures import demo_data
+from tests.fixtures import demo_data
 from elphick.mass_composition import MassComposition
 import xarray as xr
 

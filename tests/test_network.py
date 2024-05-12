@@ -10,7 +10,7 @@ from elphick.mass_composition import MassComposition
 from elphick.mass_composition.mc_node import MCNode
 from elphick.mass_composition.network import MCNetwork
 # noinspection PyUnresolvedReferences
-from test.fixtures import demo_data, size_assay_data, demo_size_network, script_loc
+from tests.fixtures import demo_data, size_assay_data, demo_size_network, script_loc
 
 
 def test_graph_object_types_and_attributes(demo_size_network):

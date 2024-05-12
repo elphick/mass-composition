@@ -3,7 +3,7 @@ import pandas as pd
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.network import MCNetwork
 # noinspection PyUnresolvedReferences
-from test.fixtures import demo_data
+from tests.fixtures import demo_data
 
 
 def test_query(demo_data):
