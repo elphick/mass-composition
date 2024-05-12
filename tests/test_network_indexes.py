@@ -9,7 +9,7 @@ from pandas import Interval
 from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.partition import napier_munn
 # noinspection PyUnresolvedReferences
-from test.fixtures import demo_data, size_assay_data
+from tests.fixtures import demo_data, size_assay_data
 from elphick.mass_composition import MassComposition
 
 
