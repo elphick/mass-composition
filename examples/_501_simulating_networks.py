@@ -7,7 +7,7 @@ this pattern may be useful in the mean-time. It demonstrates how to process mult
 with a progressbar to provide feedback.
 
 The function my_simulator and the class TqdmParallel is defined in simulating_networks_tools.py, and are
- imported here to demonstrate.
+imported here to demonstrate.
 
 """
 import pandas as pd

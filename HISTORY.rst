@@ -1,3 +1,13 @@
+Mass_Composition 0.4.9 (2024-05-12)
+===================================
+
+Other Tasks
+-----------
+
+- Added warning for multi-index >2 levels.  New test.
+- format fix for example 501. (#107)
+
+
 Mass_Composition 0.4.8 (2024-05-12)
 ===================================
 

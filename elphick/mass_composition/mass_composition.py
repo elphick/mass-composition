@@ -85,6 +85,11 @@ class MassComposition:
         elif isinstance(data, pd.DataFrame):
             if sum(data.index.duplicated()) > 0:
                 raise KeyError('The data has duplicate indexes.')
+            if isinstance(data.index, pd.MultiIndex) and data.index.nlevels >= 3:
+                self._logger.warning('The data has more than 2 levels in the index, which can consume excessive '
+                                     'memory for large datasets.  Is this is what you intend?  Depending on your'
+                                     'requirements you may be able to process ths dataset with a single index.')
+
             data: pd.DataFrame = data.copy()
 
             self.variables = Variables(config=self.config['vars'],
