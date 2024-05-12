@@ -1,17 +1,31 @@
 import logging
-from typing import Dict, Optional, List, Union, Iterable
+from typing import Dict, Optional, List, Union, Iterable, Tuple
 
 import numpy as np
 import pandas as pd
+from joblib import delayed
+from tqdm import tqdm
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.utils.interp import _upsample_grid_by_factor
+from elphick.mass_composition.utils.parallel import TqdmParallel
 from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
+
+
+def create_mass_composition(stream_data: Tuple[Union[int, str], pd.DataFrame],
+                            interval_edges: Optional[Union[Iterable, int]] = None) -> Tuple[
+                            Union[int, str], MassComposition]:
+    stream, data = stream_data
+    if interval_edges is not None:
+        return stream, MassComposition(data=data, name=stream).resample_1d(interval_edges=interval_edges)
+    else:
+        return stream, MassComposition(data=data, name=stream)
 
 
 def streams_from_dataframe(df: pd.DataFrame,
                            mc_name_col: Optional[str] = None,
-                           interval_edges: Optional[Union[Iterable, int]] = None) -> Dict[str, MassComposition]:
+                           interval_edges: Optional[Union[Iterable, int]] = None,
+                           n_jobs=1) -> Dict[str, MassComposition]:
     """Objects from a DataFrame
 
     Args:
@@ -21,14 +35,15 @@ def streams_from_dataframe(df: pd.DataFrame,
         interval_edges: The values of the new grid (interval edges).  If an int, will up-sample by that factor, for
          example the value of 10 will automatically define edges that create 10 x the resolution (up-sampled).
          Applicable only to 1d interval indexes.
+        n_jobs: The number of parallel jobs to run.  If -1, will use all available cores.
 
     Returns:
 
     """
     logger: logging.Logger = logging.getLogger(__name__)
 
-    stream_data: Dict = {}
-    index_names: List = []
+    stream_data: Dict[str, pd.DataFrame] = {}
+    index_names: List[str] = []
     if mc_name_col:
         if mc_name_col in df.index.names:
             index_names = df.index.names
@@ -36,7 +51,7 @@ def streams_from_dataframe(df: pd.DataFrame,
         if mc_name_col not in df.columns:
             raise KeyError(f'{mc_name_col} is not in the columns or indexes.')
         names = df[mc_name_col].unique()
-        for obj_name in names:
+        for obj_name in tqdm(names, desc='Preparing MassComposition data'):
             stream_data[obj_name] = df.query(f'{mc_name_col} == @obj_name')[
                 [col for col in df.columns if col != mc_name_col]]
         if index_names:  # reinstate the index on the original dataframe
@@ -46,8 +61,8 @@ def streams_from_dataframe(df: pd.DataFrame,
         # wide case - find prefixes where there are at least 3 columns
         prefix_counts = column_prefix_counts(df.columns)
         prefix_cols = column_prefixes(df.columns)
-        for prefix, n in prefix_counts.items():
-            if n >= 3:
+        for prefix, n in tqdm(prefix_counts.items(), desc='Preparing MassComposition data by column prefixes'):
+            if n >= 3:  # we need at least 3 columns to create a MassComposition object
                 logger.info(f"Creating object for {prefix}")
                 cols = prefix_cols[prefix]
                 stream_data[prefix] = df[[col for col in df.columns if col in cols]].rename(
@@ -67,9 +82,9 @@ def streams_from_dataframe(df: pd.DataFrame,
             indx = pd.IntervalIndex.from_arrays(left=all_edges[0:-1], right=all_edges[1:])
             interval_edges = _upsample_grid_by_factor(indx=indx, factor=interval_edges)
 
-        res = {stream: MassComposition(data=data, name=stream).resample_1d(interval_edges=interval_edges) for
-               stream, data in stream_data.items()}
-    else:
-        res = {stream: MassComposition(data=data, name=stream) for stream, data in stream_data.items()}
+    with TqdmParallel(desc="Creating MassComposition objects", n_jobs=n_jobs, prefer="processes",
+                      total=len(stream_data)) as p:
+        res = p(delayed(create_mass_composition)(stream_data, interval_edges) for stream_data in stream_data.items())
+    res = dict(res)
 
     return res
