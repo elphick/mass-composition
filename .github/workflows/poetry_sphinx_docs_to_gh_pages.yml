@@ -1,15 +1,16 @@
-name: "Publish Docs"
+name: "Build and Publish Docs to GitHub Pages"
 on:
   push:
     paths:
-      - 'docs/**'
       - 'examples/*.py'
+      - 'docs/**'
+      - 'README.md'
   pull_request:
     paths:
       - 'docs/**'
       - 'examples/*.py'
+      - 'README.md'
   workflow_dispatch:
-
 
 permissions:
     contents: write
@@ -20,22 +21,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+
+      - name: Install poetry
+        run: |
+          pip install poetry==1.5.0
+
+      - name: Configure poetry
+        run: |
+          poetry config virtualenvs.in-project true
+
       - name: Install dependencies
         run: |
-          pip install mass-composition -e ".[viz,network,omf]"
-          pip install sphinx sphinx_rtd_theme
-          pip install sphinx-gallery
-          pip install sphinx-autodoc-typehints
-          pip install myst-parser
-          pip install orca
-          pip install pytest
-          pip install sphinxcontrib-datatemplates
-          pip install sphinxemoji
+          poetry install
+
       - name: Sphinx build
         run: |
-          sphinx-build docs/source _build
+          poetry run sphinx-build docs/source _build
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -44,4 +46,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: _build/
           force_orphan: true
-
