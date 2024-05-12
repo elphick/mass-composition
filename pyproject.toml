@@ -8,11 +8,6 @@ repository = "https://github.com/elphick/mass-composition"
 documentation = "https://elphick.github.io/mass-composition"
 readme = "README.md"
 
-#[[tool.poetry.source]]
-#name = "pypi_"
-#url = "https://pypi.org/mass-composition"
-#priority = "primary"
-
 [[tool.poetry.source]]
 name = "PyPI"
 priority = "primary"
@@ -48,18 +43,14 @@ pooch = "^1.7.0"
 jsonpickle = ">=3.0.1"
 
 kaleido = { version = "0.2.1", optional = true }
-pyvista = { version = ">=0.37.0", optional = true }
 statsmodels = { version = ">=0.14.0", optional = true }
-pyvista-xarray = { version = ">=0.1.2", optional = true }
 networkx = { version = ">2.0,<4.0", optional = true }
-omfvista = { version = ">=0.2.5", optional = true }
 joblib = {version = "^1.4.0", optional = true}
 tqdm = {version = "^4.66.2", optional = true}
 
 [tool.poetry.extras]
-viz = ["kaleido", "pyvista", "statsmodels", "pyvista-xarray"]
+viz = ["kaleido", "statsmodels"]
 network = ["networkx", "joblib", "tqdm"]
-omf = ["omfvista"]
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.0.5"
@@ -68,15 +59,13 @@ pytest = "^7.2.0"
 Sphinx = "^5.0.2"
 sphinx-rtd-theme = "^1.0.0"
 sphinx-gallery = "^0.11.1"
+kaleido = "0.2.1"
 sphinx-autodoc-typehints = "^1.18.3"
 myst-parser = "^0.18.0"
-orca = "^1.8"  # for plotly thumbnails in docs
 ydata-profiling = "^4.3.2"
 sphinxcontrib-datatemplates = "^0.9.2"
 sphinxemoji = "^0.2.0"
 towncrier = "^23.11.0"
-
-
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
