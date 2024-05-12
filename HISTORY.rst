@@ -1,3 +1,13 @@
+Mass_Composition 0.4.10 (2024-05-13)
+====================================
+
+Feature
+-------
+
+- Added parallel support with progressbar to
+  streams_from_dataframe and MCNetwork.from_dataframe. (#134)
+
+
 Mass_Composition 0.4.9 (2024-05-12)
 ===================================
 
