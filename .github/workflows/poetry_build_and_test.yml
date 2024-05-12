@@ -23,7 +23,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
+          pip install poetry==1.5.0
 
       - name: Load cached venv
         id: cached-poetry-dependencies
@@ -37,7 +37,7 @@ jobs:
       - name: Install dependencies
         #        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
-          poetry install --no-interaction --no-root --no-dev
+          poetry install --all-extras --no-interaction --no-root --no-dev
 
       - name: Install pytest
         run: |

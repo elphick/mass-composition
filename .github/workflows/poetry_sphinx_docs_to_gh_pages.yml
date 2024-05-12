@@ -32,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --all-extras --no-interaction --no-root
 
       - name: Sphinx build
         run: |
