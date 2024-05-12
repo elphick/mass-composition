@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mass-composition"
-version = "0.4.5"
+version = "0.4.6"
 description = "For managing multi-dimensional mass-composition datasets, supporting weighted mathematical operations and visualisation."
 authors = ["Greg <greg@elphick.com.au>"]
 packages = [{ include = "elphick/mass_composition" }]
@@ -16,6 +16,24 @@ readme = "README.md"
 [[tool.poetry.source]]
 name = "PyPI"
 priority = "primary"
+
+[tool.poetry.scripts]
+bump_version = "scripts.bump_version:main"
+
+[tool.towncrier]
+package = "elphick.mass_composition"
+package_dir = "elphick/mass_composition"
+filename = "HISTORY.rst"
+directory = "towncrier/newsfragments"
+[tool.towncrier.fragment.feature]
+[tool.towncrier.fragment.bugfix]
+[tool.towncrier.fragment.doc]
+[tool.towncrier.fragment.removal]
+[tool.towncrier.fragment.misc]
+
+[tool.towncrier.fragment.maint]
+name = "Other Tasks"
+showcontent = true
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
@@ -56,6 +74,7 @@ orca = "^1.8"  # for plotly thumbnails in docs
 ydata-profiling = "^4.3.2"
 sphinxcontrib-datatemplates = "^0.9.2"
 sphinxemoji = "^0.2.0"
+towncrier = "^23.11.0"
 
 
 

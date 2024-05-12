@@ -440,6 +440,20 @@ files = [
 ]
 
 [[package]]
+name = "click"
+version = "8.1.7"
+description = "Composable command line interface toolkit"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "click-8.1.7-py3-none-any.whl", hash = "sha256:ae74fb96c20a0277a1d615f1e4d73c8414f5a98db8b799a7931d1582f3390c28"},
+    {file = "click-8.1.7.tar.gz", hash = "sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de"},
+]
+
+[package.dependencies]
+colorama = {version = "*", markers = "platform_system == \"Windows\""}
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -900,6 +914,21 @@ zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
 [package.extras]
 docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
 testing = ["jaraco.test (>=5.4)", "pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-ruff (>=0.2.1)", "zipp (>=3.17)"]
+
+[[package]]
+name = "incremental"
+version = "22.10.0"
+description = "\"A small library that versions your Python projects.\""
+optional = false
+python-versions = "*"
+files = [
+    {file = "incremental-22.10.0-py2.py3-none-any.whl", hash = "sha256:b864a1f30885ee72c5ac2835a761b8fe8aa9c28b9395cacf27286602688d3e51"},
+    {file = "incremental-22.10.0.tar.gz", hash = "sha256:912feeb5e0f7e0188e6f42241d2f450002e11bbc0937c65865045854c24c0bd0"},
+]
+
+[package.extras]
+mypy = ["click (>=6.0)", "mypy (==0.812)", "twisted (>=16.4.0)"]
+scripts = ["click (>=6.0)", "twisted (>=16.4.0)"]
 
 [[package]]
 name = "iniconfig"
@@ -3820,6 +3849,27 @@ files = [
 ]
 
 [[package]]
+name = "towncrier"
+version = "23.11.0"
+description = "Building newsfiles for your project."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "towncrier-23.11.0-py3-none-any.whl", hash = "sha256:2e519ca619426d189e3c98c99558fe8be50c9ced13ea1fc20a4a353a95d2ded7"},
+    {file = "towncrier-23.11.0.tar.gz", hash = "sha256:13937c247e3f8ae20ac44d895cf5f96a60ad46cfdcc1671759530d7837d9ee5d"},
+]
+
+[package.dependencies]
+click = "*"
+importlib-resources = {version = ">=5", markers = "python_version < \"3.10\""}
+incremental = "*"
+jinja2 = "*"
+tomli = {version = "*", markers = "python_version < \"3.11\""}
+
+[package.extras]
+dev = ["furo", "packaging", "sphinx (>=5)", "twisted"]
+
+[[package]]
 name = "tqdm"
 version = "4.66.2"
 description = "Fast, Extensible Progress Meter"
@@ -4234,4 +4284,4 @@ viz = ["kaleido", "pyvista", "pyvista-xarray", "statsmodels"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "105706cd38f8ca5f2c5ec6a9d747e0130a8ba23df6ec77f2da76d224f27821d0"
+content-hash = "abfa4349fcfee8b60a3096c308840455156fb68288d523ff7dcd20224e672892"
