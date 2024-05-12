@@ -17,7 +17,8 @@ from joblib import delayed
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.datasets.sample_data import sample_data
 from elphick.mass_composition.network import MCNetwork
-from examples._simulating_network_functions import my_simulator, TqdmParallel
+from elphick.mass_composition.utils.parallel import TqdmParallel
+from examples._simulating_network_functions import my_simulator
 
 # %%
 # Execute multiple simulations

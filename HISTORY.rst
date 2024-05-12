@@ -1,3 +1,13 @@
+Mass_Composition 0.4.8 (2024-05-12)
+===================================
+
+Feature
+-------
+
+- Added TqdmParallel to utils.
+- removed pyvista from dependencies. (#140)
+
+
 Mass_Composition 0.4.7 (2024-05-12)
 ===================================
 
