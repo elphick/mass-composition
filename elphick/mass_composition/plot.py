@@ -67,7 +67,9 @@ def parallel_plot(data: pd.DataFrame,
 def comparison_plot(data: pd.DataFrame,
                     x: str, y: str,
                     facet_col_wrap: int = 3,
-                    color: Optional[str] = None) -> go.Figure:
+                    color: Optional[str] = None,
+                    trendline: bool = False,
+                    trendline_kwargs: Optional[Dict] = None) -> go.Figure:
     """Comparison Plot with multiple x-y scatter plots
 
     Args:
@@ -76,25 +78,40 @@ def comparison_plot(data: pd.DataFrame,
         y: The y column
         facet_col_wrap: the number of subplots per row before wrapping
         color: The optional variable to color by. If None color will be by Node
+        trendline: If True add trendlines
+        trendline_kwargs: Allows customising the trendline: ref: https://plotly.com/python/linear-fits/.  Note: Axis
+         scaling across components can be affected if using {'trendline_scope': 'trendline_scope'}.
 
     Returns:
         plotly Figure
     """
+    if trendline:
+        if trendline_kwargs is None:
+            trendline_kwargs = {'trendline': 'ols'}
+        else:
+            if 'trendline' not in trendline_kwargs:
+                trendline_kwargs['trendline'] = "ols"
+    else:
+        trendline_kwargs = {'trendline': None}
 
     data['residual'] = data[x] - data[y]
     fig = px.scatter(data, x=x, y=y, color=color,
                      facet_col='variable', facet_col_wrap=facet_col_wrap,
-                     hover_data=['residual'])
+                     hover_data=['residual'],
+                     **trendline_kwargs)
 
+    # fig.print_grid()
     # add y=x based on data per subplot
-    d_subplots = subplot_index_by_title(fig)
+    variable_order = list(data['variable'].unique())
+    d_subplots = subplot_index_by_title(fig, variable_order)
+
     for k, v in d_subplots.items():
         tmp_df = data.query('variable==@k')
         limits = [min([tmp_df[x].min(), tmp_df[y].min()]),
                   max([tmp_df[x].max(), tmp_df[y].max()])]
 
         equal_trace = go.Scatter(x=limits, y=limits,
-                                 line_color="gray", name="y=x", mode='lines', showlegend=False)
+                                 line_color="gray", name="y=x", mode='lines', legendgroup='y=x', showlegend=False)
         fig.add_trace(equal_trace, row=v[0], col=v[1], exclude_empty_subplots=True)
         sp = fig.get_subplot(v[0], v[1])
         fig.update_xaxes(scaleanchor=sp.xaxis.anchor, scaleratio=1, row=v[0], col=v[1])
@@ -106,20 +123,25 @@ def comparison_plot(data: pd.DataFrame,
     return fig
 
 
-def subplot_index_by_title(fig) -> Dict['str', Tuple[int, int]]:
+def subplot_index_by_title(fig, variable_order: List[str]) -> Dict['str', Tuple[int, int]]:
     """Map of subplot index by title
 
     Assumes consistency by plotly between axes numbering and annotation order.
 
     Args:
         fig: The figure including subplots with unique titles
+        variable_order: the variables in order top-left to bottom-right
 
     Returns:
         Dict keyed by title with tuple of subplot positions
     """
-    variable_order = [a.text.split("=")[-1] for a in fig.layout.annotations]
-    d_subplots = {}
-    for ri, r in enumerate(fig._grid_ref):
-        for ci, c in enumerate(r):
-            d_subplots[variable_order.pop(0)] = (ri + 1, ci + 1)
+
+    d_subplots: Dict = {}
+    i = 0
+    for r in range(len(fig._grid_ref), 0, -1):
+        for c in range(1, len(fig._grid_ref[0]) + 1, 1):
+            if i < len(variable_order):
+                d_subplots[variable_order[i]] = (r, c)
+            i += 1
+
     return d_subplots

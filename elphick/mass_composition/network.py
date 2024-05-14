@@ -2,7 +2,7 @@ import logging
 import webbrowser
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union, Iterable
+from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib
 import networkx as nx
@@ -13,15 +13,19 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import matplotlib.cm as cm
 import seaborn as sns
+from networkx import cytoscape_data
 
 from plotly.subplots import make_subplots
 
 from elphick.mass_composition import MassComposition
+from elphick.mass_composition.config.config_read import read_flowsheet_yaml
+from elphick.mass_composition.dag import DAG
 from elphick.mass_composition.layout import digraph_linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils.geometry import midpoint
-from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
+from elphick.mass_composition.utils.loader import streams_from_dataframe
+from elphick.mass_composition.utils.sampling import random_int
 
 
 class MCNetwork:
@@ -74,7 +78,8 @@ class MCNetwork:
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame,
                        name: Optional[str] = 'Flowsheet',
-                       mc_name_col: Optional[str] = None) -> 'MCNetwork':
+                       mc_name_col: Optional[str] = None,
+                       n_jobs: int = 1) -> 'MCNetwork':
         """Instantiate from a DataFrame
 
         Args:
@@ -82,42 +87,80 @@ class MCNetwork:
             name: name of the network
             mc_name_col: The column specified contains the names of objects to create.
               If None the DataFrame is assumed to be wide and the mc objects will be extracted from column prefixes.
+            n_jobs: The number of parallel jobs to run.  If -1, will use all available cores.
+
+        Returns:
+            MCNetwork: An instance of the MCNetwork class initialized from the provided DataFrame.
+
+        """
+        streams: Dict[Union[int, str], MassComposition] = streams_from_dataframe(df=df, mc_name_col=mc_name_col,
+                                                                                 n_jobs=n_jobs)
+        return cls().from_streams(streams=list(streams.values()), name=name)
+
+    @classmethod
+    def from_yaml(cls, flowsheet_file: Path) -> 'MCNetwork':
+        """Construct a flowsheet defined in a yaml file
+
+        Args:
+            flowsheet_file: The yaml file following the prescribed format
 
         Returns:
 
         """
-        logger: logging.Logger = logging.getLogger(__class__.__name__)
+        config = read_flowsheet_yaml(flowsheet_file)
+        obj = cls(name=config['flowsheet']['name'])
 
-        res: List = []
-        index_names: List = []
-        if mc_name_col:
-            if mc_name_col in df.index.names:
-                index_names = df.index.names
-                df.reset_index(mc_name_col, inplace=True)
-            if mc_name_col not in df.columns:
-                raise KeyError(f'{mc_name_col} is not in the columns or indexes.')
-            names = df[mc_name_col].unique()
-            for obj_name in names:
-                res.append(MassComposition(
-                    data=df.query(f'{mc_name_col} == @obj_name')[[col for col in df.columns if col != mc_name_col]],
-                    name=obj_name))
-            if index_names:  # reinstate the index on the original dataframe
-                df.reset_index(inplace=True)
-                df.set_index(index_names, inplace=True)
-        else:
-            # wide case - find prefixes where there are at least 3 columns
-            prefix_counts = column_prefix_counts(df.columns)
-            prefix_cols = column_prefixes(df.columns)
-            for prefix, n in prefix_counts.items():
-                if n >= 3:
-                    logger.info(f"Creating object for {prefix}")
-                    cols = prefix_cols[prefix]
-                    res.append(MassComposition(
-                        data=df[[col for col in df.columns if col in cols]].rename(
-                            columns={col: col.replace(f'{prefix}_', '') for col in df.columns}),
-                        name=prefix))
+        bunch_of_edges: List = []
+        for stream, nodes in config['streams'].items():
+            # add the objects to the edges
+            bunch_of_edges.append(
+                (nodes['node_in'], nodes['node_out'],
+                 {'mc': MassComposition(name=stream, data=pd.DataFrame(columns=['mass_wet', 'mass_dry', 'H2O']))}))
 
-        return cls().from_streams(streams=res, name=name)
+        graph = nx.DiGraph(name=config['flowsheet']['name'])
+        graph.add_edges_from(bunch_of_edges)
+
+        d_node_objects: Dict = {}
+        for node in graph.nodes:
+            d_node_objects[node] = MCNode(node_id=int(node), node_name=config['nodes'][node]['name'],
+                                          node_subset=config['nodes'][node]['subset'])
+        nx.set_node_attributes(graph, d_node_objects, 'mc')
+
+        obj.graph = graph
+        return obj
+
+    @classmethod
+    def from_dag(cls, dag: DAG) -> 'MCNetwork':
+        """Construct a flowsheet from a dag object
+
+        Args:
+            dag: The dag object that has been run previously.
+
+        Returns:
+
+        """
+
+        # Create a new instance of MCNetwork
+        mcn = cls(name=dag.name)
+
+        # Copy the nodes from the dag to the MCNetwork
+        for nid, (node, data) in enumerate(dag.graph.nodes(data=True)):
+            mcn.graph.add_node(data['name'], mc=MCNode(node_id=nid, node_name=data['name']))
+
+        # Copy the edges from the dag to the MCNetwork
+        for edge in dag.graph.edges:
+            # Retrieve the MassComposition object from the edge
+            mc = dag.graph.edges[edge]['mc']
+            # Use the name of the MassComposition object as the name of the edge
+            mcn.graph.add_edge(*edge, name=mc.name, **dag.graph.edges[edge])
+
+        # Populate the inputs and outputs properties of the MCNode objects
+        for node in mcn.graph.nodes:
+            mc_node = mcn.graph.nodes[node]['mc']
+            mc_node.inputs = [mcn.graph.edges[edge]['mc'] for edge in mcn.graph.in_edges(node)]
+            mc_node.outputs = [mcn.graph.edges[edge]['mc'] for edge in mcn.graph.out_edges(node)]
+
+        return mcn
 
     @property
     def balanced(self) -> bool:
@@ -134,6 +177,10 @@ class MCNetwork:
             if not data['mc'].status.ok:
                 d_failing_edges[data['mc'].name] = data['mc'].status.failing_components
         return all(d_edge_status_ok.values()), d_failing_edges
+
+    def to_json(self) -> Dict:
+        json_graph: Dict = cytoscape_data(self.graph)
+        return json_graph
 
     def get_edge_by_name(self, name: str) -> MassComposition:
         """Get the MC object from the network by its name
@@ -155,8 +202,8 @@ class MCNetwork:
 
         return res
 
-    def get_edge_names(self) -> List[str]:
-        """Get the names of the MC objects on the edges
+    def get_stream_names(self) -> List[str]:
+        """Get the names of the streams (MC objects on the edges)
 
         Returns:
 
@@ -167,25 +214,29 @@ class MCNetwork:
             res.append(a['mc'].name)
         return res
 
-    def get_input_edges(self) -> List[MassComposition]:
-        """Get the input (feed) edge objects
+    def get_input_streams(self) -> List[MassComposition]:
+        """Get the input (feed) streams (edge objects)
 
         Returns:
             List of MassComposition objects
         """
 
-        degrees = [d for n, d in self.graph.degree()]
+        # Create a dictionary that maps node names to their degrees
+        degrees = {n: d for n, d in self.graph.degree()}
+
         res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[u] == 1]
         return res
 
-    def get_output_edges(self) -> List[MassComposition]:
-        """Get the output (product) edge objects
+    def get_output_streams(self) -> List[MassComposition]:
+        """Get the output (product) streams (edge objects)
 
         Returns:
             List of MassComposition objects
         """
 
-        degrees = [d for n, d in self.graph.degree()]
+        # Create a dictionary that maps node names to their degrees
+        degrees = {n: d for n, d in self.graph.degree()}
+
         res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[v] == 1]
         return res
 
@@ -199,7 +250,7 @@ class MCNetwork:
         Returns:
 
         """
-        variables = self.get_input_edges()[0].variables
+        variables = self.get_input_streams()[0].variables
         d_format: Dict = {}
         for col in columns:
             for v in variables.vars.variables:
@@ -220,6 +271,8 @@ class MCNetwork:
         chunks: List[pd.DataFrame] = []
         for n, nbrs in self.graph.adj.items():
             for nbr, eattr in nbrs.items():
+                if eattr['mc'].data.to_dataframe().empty:
+                    raise KeyError("Cannot generate report on empty dataset")
                 chunks.append(eattr['mc'].aggregate().assign(name=eattr['mc'].name))
         rpt: pd.DataFrame = pd.concat(chunks, axis='index').set_index('name')
         if apply_formats:
@@ -310,14 +363,14 @@ class MCNetwork:
         nx.draw(self.graph, pos=pos, ax=ax, with_labels=True, font_weight='bold',
                 node_color=node_colors, edge_color=edge_colors)
 
-        nx.draw_networkx_edge_labels(self, pos=pos, ax=ax, edge_labels=edge_labels, font_color='black')
+        nx.draw_networkx_edge_labels(self.graph, pos=pos, ax=ax, edge_labels=edge_labels, font_color='black')
         ax.set_title(self._plot_title(html=False), fontsize=10)
 
         return hf
 
     def plot_balance(self, facet_col_wrap: int = 3,
                      color: Optional[str] = 'node') -> go.Figure:
-        """Plot input verus output across all nodes in the network
+        """Plot input versus output across all nodes in the network
 
         Args:
             facet_col_wrap: the number of subplots per row before wrapping
@@ -402,7 +455,14 @@ class MCNetwork:
         Returns:
 
         """
-        d_sankey: Dict = self._generate_sankey_args(color_var, edge_colormap, width_var, vmin, vmax)
+        # Create a mapping of node names to indices, and the integer nodes
+        node_indices = {node: index for index, node in enumerate(self.graph.nodes)}
+        int_graph = nx.relabel_nodes(self.graph, node_indices)
+
+        # Generate the sankey diagram arguments using the new graph with integer nodes
+        d_sankey = self._generate_sankey_args(int_graph, color_var, edge_colormap, width_var, vmin, vmax)
+
+        # Create the sankey diagram
         node, link = self._get_sankey_node_link_dicts(d_sankey)
         fig = go.Figure(data=[go.Sankey(node=node, link=link)])
         title = self._plot_title()
@@ -477,11 +537,16 @@ class MCNetwork:
             **d_table)
 
         if plot_type == 'sankey':
-            d_sankey: Dict = self._generate_sankey_args(sankey_color_var,
-                                                        sankey_edge_colormap,
-                                                        sankey_width_var,
-                                                        sankey_vmin,
-                                                        sankey_vmax)
+            # Create a mapping of node names to indices, and the integer nodes
+            node_indices = {node: index for index, node in enumerate(self.graph.nodes)}
+            int_graph = nx.relabel_nodes(self.graph, node_indices)
+
+            # Generate the sankey diagram arguments using the new graph with integer nodes
+            d_sankey = self._generate_sankey_args(int_graph, sankey_color_var,
+                                                  sankey_edge_colormap,
+                                                  sankey_width_var,
+                                                  sankey_vmin,
+                                                  sankey_vmax)
             node, link = self._get_sankey_node_link_dicts(d_sankey)
             fig.add_trace(go.Sankey(node=node, link=link), **d_plot)
 
@@ -555,6 +620,109 @@ class MCNetwork:
                             include_dims=include_dims, plot_interval_edges=plot_interval_edges)
         return fig
 
+    def set_stream_parent(self, stream: str, parent: str):
+        mc: MassComposition = self.get_edge_by_name(stream)
+        mc.set_parent_node(self.get_edge_by_name(parent))
+        self._update_graph(mc)
+
+    def set_stream_child(self, stream: str, child: str):
+        mc: MassComposition = self.get_edge_by_name(stream)
+        mc.set_child_node(self.get_edge_by_name(child))
+        self._update_graph(mc)
+
+    def set_stream_nodes(self, stream: str, nodes: Tuple[int, int]):
+        mc: MassComposition = self.get_edge_by_name(stream)
+        mc.set_stream_nodes(nodes=nodes)
+        self._update_graph(mc)
+
+    def reset_stream_nodes(self, stream: Optional[str] = None):
+
+        """Reset stream nodes to break relationships
+
+        Args:
+            stream: The optional stream (edge) within the network.
+              If None all streams nodes on the network will be reset.
+
+
+        Returns:
+
+        """
+        if stream is None:
+            streams: Dict[str, MassComposition] = self.streams_to_dict()
+            for k, v in streams.items():
+                streams[k] = v.set_stream_nodes((random_int(), random_int()))
+            self.graph = MCNetwork(name=self.name).from_streams(streams=list(streams.values())).graph
+        else:
+            mc: MassComposition = self.get_edge_by_name(stream)
+            mc.set_stream_nodes((random_int(), random_int()))
+            self._update_graph(mc)
+
+    def _update_graph(self, mc: MassComposition):
+        """Update the graph with an existing stream object
+
+        Args:
+            mc: The stream object
+
+        Returns:
+
+        """
+        # brutal approach - rebuild from streams
+        strms: List[MassComposition] = []
+        for u, v, a in self.graph.edges(data=True):
+            if a['mc'].name == mc.name:
+                strms.append(mc)
+            else:
+                strms.append(a['mc'])
+        self.graph = MCNetwork(name=self.name).from_streams(streams=strms).graph
+
+    def set_node_names(self, node_names: Dict[int, str]):
+        """Set the names of network nodes with a Dict
+        """
+        for node in node_names.keys():
+            if ('mc' in self.graph.nodes[node].keys()) and (node in node_names.keys()):
+                self.graph.nodes[node]['mc'].node_name = node_names[node]
+
+    def set_stream_data(self, stream_data: Dict[str, MassComposition]):
+        """Set the data (MassComposition) of network edges (streams) with a Dict
+        """
+        for stream_name, stream_data in stream_data.items():
+            for u, v, data in self.graph.edges(data=True):
+                if ('mc' in data.keys()) and (data['mc'].name == stream_name):
+                    self._logger.info(f'Setting data on stream {stream_name}')
+                    data['mc'] = stream_data
+                    # refresh the node status
+                    for node in [u, v]:
+                        self.graph.nodes[node]['mc'].inputs = [self.graph.get_edge_data(e[0], e[1])['mc'] for e in
+                                                               self.graph.in_edges(node)]
+                        self.graph.nodes[node]['mc'].outputs = [self.graph.get_edge_data(e[0], e[1])['mc'] for e in
+                                                                self.graph.out_edges(node)]
+
+    def streams_to_dict(self) -> Dict[str, MassComposition]:
+        """Export the Stream objects to a Dict
+
+        Returns:
+            A dictionary keyed by name containing MassComposition objects
+
+        """
+        streams: Dict[str, MassComposition] = {}
+        for u, v, data in self.graph.edges(data=True):
+            if 'mc' in data.keys():
+                streams[data['mc'].name] = data['mc']
+        return streams
+
+    def nodes_to_dict(self) -> Dict[int, MCNode]:
+        """Export the MCNode objects to a Dict
+
+        Returns:
+            A dictionary keyed by integer containing MCNode objects
+
+        """
+        nodes: Dict[int, MCNode] = {}
+        for node in self.graph.nodes.keys():
+            if 'mc' in self.graph.nodes[node].keys():
+                nodes[node] = self.graph.nodes[node]['mc']
+        return nodes
+
     @staticmethod
     def _get_position_kwargs(table_pos, table_area, plot_type):
         """Helper to manage location dependencies
@@ -602,7 +770,7 @@ class MCNetwork:
 
         return subplot_kwargs, table_kwargs, plot_kwargs
 
-    def _generate_sankey_args(self, color_var, edge_colormap, width_var, v_min, v_max):
+    def _generate_sankey_args(self, int_graph, color_var, edge_colormap, width_var, v_min, v_max):
         rpt: pd.DataFrame = self.report()
         if color_var is not None:
             cmap = sns.color_palette(edge_colormap, as_cmap=True)
@@ -611,10 +779,7 @@ class MCNetwork:
                 v_min = np.floor(rpt[color_var].min())
             if not v_max:
                 v_max = np.ceil(rpt[color_var].max())
-        if isinstance(list(self.graph.nodes)[0], int):
-            labels = [str(n) for n in list(self.graph.nodes)]
-        else:
-            labels = list(self.graph.nodes)
+
         # run the report for the hover data
         d_custom_data: Dict = self._rpt_to_html(df=rpt)
         source: List = []
@@ -624,17 +789,23 @@ class MCNetwork:
         edge_color: List = []
         edge_labels: List = []
         node_colors: List = []
+        node_labels: List = []
 
-        for n in self.graph.nodes:
-            if self.graph.nodes[n]['mc'].node_type == NodeType.BALANCE:
-                if self.graph.nodes[n]['mc'].balanced:
+        for n in int_graph.nodes:
+            if int_graph.nodes[n]['mc'].node_name != 'Node':
+                node_labels.append(int_graph.nodes[n]['mc'].node_name)
+            else:
+                node_labels.append(str(n))  # the integer string
+
+            if int_graph.nodes[n]['mc'].node_type == NodeType.BALANCE:
+                if int_graph.nodes[n]['mc'].balanced:
                     node_colors.append('green')
                 else:
                     node_colors.append('red')
             else:
                 node_colors.append('blue')
 
-        for u, v, data in self.graph.edges(data=True):
+        for u, v, data in int_graph.edges(data=True):
             edge_labels.append(data['mc'].name)
             source.append(u)
             target.append(v)
@@ -652,7 +823,7 @@ class MCNetwork:
                           'edge_color': edge_color,
                           'edge_custom_data': edge_custom_data,
                           'edge_labels': edge_labels,
-                          'labels': labels,
+                          'labels': node_labels,
                           'source': source,
                           'target': target,
                           'value': value}
@@ -694,8 +865,15 @@ class MCNetwork:
             edge_traces.append(go.Scatter(x=[x0, x1], y=[y0, y1],
                                           line=dict(width=2, color=edge_color_map[data['mc'].status.ok]),
                                           hoverinfo='text',
-                                          mode='lines',
-                                          text=data['mc'].name))
+                                          mode='lines+markers',
+                                          text=data['mc'].name,
+                                          marker=dict(
+                                              symbol="arrow",
+                                              color=edge_color_map[data['mc'].status.ok],
+                                              size=16,
+                                              angleref="previous",
+                                              standoff=15)
+                                          ))
 
         # nodes
         node_color_map: Dict = {None: 'grey', True: 'green', False: 'red'}
@@ -800,29 +978,16 @@ class MCNetwork:
                     s: str = stream.name
                     tmp_nans: pd.Series = stream_nans.query('stream==@s').sum(axis=1)
                     if tmp_nans.iloc[0] > 0:
-                        logging.debug(f'The {s} stream has missing coarse sizes')
+                        logger.debug(f'The {s} stream has missing coarse sizes')
                         first_zero_index = tmp_nans.loc[tmp_nans == 0].index[0]
                         if tmp_nans[tmp_nans.index <= first_zero_index].sum() > 0:
-                            logging.debug(f'The {s} stream has missing sizes requiring interpolation')
+                            logger.debug(f'The {s} stream has missing sizes requiring interpolation')
                             raise NotImplementedError('Coming soon - we need interpolation!')
                         else:
-                            logging.debug(f'The {s} stream has missing coarse sizes only')
+                            logger.debug(f'The {s} stream has missing coarse sizes only')
                             stream_df = df_streams_full.loc[:, (slice(None), s)].droplevel(-1, axis=1).fillna(0)
                             # recreate the stream from the dataframe
                             stream.set_data(stream_df)
             else:
                 raise KeyError("stream index shapes are not consistent")
         return streams
-
-    def set_stream_parent(self, stream: str, parent: str):
-        mc: MassComposition = self.get_edge_by_name(stream)
-        mc.set_parent(self.get_edge_by_name(parent))
-
-        # brutal approach - rebuild from streams
-        strms: List[MassComposition] = []
-        for u, v, a in self.graph.edges(data=True):
-            if a['mc'].name == stream:
-                strms.append(mc)
-            else:
-                strms.append(a['mc'])
-        self.graph = MCNetwork(name=self.name).from_streams(streams=strms).graph

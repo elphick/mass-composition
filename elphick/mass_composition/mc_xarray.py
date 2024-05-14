@@ -15,6 +15,7 @@ from elphick.mass_composition.utils.size import mean_size
 class CompositionContext(Enum):
     ABSOLUTE = 'mass'
     RELATIVE = "percent"
+    NONE = None
 
 
 @xr.register_dataset_accessor("mc")
@@ -67,7 +68,7 @@ class MassCompositionAccessor:
             else:
                 raise KeyError("Chemistry units do not conform")
         else:
-            raise KeyError("Chemistry units are inconsistent")
+            res = CompositionContext.NONE
         return res
 
     def rename(self, new_name: str):
@@ -194,13 +195,15 @@ class MassCompositionAccessor:
 
         dsm: xr.Dataset = self._obj.copy()
 
-        dsm[self._obj.mc_vars_chem] = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
         if 'H2O' in dsm.variables:
             dsm['H2O'] = self._obj['mass_wet'] - self._obj['mass_dry']
 
-        for da in dsm.values():
-            if da.attrs['mc_type'] == 'chemistry':
-                da.attrs['units'] = dsm['mass_wet'].attrs['units']
+        if self.composition_context == CompositionContext.RELATIVE:
+            dsm[self._obj.mc_vars_chem] = dsm[self._obj.mc_vars_chem] * self._obj['mass_dry'] / 100
+
+            for da in dsm.values():
+                if da.attrs['mc_type'] == 'chemistry':
+                    da.attrs['units'] = dsm['mass_wet'].attrs['units']
 
         xr.set_options(keep_attrs='default')
 
@@ -218,13 +221,15 @@ class MassCompositionAccessor:
         xr.set_options(keep_attrs=True)
 
         dsc: xr.Dataset = self._obj.copy()
-        dsc[self._obj.mc_vars_chem] = dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100
         if 'H2O' in dsc.variables:
             dsc['H2O'] = (self._obj['mass_wet'] - self._obj['mass_dry']) / self._obj['mass_wet'] * 100
 
-        for da in dsc.values():
-            if da.attrs['mc_type'] == 'chemistry':
-                da.attrs['units'] = '%'
+        if self.composition_context == CompositionContext.ABSOLUTE:
+            dsc[self._obj.mc_vars_chem] = dsc[self._obj.mc_vars_chem] / self._obj['mass_dry'] * 100
+
+            for da in dsc.values():
+                if da.attrs['mc_type'] == 'chemistry':
+                    da.attrs['units'] = '%'
 
         xr.set_options(keep_attrs='default')
 
@@ -264,7 +269,7 @@ class MassCompositionAccessor:
 
         return out._obj, comp._obj
 
-    def partition(self, definition: Callable) -> Tuple[xr.Dataset, xr.Dataset]:
+    def apply_partition(self, definition: Callable) -> Tuple[xr.Dataset, xr.Dataset]:
         """Partition the object along a given dimension.
 
         This method applies the defined partition resulting in two new objects.
@@ -457,7 +462,8 @@ class MassCompositionAccessor:
             raise NotImplementedError('Unexpected operator string')
 
         # protect grades from nans and infs - push them to zero
-        res[res.mc_vars_chem] = res[res.mc_vars_chem].where(res[res.mc_vars_chem].map(np.isfinite), 0.0)
+        if res.mc_vars_chem:
+            res[res.mc_vars_chem] = res[res.mc_vars_chem].where(res[res.mc_vars_chem].map(np.isfinite), 0.0)
 
         return res
 
@@ -481,16 +487,16 @@ class MassCompositionAccessor:
             df.rename(columns=self.column_map(), inplace=True)
         return df
 
-    def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> xr.Dataset:
-        if len(self._obj.dims) > 1:
-            raise NotImplementedError("Not yet tested on datasets > 1D")
-
-        # define the new coordinates
-        right_edges = pd.arrays.IntervalArray(self._obj[dim].data).right
-        new_coords = np.round(np.geomspace(right_edges.min(), right_edges.max(), num_intervals), edge_precision)
-        xr_upsampled: xr.Dataset = interp_monotonic(self._obj, coords={'size': new_coords},
-                                                    include_original_coords=True)
-        return xr_upsampled
+    # def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> xr.Dataset:
+    #     if len(self._obj.dims) > 1:
+    #         raise NotImplementedError("Not yet tested on datasets > 1D")
+    #
+    #     # define the new coordinates
+    #     right_edges = pd.arrays.IntervalArray(self._obj[dim].data).right
+    #     new_coords = np.round(np.geomspace(right_edges.min(), right_edges.max(), num_intervals), edge_precision)
+    #     xr_upsampled: xr.Dataset = interp_monotonic(self._obj, coords={'size': new_coords},
+    #                                                 include_original_coords=True)
+    #     return xr_upsampled
 
 
 def mc_aggregate(xr_ds: xr.Dataset) -> xr.Dataset:

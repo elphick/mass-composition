@@ -11,8 +11,8 @@ Welcome to mass-composition documentation!
    :glob:
 
 
-   usage/installation
-   usage/quickstart
+   usage/*
+   user_guide/user_guide
    auto_examples/index
    datasets/datasets
    glossary/*

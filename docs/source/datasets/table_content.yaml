@@ -67,6 +67,18 @@ datasets:
   maintainer: Greg Elphick
   title: Iron Ore Sample xyz
   url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+- author: ''
+  citation: null
+  copyright_holder: ''
+  copyright_year: ''
+  creator: ''
+  description: Sink-float data on Rougher LIMS tailings
+  download: :download:`zip <../_static/nordic_iron_ore_sink_float.zip>`
+  filename: nordic_iron_ore_sink_float.csv
+  link: '`link <../_static/nordic_iron_ore_sink_float.html>`_'
+  maintainer: Greg Elphick
+  title: Nordic Iron Ore Sink Float
+  url: https://nordicironore.se/wp-content/uploads/2017/05/a7451_nordicironore_blotberget_report-v2.pdf
 - citation: Sarkar, Biswajit & Das, Avimanyu & Roy, Subrata & Rai, Satish. (2007).
     In depth analysis of alumina removal from iron ore fines using teetered bed gravity
     separator. Mineral Processing and Extractive Metallurgy (Trans. Inst. Min Metall.

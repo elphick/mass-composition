@@ -1,7 +1,7 @@
 import logging
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set
+from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set, Literal, Any
 
 import numpy as np
 import pandas as pd
@@ -9,15 +9,15 @@ import plotly.express as px
 import plotly.graph_objects as go
 import xarray as xr
 
-# noinspection PyUnresolvedReferences
-import elphick.mass_composition.mc_xarray  # keep this "unused" import - it helps
 from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.mc_status import Status
-from elphick.mass_composition.plot import parallel_plot
+from elphick.mass_composition.plot import parallel_plot, comparison_plot
 from elphick.mass_composition.utils import solve_mass_moisture
+from elphick.mass_composition.utils.amenability import amenability_index
+from elphick.mass_composition.utils.interp import mass_preserving_interp
+from elphick.mass_composition.utils.pd_utils import weight_average, calculate_recovery, calculate_partition
 from elphick.mass_composition.utils.sampling import random_int
 
-# noinspection PyUnresolvedReferences
 from elphick.mass_composition.variables import Variables, VariableGroups
 
 
@@ -75,7 +75,7 @@ class MassComposition:
     def set_data(self, data: Union[pd.DataFrame, xr.Dataset],
                  constraints: Optional[Dict[str, List]] = None):
         if isinstance(data, xr.Dataset):
-            # we assume it is a complianct mc-xarray
+            # we assume it is a compliant mc-xarray
             self._data = data
             self.variables = Variables(config=self.config['vars'],
                                        supplied=[str(v) for v in data.variables if v not in data.dims],
@@ -83,6 +83,11 @@ class MassComposition:
         elif isinstance(data, pd.DataFrame):
             if sum(data.index.duplicated()) > 0:
                 raise KeyError('The data has duplicate indexes.')
+            if isinstance(data.index, pd.MultiIndex) and data.index.nlevels >= 3:
+                self._logger.warning('The data has more than 2 levels in the index, which can consume excessive '
+                                     'memory for large datasets.  Is this is what you intend?  Depending on your'
+                                     'requirements you may be able to process ths dataset with a single index.')
+
             data: pd.DataFrame = data.copy()
 
             self.variables = Variables(config=self.config['vars'],
@@ -105,6 +110,10 @@ class MassComposition:
         # explicitly define the constraints
         self.constraints: Dict = self.get_constraint_bounds(constraints=constraints)
         self.status = Status(self._check_constraints())
+
+    def rename(self, new_name: str) -> 'MassComposition':
+        self.name = new_name
+        return self
 
     def get_constraint_bounds(self, constraints: Optional[Dict[str, List]]) -> Dict[str, List]:
         d_constraints: Dict = {}
@@ -165,8 +174,16 @@ class MassComposition:
             self._data[v].values = values[v].values
         self.status = Status(self._check_constraints())
 
-    def set_parent(self, parent: 'MassComposition') -> 'MassComposition':
+    def set_parent_node(self, parent: 'MassComposition') -> 'MassComposition':
         self.nodes = [parent.nodes[1], self.nodes[1]]
+        return self
+
+    def set_child_node(self, child: 'MassComposition') -> 'MassComposition':
+        self.nodes = [self.nodes[0], child.nodes[0]]
+        return self
+
+    def set_stream_nodes(self, nodes: Tuple[int, int]) -> 'MassComposition':
+        self.nodes = nodes
         return self
 
     def to_xarray(self) -> xr.Dataset:
@@ -180,7 +197,7 @@ class MassComposition:
     def aggregate(self, group_var: Optional[str] = None,
                   group_bins: Optional[Union[int, Iterable]] = None,
                   as_dataframe: bool = True,
-                  original_column_names: bool = False) -> Union[xr.Dataset, pd.DataFrame]:
+                  original_column_names: bool = False) -> Union[pd.DataFrame, xr.Dataset]:
         """Calculate the weight average.
 
         Args:
@@ -266,7 +283,7 @@ class MassComposition:
             xr_ds = self._copy_all_attrs(xr_ds, self.data)
 
         if relative_composition:
-            xr_relative: xr.Dataset = self.compare(other=other, comparison='recovery', explicit_names=False,
+            xr_relative: xr.Dataset = self.compare(other=other, comparisons='recovery', explicit_names=False,
                                                    as_dataframe=False)
             if isinstance(relative_composition, Dict):
                 for k, v in relative_composition.items():
@@ -276,7 +293,7 @@ class MassComposition:
                                          limits=relative_composition)
 
             # convert back to relative composition (mass/grades)
-            xr_ds = other.data.mc.composition_to_mass() * xr_relative
+            xr_ds = other.data.mc.mul(xr_relative)
             xr_ds = xr.merge([xr_ds, self.data[self.data.mc.mc_vars_attrs]])
             xr_ds = self._copy_all_attrs(xr_ds, self.data)
 
@@ -284,29 +301,39 @@ class MassComposition:
 
         return res
 
-    def compare(self, other: 'MassComposition', comparison: str = 'recovery',
+    def compare(self, other: 'MassComposition', comparisons: Union[str, List[str]] = 'recovery',
                 explicit_names: bool = True, as_dataframe: bool = True) -> Union[pd.DataFrame, xr.Dataset]:
 
-        valid_comparisons: Set = {'recovery', 'difference', 'divide'}
+        comparisons = [comparisons] if isinstance(comparisons, str) else comparisons
+        valid_comparisons: Set = {'recovery', 'difference', 'divide', 'all'}
+
+        def set_explicit_names(xrds, comparison) -> xr.Dataset:
+            xrds = xrds.rename_vars(
+                {col: f"{self.name}_{col}_{self.config['comparisons'][comparison]}_{other.name}" for col in
+                 xrds.data_vars})
+            return xrds
 
         cols = [col for col in self.data.data_vars if col not in self.data.mc.mc_vars_attrs]
 
-        if comparison == 'recovery':
-            res: xr.Dataset = self.data.mc.composition_to_mass()[cols] / other.data.mc.composition_to_mass()[cols]
-        elif comparison == 'difference':
-            res: xr.Dataset = self.data[cols] - other.data[cols]
-        elif comparison == 'divide':
-            res: xr.Dataset = self.data[cols] / other.data[cols]
-        else:
+        chunks: List[xr.Dataset] = []
+        if 'recovery' in comparisons or comparisons == ['all']:
+            ds: xr.Dataset = self.data.mc.composition_to_mass()[cols] / other.data.mc.composition_to_mass()[cols]
+            ds = set_explicit_names(ds, comparison='recovery') if explicit_names else ds
+            chunks.append(ds)
+        if 'difference' in comparisons or comparisons == ['all']:
+            ds: xr.Dataset = self.data[cols] - other.data[cols]
+            ds = set_explicit_names(ds, comparison='difference') if explicit_names else ds
+            chunks.append(ds)
+        if 'divide' in comparisons or comparisons == ['all']:
+            ds: xr.Dataset = self.data[cols] / other.data[cols]
+            ds = set_explicit_names(ds, comparison='divide') if explicit_names else ds
+            chunks.append(ds)
+
+        if not chunks:
             raise ValueError(f"The comparison argument is not valid: {valid_comparisons}")
 
-        if explicit_names:
-            res = res.rename_vars(
-                {col: f"{self.name}_{col}_{self.config['comparisons'][comparison]}_{other.name}" for col in
-                 res.data_vars})
-
-        if as_dataframe:
-            res: pd.DataFrame = res.to_dataframe()
+        res: xr.Dataset = xr.merge(chunks)
+        res: pd.DataFrame = res.to_dataframe() if as_dataframe else res
 
         return res
 
@@ -350,6 +377,114 @@ class MassComposition:
 
         return res
 
+    def ideal_incremental_separation(self, discard_from: Literal["lowest", "highest"] = "lowest") -> pd.DataFrame:
+        """Incrementally separate a fractionated sample.
+
+        This method sorts by the provided direction prior to incrementally removing and discarding the first fraction
+         (of the remaining fractions) and recalculating the mass-composition and recovery of the portion remaining.
+         This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        See also: ideal_incremental_composition, ideal_incremental_recovery.
+
+        Args:
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+
+        Returns:
+            A pandas DataFrame
+        """
+        self._check_one_dim_interval()
+
+        sample: pd.DataFrame = self.data.to_dataframe()
+
+        is_decreasing: bool = sample.index.is_monotonic_decreasing
+        if discard_from == "lowest":
+            sample.sort_index(ascending=True, inplace=True)
+            new_index: pd.Index = pd.Index(sample.index.left)
+        else:
+            sample.sort_index(ascending=False, inplace=True)
+            new_index: pd.Index = pd.Index(sample.index.right)
+        new_index.name = f"{sample.index.name}_cut-point"
+
+        aggregated_chunks: List = []
+        recovery_chunks: List = []
+        head: pd.DataFrame = sample.pipe(weight_average)
+
+        for i, indx in enumerate(sample.index):
+            tmp_composition: pd.DataFrame = sample.iloc[i:, :].pipe(weight_average)
+            aggregated_chunks.append(tmp_composition)
+            recovery_chunks.append(tmp_composition.pipe(calculate_recovery, df_ref=head))
+
+        res_composition: pd.DataFrame = pd.concat(aggregated_chunks).assign(attribute="composition").set_index(
+            new_index)
+        res_recovery: pd.DataFrame = pd.concat(recovery_chunks).assign(attribute="recovery").set_index(
+            new_index)
+
+        if is_decreasing:
+            res_composition.sort_index(ascending=False, inplace=True)
+            res_recovery.sort_index(ascending=False, inplace=True)
+
+        res: pd.DataFrame = pd.concat([res_composition, res_recovery]).reset_index().set_index(
+            [new_index.name, 'attribute'])
+
+        return res
+
+    def ideal_incremental_composition(self, discard_from: Literal["lowest", "highest"] = "lowest") -> pd.DataFrame:
+        """Incrementally separate a fractionated sample.
+
+        This method sorts by the provided direction prior to incrementally removing and discarding the first fraction
+         (of the remaining fractions) and recalculating the mass-composition of the portion remaining.
+         This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        See also: ideal_incremental_separation, ideal_incremental_recovery.
+
+        Args:
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+
+        Returns:
+            A pandas DataFrame
+        """
+        df: pd.DataFrame = self.ideal_incremental_separation(discard_from=discard_from).query(
+            'attribute=="composition"').droplevel('attribute')
+        return df
+
+    def ideal_incremental_recovery(self, discard_from: Literal["lowest", "highest"] = "lowest",
+                                   apply_closure: bool = True) -> pd.DataFrame:
+        """Incrementally separate a fractionated sample.
+
+        This method sorts by the provided direction prior to incrementally removing and discarding the first fraction
+         (of the remaining fractions) and recalculating the recovery of the portion remaining.
+         This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        See also: ideal_incremental_separation, ideal_incremental_composition.
+
+        Args:
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+            apply_closure: If True, Add the missing record (zero recovery) that closes the recovery envelope.
+
+        Returns:
+            A pandas DataFrame
+        """
+
+        df: pd.DataFrame = self.ideal_incremental_separation(discard_from=discard_from).query(
+            'attribute=="recovery"').droplevel('attribute').rename(columns={'mass_dry': 'mass'}).drop(
+            columns=["mass_wet", 'H2O'])
+        if apply_closure:
+            # add zero recovery record to close the envelope.
+            indx = np.inf if df.index.min() == 0.0 else 0.0
+            indx_name: str = df.index.name
+            df = pd.concat([df, pd.Series(0, index=df.columns, name=indx).to_frame().T]).sort_index(ascending=True)
+            df.index.name = indx_name
+        return df
+
     def split(self,
               fraction: float,
               name_1: Optional[str] = None,
@@ -378,10 +513,10 @@ class MassComposition:
 
         return out, comp
 
-    def partition(self,
-                  definition: Callable,
-                  name_1: Optional[str] = None,
-                  name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+    def apply_partition(self,
+                        definition: Callable,
+                        name_1: Optional[str] = None,
+                        name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
         """Partition the object along a given dimension.
 
         This method applies the defined separation resulting in two new objects.
@@ -399,7 +534,7 @@ class MassComposition:
         out = deepcopy(self)
         comp = deepcopy(self)
 
-        xr_ds_1, xr_ds_2 = self._data.mc.partition(definition=definition)
+        xr_ds_1, xr_ds_2 = self._data.mc.apply_partition(definition=definition)
 
         out._data = xr_ds_1
         comp._data = xr_ds_2
@@ -408,10 +543,42 @@ class MassComposition:
 
         return out, comp
 
-    def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> 'MassComposition':
-        res = deepcopy(self)
-        res._data = self._data.mc.resample(dim=dim, num_intervals=num_intervals, edge_precision=edge_precision)
-        return res
+    def calculate_partition(self, ref: 'MassComposition') -> pd.DataFrame:
+        """Calculate the partition of the ref stream relative to self"""
+        self._check_one_dim_interval()
+        return calculate_partition(df_feed=self.data.to_dataframe(), df_ref=ref.data.to_dataframe(),
+                                   col_mass_dry='mass_dry')
+
+    # def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -> 'MassComposition':
+    #     res = deepcopy(self)
+    #     res._data = self._data.mc.resample(dim=dim, num_intervals=num_intervals, edge_precision=edge_precision)
+    #     return res
+
+    def resample_1d(self, interval_edges: Union[Iterable, int],
+                    precision: Optional[int] = None,
+                    include_original_edges: bool = False) -> 'MassComposition':
+        """Resample a 1D fractional dim/index
+
+        Args:
+            interval_edges: The values of the new grid (interval edges).  If an int, will up-sample by that factor, for
+             example the value of 10 will automatically define edges that create 10 x the resolution (up-sampled).
+            precision: Optional integer for the number of decimal places to round the grid values to.
+            include_original_edges: If True include the original edges in the grid.
+
+        Returns:
+            A new object interpolated onto the new grid
+        """
+
+        # TODO: add support for supplementary variables
+
+        df_upsampled: pd.DataFrame = mass_preserving_interp(self.data.to_dataframe(),
+                                                            interval_edges=interval_edges, precision=precision,
+                                                            include_original_edges=include_original_edges)
+
+        obj: MassComposition = MassComposition(df_upsampled, name=self.name)
+        obj.nodes = self.nodes
+        obj.constraints = self.constraints
+        return obj
 
     def add(self, other: 'MassComposition', name: Optional[str] = None) -> 'MassComposition':
         """Add two objects
@@ -506,6 +673,7 @@ class MassComposition:
                        variables: List[str],
                        cumulative: bool = True,
                        direction: str = 'descending',
+                       show_edges: bool = True,
                        min_x: Optional[float] = None) -> go.Figure:
         """Plot "The Grade-Tonnage" curve.
 
@@ -515,6 +683,7 @@ class MassComposition:
             variables: List of variables to include in the plot
             cumulative: If True, the results are cumulative weight averaged.
             direction: 'ascending'|'descending', if cumulative is True, the direction of accumulation
+            show_edges: If True, show the edges on the plot.  Applicable to cumulative plots only.
             min_x: Optional minimum value for the x-axis, useful to set reasonable visual range with a log
             scaled x-axis when plotting size data
         """
@@ -560,11 +729,99 @@ class MassComposition:
 
         df = df[[x_var] + variables].melt(id_vars=[x_var], var_name='component')
 
+        if cumulative and show_edges:
+            plot_kwargs['markers'] = True
+
         fig = px.line(df, x=x_var, y='value', facet_row='component', **plot_kwargs)
         fig.for_each_annotation(lambda a: a.update(text=a.text.replace("component=", "")))
         fig.update_yaxes(matches=None)
         fig.update_layout(title=self.name)
 
+        return fig
+
+    def plot_grade_recovery(self, target_analyte,
+                            discard_from: Literal["lowest", "highest"] = "lowest",
+                            title: Optional[str] = None,
+                            ) -> go.Figure:
+        """The grade-recovery plot.
+
+        The grade recovery curve is generated by assuming an ideal separation (for the chosen property, or dimension)
+        at each fractional interval.  It defines the theoretical maximum performance, which can only be improved if
+        liberation is improved by comminution.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        Args:
+            target_analyte: The analyte of value.
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+            title: Optional plot title
+
+        Returns:
+            A plotly.GraphObjects figure
+        """
+        title = title if title is not None else 'Ideal Grade - Recovery'
+
+        df: pd.DataFrame = self.ideal_incremental_separation(discard_from=discard_from)
+        df_recovery: pd.DataFrame = df.loc[(slice(None), 'recovery'), [target_analyte, 'mass_dry']].droplevel(
+            'attribute').rename(
+            columns={'mass_dry': 'Yield', target_analyte: f"{target_analyte}_recovery"})
+        df_composition: pd.DataFrame = df.loc[(slice(None), 'composition'), :].droplevel('attribute').drop(
+            columns=['mass_wet', 'mass_dry', 'H2O'])
+
+        df_plot: pd.DataFrame = pd.concat([df_recovery, df_composition], axis=1).reset_index()
+        fig = px.line(df_plot, x=target_analyte,
+                      y=f"{target_analyte}_recovery",
+                      hover_data=df_plot.columns,
+                      title=title)
+        # fig.update_layout(xaxis_title=f"Grade of {target_analyte}", yaxis_title=f"Recovery of {target_analyte}",
+        #                   title=title)
+
+        return fig
+
+    def plot_amenability(self, target_analyte: str,
+                         discard_from: Literal["lowest", "highest"] = "lowest",
+                         gangue_analytes: Optional[str] = None,
+                         title: Optional[str] = None,
+                         ) -> go.Figure:
+        """The yield-recovery plot.
+
+        The yield recovery curve provides an understanding of the amenability of a sample.
+
+        This method is only applicable to a 1D object where the single dimension is a pd.Interval type.
+
+        Args:
+            target_analyte: The analyte of value.
+            discard_from: Defines the discarded direction.  discard_from = "lowest" will discard the lowest value
+             first, then the next lowest, etc.
+            gangue_analytes: The analytes to be rejected
+            title: Optional plot title
+
+        Returns:
+            A plotly.GraphObjects figure
+        """
+        title = title if title is not None else 'Amenability Plot'
+        df: pd.DataFrame = self.ideal_incremental_recovery(discard_from=discard_from)
+        amenability_indices: pd.Series = amenability_index(df, col_target=target_analyte, col_mass_recovery='mass')
+
+        analytes = [col for col in df.columns if col != "mass"] if gangue_analytes is None else [
+            target_analyte + gangue_analytes]
+
+        mass_rec: pd.DataFrame = df["mass"]
+        df = df[analytes]
+
+        fig = go.Figure()
+        for analyte in analytes:
+            fig.add_trace(
+                go.Scatter(x=mass_rec, y=df[analyte], mode="lines",
+                           name=f"{analyte} ({round(amenability_indices[analyte], 2)})",
+                           customdata=df.index.values,
+                           hovertemplate='<b>Recovery: %{y:.3f}</b><br>Cut-point: %{customdata:.3f} '))
+        fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name='y=x',
+                                 line=dict(shape='linear', color='gray', dash='dash'),
+                                 ))
+        fig.update_layout(xaxis_title='Yield (Mass Recovery)', yaxis_title='Recovery', title=title,
+                          hovermode='x')
         return fig
 
     def plot_parallel(self, color: Optional[str] = None,
@@ -595,6 +852,68 @@ class MassComposition:
 
         fig = parallel_plot(data=df, color=color, vars_include=vars_include, vars_exclude=vars_exclude, title=title,
                             include_dims=include_dims, plot_interval_edges=plot_interval_edges)
+        return fig
+
+    def plot_comparison(self, other: 'MassComposition',
+                        color: Optional[str] = None,
+                        vars_include: Optional[List[str]] = None,
+                        vars_exclude: Optional[List[str]] = None,
+                        facet_col_wrap: int = 3,
+                        trendline: bool = False,
+                        trendline_kwargs: Optional[Dict] = None,
+                        title: Optional[str] = None) -> go.Figure:
+        """Create an interactive parallel plot
+
+        Useful to compare the difference in component values between two objects.
+
+        Args:
+            other: the object to compare with self.
+            color: Optional color variable
+            vars_include: Optional List of variables to include in the plot
+            vars_exclude: Optional List of variables to exclude in the plot
+            trendline: If True and trendlines
+            trendline_kwargs: Allows customising the trendline: ref: https://plotly.com/python/linear-fits/
+            title: Optional plot title
+            facet_col_wrap: The number of subplot columns per row.
+
+        Returns:
+
+        """
+        df_self: pd.DataFrame = self.data.to_dataframe()
+        df_other: pd.DataFrame = other.data.to_dataframe()
+
+        if vars_include is not None:
+            missing_vars = set(vars_include).difference(set(df_self.columns))
+            if len(missing_vars) > 0:
+                raise KeyError(f'var_subset provided contains variable not found in the data: {missing_vars}')
+            df_self = df_self[vars_include]
+        if vars_exclude:
+            df_self = df_self[[col for col in df_self.columns if col not in vars_exclude]]
+        df_other = df_other[df_self.columns]
+        # Supplementary variables are the same for each stream and so will be unstacked.
+        supp_cols: List[str] = [col for col in df_self.columns if col in self.variables.supplementary.get_col_names()]
+        if supp_cols:
+            df_self.set_index(supp_cols, append=True, inplace=True)
+            df_other.set_index(supp_cols, append=True, inplace=True)
+
+        index_names = list(df_self.index.names)
+        cols = list(df_self.columns).copy()
+
+        df_self = df_self[cols].assign(name=self.name).reset_index().melt(id_vars=index_names + ['name'])
+        df_other = df_other[cols].assign(name=other.name).reset_index().melt(id_vars=index_names + ['name'])
+
+        df_plot: pd.DataFrame = pd.concat([df_self, df_other])
+        df_plot = df_plot.set_index(index_names + ['name', 'variable'], drop=True).unstack(['name'])
+        df_plot.columns = df_plot.columns.droplevel(0)
+        df_plot.reset_index(level=list(np.arange(-1, -len(index_names) - 1, -1)), inplace=True)
+
+        # set variables back to standard order
+        variable_order: Dict = {col: i for i, col in enumerate(cols)}
+        df_plot = df_plot.sort_values(by=['variable'], key=lambda x: x.map(variable_order))
+
+        fig: go.Figure = comparison_plot(data=df_plot, x=self.name, y=other.name, facet_col_wrap=facet_col_wrap,
+                                         color=color, trendline=trendline, trendline_kwargs=trendline_kwargs)
+        fig.update_layout(title=title)
         return fig
 
     def plot_ternary(self, variables: List[str], color: Optional[str] = None,
@@ -691,12 +1010,17 @@ class MassComposition:
 
         return res
 
+    def __eq__(self, other):
+        if isinstance(other, MassComposition):
+            return self.__dict__ == other.__dict__
+        return False
+
     @staticmethod
     def _check_cols_in_data_cols(cols: List[str], cols_data: List[str]):
         for col in cols:
             if (col is not None) and (col not in cols_data):
                 msg: str = f"{col} not in the data columns: {cols_data}"
-                logging.error(msg)
+                logging.getLogger(__name__).error(msg)
                 raise IndexError(msg)
 
     @staticmethod
@@ -750,33 +1074,34 @@ class MassComposition:
 
     def _create_interval_indexes(self, data: pd.DataFrame) -> pd.DataFrame:
 
-        for pair in self.config['intervals']['suffixes']:
-            suffix_candidates: Dict = {n: n.split('_')[-1].lower() for n in data.index.names}
-            suffixes: Dict = {k: v for k, v in suffix_candidates.items() if v in pair}
-            if suffixes:
-                indexes_orig: List = data.index.names
-                data = data.reset_index()
-                num_intervals: int = int(len(suffixes.keys()) / 2)
-                for i in range(0, num_intervals):
-                    keys = list(suffixes.keys())[i: i + 2]
-                    base_name: str = '_'.join(keys[0].split('_')[:-1])
-                    data[base_name] = pd.arrays.IntervalArray.from_arrays(left=data[keys[0]], right=data[keys[1]],
-                                                                          closed=self.config['intervals']['closed'])
-                    # verbose but need to preserve index order...
-                    new_indexes: List = []
-                    index_edge_names: Dict = {base_name: {'left': keys[0].split('_')[-1],
-                                                          'right': keys[1].split('_')[-1]}}
-                    for index in indexes_orig:
-                        if index not in keys:
-                            new_indexes.append(index)
-                        if (index in keys) and (base_name not in new_indexes):
-                            new_indexes.append(base_name)
+        if (data.index.names is not None) and (data.index.names[0] is not None):
+            for pair in self.config['intervals']['suffixes']:
+                suffix_candidates: Dict = {n: n.split('_')[-1].lower() for n in data.index.names}
+                suffixes: Dict = {k: v for k, v in suffix_candidates.items() if v in pair}
+                if suffixes:
+                    indexes_orig: List = data.index.names
+                    data = data.reset_index()
+                    num_intervals: int = int(len(suffixes.keys()) / 2)
+                    for i in range(0, num_intervals):
+                        keys = list(suffixes.keys())[i: i + 2]
+                        base_name: str = '_'.join(keys[0].split('_')[:-1])
+                        data[base_name] = pd.arrays.IntervalArray.from_arrays(left=data[keys[0]], right=data[keys[1]],
+                                                                              closed=self.config['intervals']['closed'])
+                        # verbose but need to preserve index order...
+                        new_indexes: List = []
+                        index_edge_names: Dict = {base_name: {'left': keys[0].split('_')[-1],
+                                                              'right': keys[1].split('_')[-1]}}
+                        for index in indexes_orig:
+                            if index not in keys:
+                                new_indexes.append(index)
+                            if (index in keys) and (base_name not in new_indexes):
+                                new_indexes.append(base_name)
 
-                    # push the left and right names (suffixes) to the dataset attrs
-                    # (series attrs are lost when set to an index)
-                    data.attrs = index_edge_names
-                    data.set_index(new_indexes, inplace=True)
-                    data.drop(columns=keys, inplace=True)
+                        # push the left and right names (suffixes) to the dataset attrs
+                        # (series attrs are lost when set to an index)
+                        data.attrs = index_edge_names
+                        data.set_index(new_indexes, inplace=True)
+                        data.drop(columns=keys, inplace=True)
 
         return data
 
@@ -792,14 +1117,14 @@ class MassComposition:
             raise KeyError(f"At least one mass variable must be supplied to solve mass-moisture: {d_mass_var_exists}")
         if sum(list(d_var_exists.values())) == 3:
             # TODO: add mass-moisture balance integrity check.
-            self._logger.warning(
+            self._logger.info(
                 'The mass-moisture variables are over-specified and not (yet) checked for balance. '
                 'Moisture is ignored and the mass variables assumed to be correct.')
 
         # assume zero moisture
         if sum(list(d_var_exists.values())) == 1:
             data[d_var_map['moisture']] = 0.0
-            self._logger.warning('Zero moisture has been assumed.')
+            self._logger.info('Zero moisture has been assumed.')
 
         if not d_var_exists['mass_wet']:
             data[d_var_map['mass_wet']] = solve_mass_moisture(mass_dry=data[d_var_map['mass_dry']],
@@ -846,3 +1171,12 @@ class MassComposition:
             chunks.append(df.loc[(df[variable] < bounds[0]) | (df[variable] > bounds[1]), variable])
         oor: pd.DataFrame = pd.concat(chunks, axis='columns')
         return oor
+
+    def _check_one_dim_interval(self):
+        if len(self.data.dims) > 1:
+            raise NotImplementedError(f"This object is {len(self.data.dims)} dimensional. "
+                                      f"Only 1D interval objects are valid")
+        index_var: str = str(list(self.data.dims.keys())[0])
+        if not isinstance(self.data[index_var].data[0], pd.Interval):
+            raise NotImplementedError(f"The dim {index_var} of this object is not a pd.Interval. "
+                                      f" Only 1D interval objects are valid")
