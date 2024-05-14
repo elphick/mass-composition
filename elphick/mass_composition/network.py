@@ -49,9 +49,9 @@ class MCNetwork:
         streams: List[MassComposition] = cls._check_indexes(streams)
         bunch_of_edges: List = []
         for stream in streams:
-            if stream.nodes is None:
+            if stream._nodes is None:
                 raise KeyError(f'Stream {stream.name} does not have the node property set')
-            nodes = stream.nodes
+            nodes = stream._nodes
 
             # add the objects to the edges
             bunch_of_edges.append((nodes[0], nodes[1], {'mc': stream}))

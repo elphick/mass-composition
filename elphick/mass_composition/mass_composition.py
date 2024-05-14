@@ -54,8 +54,8 @@ class MassComposition:
             config_file = Path(__file__).parent / './config/mc_config.yml'
         self.config = read_yaml(config_file)
 
-        # nodes become useful when multiple objects exist
-        self.nodes: List[int] = [random_int(), random_int()]
+        # _nodes can preserve relationships from math operations, and can be used to build a network.
+        self._nodes: List[Union[str, int]] = [random_int(), random_int()]
 
         self._name: str = name
         self._mass_units = self.config['units']['mass'] if not mass_units else None
@@ -177,15 +177,15 @@ class MassComposition:
         self.status = Status(self._check_constraints())
 
     def set_parent_node(self, parent: 'MassComposition') -> 'MassComposition':
-        self.nodes = [parent.nodes[1], self.nodes[1]]
+        self._nodes = [parent._nodes[1], self._nodes[1]]
         return self
 
     def set_child_node(self, child: 'MassComposition') -> 'MassComposition':
-        self.nodes = [self.nodes[0], child.nodes[0]]
+        self._nodes = [self._nodes[0], child._nodes[0]]
         return self
 
     def set_stream_nodes(self, nodes: Tuple[int, int]) -> 'MassComposition':
-        self.nodes = nodes
+        self._nodes = nodes
         return self
 
     def to_xarray(self) -> xr.Dataset:
@@ -578,7 +578,7 @@ class MassComposition:
                                                             include_original_edges=include_original_edges)
 
         obj: MassComposition = MassComposition(df_upsampled, name=self.name)
-        obj.nodes = self.nodes
+        obj.nodes = self._nodes
         obj.constraints = self.constraints
         return obj
 
@@ -970,8 +970,8 @@ class MassComposition:
         res: MassComposition = MassComposition(name=xr_sum.mc.name, constraints=self.constraints)
         res.set_data(data=xr_sum, constraints=self.constraints)
 
-        other.nodes = [other.nodes[0], self.nodes[1]]
-        res.nodes = [self.nodes[1], random_int()]
+        other._nodes = [other._nodes[0], self._nodes[1]]
+        res._nodes = [self._nodes[1], random_int()]
 
         return res
 
@@ -991,7 +991,7 @@ class MassComposition:
         res: MassComposition = MassComposition(name=xr_sub.mc.name, constraints=self.constraints)
         res.set_data(data=xr_sub, constraints=self.constraints)
 
-        res.nodes = [self.nodes[1], random_int()]
+        res.nodes = [self._nodes[1], random_int()]
         return res
 
     def __truediv__(self, other: 'MassComposition') -> 'MassComposition':
@@ -1046,8 +1046,8 @@ class MassComposition:
             obj_1._data.mc.rename(name_1)
         if name_2:
             obj_2._data.mc.rename(name_2)
-        obj_1.nodes = [self.nodes[1], random_int()]
-        obj_2.nodes = [self.nodes[1], random_int()]
+        obj_1._nodes = [self._nodes[1], random_int()]
+        obj_2._nodes = [self._nodes[1], random_int()]
         obj_1._name = name_1
         obj_2._name = name_2
         return obj_1, obj_2

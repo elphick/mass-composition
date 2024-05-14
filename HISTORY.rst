@@ -1,3 +1,12 @@
+Mass_Composition 0.4.12 (2024-05-15)
+====================================
+
+Feature
+-------
+
+- Added Stream object as a version of MassComposition with source_node and destination_node attributes. (#87)
+
+
 Mass_Composition 0.4.11 (2024-05-14)
 ====================================
 

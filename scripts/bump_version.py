@@ -15,6 +15,23 @@ def process_command_line_parameters():
     return args
 
 
+def adjust_changelog():
+    with open('CHANGELOG.md', 'r') as file:
+        lines = file.readlines()
+
+    # Remove 'Elphick.' prefix from the first line
+    prefix = 'Elphick.'
+    if lines[0].startswith(prefix):
+        lines[0] = lines[0][len(prefix):]
+
+    # Adjust the length of the underline on the second line
+    if lines[1].startswith('='):
+        lines[1] = '=' * (len(lines[0].strip()) - 1) + '\n'  # -1 for the newline character
+
+    with open('CHANGELOG.md', 'w') as file:
+        file.writelines(lines)
+
+
 def main():
     args = process_command_line_parameters()
 
@@ -29,6 +46,12 @@ def main():
     run_command("poetry install --all-extras")
     # run_command("python towncrier/create_news.py")
     run_command("towncrier")
+
+    # remove the news fragments
+    run_command("rm -rf newsfragments/*")
+
+    # strip the Elphick. prefix from the top heading only.
+    adjust_changelog()
 
 
 if __name__ == "__main__":
