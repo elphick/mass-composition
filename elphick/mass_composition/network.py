@@ -145,12 +145,12 @@ class MCNetwork:
 
         # Copy the nodes from the dag to the MCNetwork
         for nid, (node, data) in enumerate(dag.graph.nodes(data=True)):
-            mcn.graph.add_node(data['name'], mc=MCNode(node_id=nid, node_name=data['name']))
+            mcn.graph.add_node(node, mc=MCNode(node_id=nid, node_name=node))
 
         # Copy the edges from the dag to the MCNetwork
         for edge in dag.graph.edges:
             # Retrieve the MassComposition object from the edge
-            mc = dag.graph.edges[edge]['mc']
+            mc = dag.graph.edges[edge]
             # Use the name of the MassComposition object as the name of the edge
             mcn.graph.add_edge(*edge, name=mc.name, **dag.graph.edges[edge])
 
