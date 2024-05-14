@@ -1012,12 +1012,17 @@ class MassComposition:
 
         return res
 
+    def __eq__(self, other):
+        if isinstance(other, MassComposition):
+            return self.__dict__ == other.__dict__
+        return False
+
     @staticmethod
     def _check_cols_in_data_cols(cols: List[str], cols_data: List[str]):
         for col in cols:
             if (col is not None) and (col not in cols_data):
                 msg: str = f"{col} not in the data columns: {cols_data}"
-                logging.error(msg)
+                logging.getLogger(__name__).error(msg)
                 raise IndexError(msg)
 
     @staticmethod

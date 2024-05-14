@@ -978,13 +978,13 @@ class MCNetwork:
                     s: str = stream.name
                     tmp_nans: pd.Series = stream_nans.query('stream==@s').sum(axis=1)
                     if tmp_nans.iloc[0] > 0:
-                        logging.debug(f'The {s} stream has missing coarse sizes')
+                        logger.debug(f'The {s} stream has missing coarse sizes')
                         first_zero_index = tmp_nans.loc[tmp_nans == 0].index[0]
                         if tmp_nans[tmp_nans.index <= first_zero_index].sum() > 0:
-                            logging.debug(f'The {s} stream has missing sizes requiring interpolation')
+                            logger.debug(f'The {s} stream has missing sizes requiring interpolation')
                             raise NotImplementedError('Coming soon - we need interpolation!')
                         else:
-                            logging.debug(f'The {s} stream has missing coarse sizes only')
+                            logger.debug(f'The {s} stream has missing coarse sizes only')
                             stream_df = df_streams_full.loc[:, (slice(None), s)].droplevel(-1, axis=1).fillna(0)
                             # recreate the stream from the dataframe
                             stream.set_data(stream_df)
