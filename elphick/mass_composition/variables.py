@@ -127,6 +127,13 @@ class Variables:
             res.append(variable)
         return res
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Variables):
+            # Compare the instances based on their attributes
+            return (self._variables == other._variables and self._config == other._config and
+                    self._supplied == other._supplied and self._specified_map == other._specified_map)
+        return False
+
     def _detect_moisture_var(self) -> Variable:
         v = 'moisture'
         match = re.search(self._config[v]['search_regex'], '\n'.join(self._supplied),
@@ -166,7 +173,3 @@ class Variables:
                                           group=VariableGroups.SUPPLEMENTARY)
             res.append(variable)
         return res
-
-
-
-

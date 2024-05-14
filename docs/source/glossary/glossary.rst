@@ -10,3 +10,11 @@ Glossary
     composition
         The composition of the DRY mass.  Typically chemical composition is of interest (elements and oxides),
         however mineral composition is/will be supported.
+
+    MassComposition
+        A class that holds the mass and composition of a sample.
+
+    Stream
+        A class that inherits MassComposition, and has a source and destination property. It is used to represent
+        a MassComposition object flowing between two nodes in a network. Synonymous with a stream in a processing
+        flowsheet.

@@ -33,7 +33,7 @@ obj_mc_1, obj_mc_2 = obj_mc.split(0.4, name_1='stream 1', name_2='stream 2')
 # This is done to capture the relationships implicitly defined by any math operations performed on the objects.
 
 for obj in [obj_mc, obj_mc_1, obj_mc_2]:
-    print(obj.name, obj.nodes)
+    print(obj.name, obj._nodes)
 
 # %%
 #
@@ -54,7 +54,7 @@ for node in mcn.graph.nodes:
 # Note that the random node placeholder integers have been renumbered for readability.
 
 for obj in [obj_mc, obj_mc_1, obj_mc_2]:
-    print(obj.name, obj.nodes)
+    print(obj.name, obj._nodes)
 
 # %%
 # Print the overall network balanced status

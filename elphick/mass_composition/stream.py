@@ -6,31 +6,29 @@ from elphick.mass_composition.utils.sampling import random_int
 
 
 class Stream(MassComposition):
-    def __init__(self, nodes: Optional[Tuple[int, int]] = None, **kwargs):
+    def __init__(self, mc: MassComposition, **kwargs):
         """
-
         Args:
-            nodes: (u, v) representing (from_node, to_node)
+            mc: MassComposition object to be used as a stream.
             **kwargs: The key word arguments for the Mass Composition object
-
-            data:
-            name:
-            mass_wet_var:
-            mass_dry_var:
-            moisture_var:
-            chem_vars:
-            mass_units:
-            constraints:
-            config_file:
         """
-        if nodes:
-            self.nodes: Tuple[int, int] = nodes
-        else:
-            self.nodes: Tuple[int, int] = (random_int(), random_int())
+        # Filter out all private properties
+        mc_dict = {k: v for k, v in mc.__dict__.items() if
+                   not (k.startswith('_') or k in ['config', 'variables', 'status'])}
 
-        super(MassComposition, self).__init__(**kwargs)
+        super().__init__(**mc_dict, **kwargs)
+        self.set_data(data=mc._data, constraints=mc.constraints)
+        self._nodes = mc._nodes
+        self.variables = mc.variables
 
+    @property
+    def source_node(self):
+        return self._nodes[0]
 
-if __name__ == '__main__':
-    obj: Stream = Stream(kwargs={'data': sample_data()})
-    print('done')
+    @property
+    def destination_node(self):
+        return self._nodes[1]
+
+    @classmethod
+    def from_mass_composition(cls, mc: MassComposition, **kwargs):
+        return cls(mc=mc, **kwargs)

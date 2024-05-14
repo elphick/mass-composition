@@ -14,10 +14,16 @@ class Status:
     @property
     def ok(self) -> bool:
         if self.num_oor > 0:
-            self._logger.warning(f'{self.num_oor} OOR records exist.')
+            self._logger.warning(f'{self.num_oor} out of range records exist.')
         return True if self.num_oor == 0 else False
 
     def __str__(self) -> str:
         res: str = f'status.ok: {self.ok}\n'
         res += f'num_oor: {self.num_oor}'
         return res
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Status):
+            # Compare the instances based on their attributes
+            return self.oor.equals(other.oor)
+        return False
