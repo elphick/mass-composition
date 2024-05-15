@@ -86,13 +86,14 @@ class DAG:
     def output(strm: Stream) -> Stream:
         return strm
 
-    def add_input(self, name: str):
+    def add_input(self, name: str) -> 'DAG':
         self.graph.add_node(name, operation=DAG.input, kwargs=None, defined=True, name=name, strm=None,
                             dependencies=[])
         # Update the stream_to_node mapping
         self.stream_parent_node[name] = name
+        return self
 
-    def add_step(self, name: str, operation: Callable, streams: List[str], kwargs: dict = None, defined: bool = True):
+    def add_step(self, name: str, operation: Callable, streams: List[str], kwargs: dict = None, defined: bool = True) -> 'DAG':
         # Determine dependencies from the input streams
         dependencies = [self.stream_parent_node[stream] for stream in streams]
         self.graph.add_node(name, operation=operation, dependencies=dependencies, kwargs=kwargs, defined=defined)
@@ -102,13 +103,15 @@ class DAG:
             for key, value in kwargs.items():
                 if key in ['name', 'name_1', 'name_2']:
                     self.stream_parent_node[value] = name
+        return self
 
-    def add_output(self, name: str, stream: str):
+    def add_output(self, name: str, stream: str) -> 'DAG':
         parent_node = self.stream_parent_node.get(stream)
         if parent_node is None:
             raise ValueError(f"No parent node found for stream {stream}")
         self.graph.add_node(name, operation=DAG.output, dependencies=[stream], kwargs=None, defined=True, name=name)
         self.graph.add_edge(parent_node, name)
+        return self
 
     def _topological_sort(self) -> List[str]:
         return list(nx.topological_sort(self.graph))

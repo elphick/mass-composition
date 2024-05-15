@@ -8,6 +8,11 @@ def run_command(command):
     process.wait()
 
 
+def run_towncrier():
+    process = subprocess.Popen('towncrier', stdin=subprocess.PIPE, shell=True)
+    process.communicate(input=b'N\n')
+
+
 def process_command_line_parameters():
     parser = argparse.ArgumentParser()
     parser.add_argument('increment', type=str, help='The increment type (major, minor, patch)')
@@ -26,7 +31,7 @@ def adjust_changelog():
 
     # Adjust the length of the underline on the second line
     if lines[1].startswith('='):
-        lines[1] = '=' * (len(lines[0].strip()) - 1) + '\n'  # -1 for the newline character
+        lines[1] = '=' * (len(lines[0].strip())) + '\n'  # -1 for the newline character
 
     with open('HISTORY.rst', 'w') as file:
         file.writelines(lines)
@@ -44,10 +49,10 @@ def main():
     # Run the commands
     run_command(f"poetry version {increment}")
     run_command("poetry install --all-extras")
-    # run_command("python towncrier/create_news.py")
-    run_command("towncrier")
 
-    # remove the news fragments
+    run_towncrier()
+
+    # remove the news fragments manually.
     run_command("rm -rf newsfragments/*")
 
     # strip the Elphick. prefix from the top heading only.

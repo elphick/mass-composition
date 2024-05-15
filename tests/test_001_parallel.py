@@ -12,7 +12,7 @@ def test_init_and_call():
         return n * 2
 
     # Create an iterable
-    iterable = tuple([(i, multiply_by_two, {}) for i in range(5)])
+    iterable = [(multiply_by_two, (i,), {}) for i in range(5)]
 
     # Process the iterable with the TqdmParallel object
     result = tp(iterable)
