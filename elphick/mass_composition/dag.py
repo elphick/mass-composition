@@ -5,11 +5,13 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from joblib import Parallel, delayed
 
-from elphick.mass_composition import MassComposition
+from elphick.mass_composition import Stream, MassComposition
+
+logger = logging.getLogger(__name__)
 
 
 class Node:
-    def __init__(self, operation: Callable[..., Union[MassComposition, Tuple[MassComposition, MassComposition]]],
+    def __init__(self, operation: Callable[..., Union[Stream, Tuple[Stream, Stream]]],
                  dependencies: List[str], kwargs: dict = None):
         self.operation = operation
         self.dependencies = dependencies
@@ -19,27 +21,57 @@ class Node:
 class DAG:
     def __init__(self, name: str = 'DAG', n_jobs=-1):
         self.name = name
+        self.stream_parent_node = {}  # Map stream names to node names
         self.n_jobs = n_jobs  # Number of workers for parallel execution
         self.graph = nx.DiGraph()
-        self.results = {}  # Store the results of node executions
+        self.node_executed = {}  # Store the execution state of nodes
+
+    # @property
+    # def mass_compositions(self) -> dict[str, Stream]:
+    #     """
+    #     Retrieves all the Stream objects associated with the nodes in the DAG.
+    #
+    #     This property iterates over all the nodes in the DAG, checks if the node has been executed,
+    #     and if so, retrieves the result of the node execution. If the node has not been executed,
+    #     it retrieves the Stream object associated with the node in the graph.
+    #
+    #     Returns:
+    #         dict[str, Stream]: A dictionary where the keys are node names and the values
+    #         are Stream objects associated with those nodes.
+    #     """
+    #     mass_compositions = {}
+    #     for node in self.graph.nodes:
+    #         if node in self.node_executed:
+    #             result = self.node_executed[node]
+    #             if isinstance(result, Stream):
+    #                 mass_compositions[node] = result
+    #             elif isinstance(result, tuple) and all(isinstance(r, Stream) for r in result):
+    #                 for r in result:
+    #                     mass_compositions[r.name] = r
+    #         else:
+    #             # If the node is not in the results dictionary, it is a leaf node
+    #             # Retrieve its result from the Stream objects associated with the node in the graph
+    #             mc = self.graph.nodes[node]['mc']
+    #             mass_compositions[node] = mc
+    #     return mass_compositions
 
     @property
-    def mass_compositions(self):
-        mass_compositions = {}
-        for node in self.graph.nodes:
-            if node in self.results:
-                result = self.results[node]
-                if isinstance(result, MassComposition):
-                    mass_compositions[node] = result
-                elif isinstance(result, tuple) and all(isinstance(r, MassComposition) for r in result):
-                    for r in result:
-                        mass_compositions[r.name] = r
-            else:
-                # If the node is not in the results dictionary, it is a leaf node
-                # Retrieve its result from the MassComposition objects associated with the node in the graph
-                mc = self.graph.nodes[node]['mc']
-                mass_compositions[node] = mc
-        return mass_compositions
+    def streams(self):
+        """
+        Retrieves all the Stream objects associated with the edges in the DAG.
+
+        This property iterates over all the edges in the DAG and retrieves the Stream object associated with each edge.
+
+        Returns:
+            dict[str, Stream]: A dictionary where the keys are edge names and the values
+            are Stream objects associated with those edges.
+        """
+        streams = {}
+        for edge in self.graph.edges:
+            strm = self.graph.edges[edge].get('mc')
+            if strm is not None:
+                streams[strm.name] = strm
+        return streams
 
     @property
     def all_nodes_(self):
@@ -47,50 +79,66 @@ class DAG:
         return list(self.graph.nodes)
 
     @staticmethod
-    def input(mc: MassComposition) -> MassComposition:
-        return mc
+    def input(strm: Stream) -> Stream:
+        return strm
 
     @staticmethod
-    def output(inputs: Union[MassComposition, List[MassComposition,]], name: str) -> MassComposition:
-        res: Optional[MassComposition] = None
-        if isinstance(inputs, MassComposition):
-            if inputs.name == name:
-                res = inputs
-        else:
-            inputs = [item for sublist in inputs for item in sublist]  # flatten the list.
-            for mc in inputs:
-                if mc.name == name:
-                    return mc
-        return res
+    def output(strm: Stream) -> Stream:
+        return strm
 
-    def add_node(self, name: str, operation: Callable[..., MassComposition], dependencies: List[str] = None,
-                 kwargs: dict = None, defined: bool = True, mc: MassComposition = None) -> 'DAG':
-        dependencies = dependencies if dependencies is not None else []
-        self.graph.add_node(name, operation=operation, kwargs=kwargs, defined=defined, name=name, mc=mc,
-                            dependencies=dependencies)
-        for dependency in dependencies:
-            self.graph.add_edge(dependency, name)
-
-        # Validate the uniqueness of the step names and the MassComposition names
-        self._validate_unique_names()
+    def add_input(self, name: str) -> 'DAG':
+        self.graph.add_node(name, operation=DAG.input, kwargs=None, defined=True, name=name, strm=None,
+                            dependencies=[])
+        # Update the stream_to_node mapping
+        self.stream_parent_node[name] = name
         return self
 
-    def topological_sort(self) -> List[str]:
+    def add_step(self, name: str, operation: Callable, streams: List[str], kwargs: dict = None, defined: bool = True) -> 'DAG':
+        # Determine dependencies from the input streams
+        dependencies = [self.stream_parent_node[stream] for stream in streams]
+        self.graph.add_node(name, operation=operation, dependencies=dependencies, kwargs=kwargs, defined=defined)
+        for stream in streams:
+            self.graph.add_edge(self.stream_parent_node[stream], name, name=stream)
+        if kwargs is not None:
+            for key, value in kwargs.items():
+                if key in ['name', 'name_1', 'name_2']:
+                    self.stream_parent_node[value] = name
+        return self
+
+    def add_output(self, name: str, stream: str) -> 'DAG':
+        parent_node = self.stream_parent_node.get(stream)
+        if parent_node is None:
+            raise ValueError(f"No parent node found for stream {stream}")
+        self.graph.add_node(name, operation=DAG.output, dependencies=[stream], kwargs=None, defined=True, name=name)
+        self.graph.add_edge(parent_node, name)
+        return self
+
+    def _topological_sort(self) -> List[str]:
         return list(nx.topological_sort(self.graph))
 
-    def run(self, mcs: dict):
-        logging.info("Running the DAG")  # Log the node that is being executed
+    def run(self, input_streams: dict):
+        """
+        Executes the Directed Acyclic Graph (DAG).
 
-        # Set the 'mc' attribute of the nodes to the corresponding MassComposition objects from the mcs dictionary
-        for node, mc in mcs.items():
-            if node in self.graph.nodes:
-                self.graph.nodes[node]['mc'] = mc
+        This method takes a dictionary of Stream objects as input and executes the operations defined in
+        the DAG.
+        The execution starts from the input nodes and proceeds in a topological order, ensuring that each node
+        is executed only after all its predecessors have been executed. The results of the node executions are
+        stored in the `self.streams` dictionary.
 
-        # Add nodes to the graph in the order they appear in the mcs dictionary
-        for node in mcs.keys():
-            self.add_node(node, self.graph.nodes[node]['operation'], self.graph.nodes[node]['dependencies'],
-                          kwargs=self.graph.nodes[node]['kwargs'], defined=self.graph.nodes[node]['defined'],
-                          mc=self.graph.nodes[node]['mc'])
+        Parameters:
+        input_streams (dict): A dictionary mapping node names to Stream objects. These are the initial Stream objects
+                    for the input nodes of the DAG.
+
+        Returns:
+        None
+        """
+        logger.info("Running the DAG")  # Log the node that is being executed
+        self._finalize()
+
+        # Initialize the execution state of all nodes to False
+        for node in self.graph.nodes:
+            self.node_executed[node] = False
 
         executed_nodes = set()  # Keep track of nodes that have been executed
 
@@ -100,82 +148,122 @@ class DAG:
                            all(pred in executed_nodes for pred in self.graph.predecessors(node)) and
                            node not in executed_nodes]
 
-            logging.info(f"Ready nodes: {ready_nodes}")
-            logging.info(f"Executed nodes: {list(executed_nodes)}")
+            logger.debug(f"Ready nodes: {ready_nodes}")
+            logger.debug(f"Executed nodes: {list(executed_nodes)}")
+            logger.debug(f"Result streams: {self.streams}")
 
             if not ready_nodes:
                 unexecuted_nodes = set(self.graph.nodes) - executed_nodes
                 for node in unexecuted_nodes:
                     predecessors = list(self.graph.predecessors(node))
-                    logging.info(f"Node {node} is waiting for {predecessors}")
+                    logger.debug(f"Node {node} is waiting for {predecessors}")
 
             # Create a job for each ready node
-            jobs = [delayed(self.execute_node)(node, mcs) for node in ready_nodes]
+            jobs = [delayed(self.execute_node)(node, input_streams, executed_nodes) for node in ready_nodes]
 
             # Execute the jobs in parallel
             if jobs:
-                results, _ = zip(*Parallel(n_jobs=self.n_jobs)(jobs))
+                results = Parallel(n_jobs=self.n_jobs)(jobs)
+                # Filter out None values
+                results = [result for result in results if result is not None]
             else:
                 results = []
 
-            # Update self.results and executed_nodes with the returned value of each job
+            # Update executed_nodes with the returned value of each job
             for i, result in enumerate(results):
-                if result is not None:
-                    if isinstance(result, tuple):
-                        for r in result:
-                            if isinstance(r, MassComposition):
-                                self.results[r.name] = r
-                    else:
-                        self.results[ready_nodes[i]] = result
                 executed_nodes.add(ready_nodes[i])
 
-        self._update_mc_nodes()
+    def execute_node(self, node: str, strms: dict, executed_nodes: set) -> Optional[Union[Stream, Tuple[Stream, ...]]]:
+        """
+        Executes a node in the DAG.
 
-    def execute_node(self, node: str, mcs: dict):
+        This method takes a node and a dictionary of Stream objects. It executes the operation associated with the
+        node using the Stream objects as inputs. If the node has successors and is defined, the result of the node
+        execution is stored in the edges of the graph.
 
-        logging.info(f"Executing node {node}")  # Log the node that is being executed
+        Parameters:
+        node (str): The name of the node to be executed.
+        strms (dict): A dictionary mapping node names to Stream objects.
+
+        Returns:
+        Union[Stream, Tuple[Stream, ...]]: The result of the node execution, or None if the node is waiting for its predecessors.
+        """
+        logger.info(f"Executing node {node}")  # Log the node that is being executed
         operation = self.graph.nodes[node]['operation']
         kwargs = self.graph.nodes[node]['kwargs']
         defined = self.graph.nodes[node]['defined']
 
-        # Check if the node is in the mcs dictionary
-        if node in mcs:
-            mc = mcs[node]
-            # Check if kwargs is not None before passing it to the operation
-            result = operation(mc, **kwargs) if kwargs is not None else operation(mc)
-        else:
-            # If the node is not in the mcs dictionary, it means that it needs to be created inside the DAG
-            # In this case, execute the operation with the results of its dependencies as inputs
-            # Check if the results of the predecessors are available
-            if all(dependency in self.results for dependency in self.graph.predecessors(node)):
-                inputs = [self.results[dependency] for dependency in self.graph.predecessors(node)]
-                # Check if kwargs is not None before passing it to the operation
-                if operation == DAG.output:
-                    result = operation(inputs, name=node)
-                else:
-                    result = operation(*inputs, **kwargs) if kwargs is not None else operation(*inputs)
+        logger.debug(f"State of self.streams before executing node {node}: {self.streams}")
+
+        # Log the predecessors of the node
+        predecessors = list(self.graph.predecessors(node))
+        logger.debug(f"Predecessors of node {node}: {predecessors}")
+
+        try:
+            # Check if the node is an input node
+            if operation == DAG.input:
+                strm: Union[Stream, MassComposition] = strms[node]
+                if isinstance(strm, MassComposition):
+                    strm = Stream(mc=strm)
+                result = operation(strm)
+
+            # Check if the node is an output node
+            elif operation == DAG.output:
+                # Retrieve the Stream object from the edge between the output node and its predecessor
+                predecessor = list(self.graph.predecessors(node))[0]
+                strm = self.graph.edges[(predecessor, node)].get('mc')
+                result = operation(strm)
+
+            # If not an input or output, then it is a step node
             else:
-                logging.info(
-                    f"Waiting for predecessors of node {node}")  # Log the node that is waiting for its predecessors
-                return None, []
+                # If the node is not in the strms dictionary, it means that it needs to be created inside the DAG
+                # In this case, execute the operation with the results of its dependencies as inputs
+                # Check if the results of the predecessors are available
 
-        # If the node has successors and is defined, store the result of the node execution
+                if all(self.node_executed[dependency] for dependency in self.graph.predecessors(node)):
+                    inputs = [self.graph.get_edge_data(*edge)['mc'] for edge in self.graph.in_edges(node)]
+                    # If only one input stream is provided, retrieve the corresponding Stream object
+                    if len(inputs) == 1:
+                        inputs = inputs[0]
+                        # Check if kwargs is not None before passing it to the operation
+                        result = operation(inputs, **kwargs) if kwargs is not None else operation(inputs)
+                    else:
+                        # Ensure inputs is always an iterable
+                        if isinstance(inputs, Stream):
+                            inputs = [inputs]
+                        # Check if kwargs is not None before passing it to the operation
+                        result = operation(*inputs, **kwargs) if kwargs is not None else operation(*inputs)
+                else:
+                    logger.debug(f"Waiting for predecessors of node {node}")
+                    return None
+
+        except AttributeError as e:
+            logger.error(f"Error while executing node {node}: {e}")
+            raise
+
+        # If the node has successors and is defined, store the result of the node execution in the edges of the graph
         if list(self.graph.successors(node)) and defined:
-            self.results[node] = result
-            logging.info(f"Stored result for node {node}")  # Log the node for which a result was stored
+            if isinstance(result, tuple):
+                for i, strm in enumerate(result):
+                    self.graph.edges[(node, list(self.graph.successors(node))[i])]['mc'] = strm
+                    logger.debug(f"Stored results for stream {strm.name}")  # Log the node for which a result was stored
+            else:
+                for successor in self.graph.successors(node):
+                    self.graph.edges[(node, successor)]['mc'] = result
+                logger.debug(f"Stored results for stream {node}")  # Log the node for which a result was stored
 
-        # If the result is a tuple, do not add new nodes to the graph
-        # Instead, return the MassComposition objects in the tuple
-        if isinstance(result, tuple):
-            return result, []
-        # Set the 'mc' attribute of the edges to the result after the worker returns
-        elif operation == DAG.output:
-            self.graph.edges[list(self.graph.predecessors(node))[0], node]['mc'] = result
-        else:
-            for successor in self.graph.successors(node):
-                self.graph.edges[node, successor]['mc'] = result
+        # After executing the operation, update the execution state of the node
+        executed_nodes.add(node)
+        self.node_executed[node] = True  # Update the execution state in the self.node_executed dictionary
 
-        return result, []
+        # Log the state of the self.streams dictionary
+        logger.debug(f"State of self.streams after executing node {node}: {self.streams}")
+
+        # Ensure the result is always a tuple
+        if isinstance(result, Stream):
+            return (result, None)
+
+        return result
 
     def plot(self):
         plt.figure(figsize=(8, 6))
@@ -184,21 +272,29 @@ class DAG:
                 font_size=10, font_weight='bold', width=2)
         plt.show()
 
+    def _finalize(self):
+        """
+        Final checks before execution.
+        """
+        orphan_nodes = [node for node, degree in self.graph.degree() if degree == 0]
+        if orphan_nodes:
+            raise ValueError(f"Orphan nodes: {orphan_nodes} exist.  Please check your configuration.")
+
+        # Validate unique names
+        self._validate_unique_names()
+
     def _validate_unique_names(self):
+        """
+        Validates the uniqueness of the step names and Stream names in the DAG.
+        """
         # Validate the uniqueness of the step names
         node_names = [name for name in self.graph.nodes]
         if len(node_names) != len(set(node_names)):
             raise ValueError("Step names are not unique within the DAG.")
 
-        # Validate the uniqueness of the MassComposition names
-        mc_names = [data['mc'].name for _, data in self.graph.nodes(data=True) if
-                    'mc' in data and data['mc'] is not None]
-        duplicates = [name for name in mc_names if mc_names.count(name) > 1]
+        # Validate the uniqueness of the Stream names
+        strm_names = [data['mc'].name for _, data in self.graph.nodes(data=True) if
+                      'mc' in data and data['mc'] is not None]
+        duplicates = [name for name in strm_names if strm_names.count(name) > 1]
         if duplicates:
-            raise ValueError(f"MassComposition names are not unique within the DAG. Duplicates: {set(duplicates)}")
-
-    def _update_mc_nodes(self):
-        for edge in self.graph.edges:
-            mc = self.graph.edges[edge]['mc']
-            src_node, dst_node = edge
-            mc.nodes = [src_node, dst_node]
+            raise ValueError(f"Stream names are not unique within the DAG. Duplicates: {set(duplicates)}")

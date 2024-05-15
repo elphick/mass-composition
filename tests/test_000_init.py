@@ -1,4 +1,5 @@
 import logging
+import pickle
 
 import pandas as pd
 
@@ -28,3 +29,17 @@ def test_multiindex_warning(demo_data, caplog):
 
     # Check if a warning was logged
     assert "The data has more than 2 levels in the index" in caplog.text
+
+
+def test_masscomposition_pickleability(demo_data):
+    # Create a MassComposition object
+    obj_mc: MassComposition = MassComposition(demo_data, name='test')
+
+    # Pickle the object
+    pickled_mass_comp = pickle.dumps(obj_mc)
+
+    # Unpickle the object
+    unpickled_mass_comp = pickle.loads(pickled_mass_comp)
+
+    # Check if the original and unpickled objects are the same
+    assert obj_mc == unpickled_mass_comp, "The original and unpickled MassComposition objects are not the same."

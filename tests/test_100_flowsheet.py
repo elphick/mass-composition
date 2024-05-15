@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict
@@ -96,6 +97,7 @@ def test_to_dataframe(demo_data):
 
 
 def test_from_dataframe_tall(demo_data):
+    logging.basicConfig(level=logging.DEBUG)
     obj_mc: MassComposition = MassComposition(demo_data, name='Feed')
     obj_mc_1, obj_mc_2 = obj_mc.split(0.4)
     fs: Flowsheet = Flowsheet().from_streams([obj_mc, obj_mc_1, obj_mc_2])
