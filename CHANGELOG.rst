@@ -1,3 +1,18 @@
+Mass_Composition 0.5.2 (2024-05-16)
+===================================
+
+Bugfix
+------
+
+- Fixed error when setting n_jobs > 1 in DAG. (#151)
+
+
+Feature
+-------
+
+- Added progressbar to  DAG. (#151)
+
+
 Mass_Composition 0.5.1 (2024-05-15)
 ===================================
 

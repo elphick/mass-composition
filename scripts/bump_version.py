@@ -4,7 +4,10 @@ import sys
 
 
 def run_command(command):
-    process = subprocess.Popen(command, shell=True)
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    print(f"stdout: {stdout.decode()}")
+    print(f"stderr: {stderr.decode()}")
     process.wait()
 
 
@@ -21,7 +24,7 @@ def process_command_line_parameters():
 
 
 def adjust_changelog():
-    with open('HISTORY.rst', 'r') as file:
+    with open('CHANGELOG.rst', 'r') as file:
         lines = file.readlines()
 
     # Remove 'Elphick.' prefix from the first line
@@ -33,7 +36,7 @@ def adjust_changelog():
     if lines[1].startswith('='):
         lines[1] = '=' * (len(lines[0].strip())) + '\n'  # -1 for the newline character
 
-    with open('HISTORY.rst', 'w') as file:
+    with open('CHANGELOG.rst', 'w') as file:
         file.writelines(lines)
 
 

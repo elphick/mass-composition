@@ -19,15 +19,15 @@ from elphick.mass_composition.dag import DAG
 from elphick.mass_composition.datasets.sample_data import sample_data
 from elphick.mass_composition.flowsheet import Flowsheet
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # %%
 # Define the DAG
 # --------------
 #
-# The DAG is defined by adding nodes to the graph.  Each node is a MassComposition operation
-# (or a DAG.input or DAG_output).
+# The DAG is defined by adding nodes to the graph.  Each node is an input, output or Stream operation
+# (e.g. add, split, etc.).  The nodes are connected by the streams they operate on.
 
 mc_sample: MassComposition = MassComposition(sample_data(), name='sample')
 
@@ -48,7 +48,7 @@ dag.add_output(name='fines', stream='fines')
 # Run the DAG
 # -----------
 #
-# The dag is run by providing MassComposition objects for all inputs.  They must be compatible i.e. have the
+# The dag is run by providing MassComposition (or Stream) objects for all inputs.  They must be compatible i.e. have the
 # same indexes.
 
 dag.run({'feed_1': mc_sample,
