@@ -11,15 +11,23 @@ from elphick.mass_composition.utils.interp import _upsample_grid_by_factor
 from elphick.mass_composition.utils.parallel import TqdmParallel
 from elphick.mass_composition.utils.pd_utils import column_prefix_counts, column_prefixes
 
+logger = logging.getLogger(__name__)
+
 
 def create_mass_composition(stream_data: Tuple[Union[int, str], pd.DataFrame],
                             interval_edges: Optional[Union[Iterable, int]] = None) -> Tuple[
-                            Union[int, str], MassComposition]:
+                                Union[int, str], MassComposition]:
     stream, data = stream_data
-    if interval_edges is not None:
-        return stream, MassComposition(data=data, name=stream).resample_1d(interval_edges=interval_edges)
-    else:
-        return stream, MassComposition(data=data, name=stream)
+    res = None
+    try:
+        if interval_edges is not None:
+            res = stream, MassComposition(data=data, name=stream).resample_1d(interval_edges=interval_edges)
+        else:
+            res = stream, MassComposition(data=data, name=stream)
+    except Exception as e:
+        logger.error(f"Error creating MassComposition object for {stream}: {e}")
+
+    return res
 
 
 def streams_from_dataframe(df: pd.DataFrame,
@@ -40,11 +48,10 @@ def streams_from_dataframe(df: pd.DataFrame,
     Returns:
 
     """
-    logger: logging.Logger = logging.getLogger(__name__)
-
     stream_data: Dict[str, pd.DataFrame] = {}
     index_names: List[str] = []
     if mc_name_col:
+        logger.debug("Creating MassComposition objects by name column.")
         if mc_name_col in df.index.names:
             index_names = df.index.names
             df.reset_index(mc_name_col, inplace=True)
@@ -58,6 +65,7 @@ def streams_from_dataframe(df: pd.DataFrame,
             df.reset_index(inplace=True)
             df.set_index(index_names, inplace=True)
     else:
+        logger.debug("Creating MassComposition objects by column prefixes.")
         # wide case - find prefixes where there are at least 3 columns
         prefix_counts = column_prefix_counts(df.columns)
         prefix_cols = column_prefixes(df.columns)
@@ -69,6 +77,7 @@ def streams_from_dataframe(df: pd.DataFrame,
                     columns={col: col.replace(f'{prefix}_', '') for col in df.columns})
 
     if interval_edges is not None:
+        logger.debug("Resampling MassComposition objects to new interval edges.")
         # unify the edges - this will also interp missing grades
         if not isinstance(df.index, pd.IntervalIndex):
             raise NotImplementedError(f"The index `{df.index}` of the dataframe is not a pd.Interval. "
@@ -82,8 +91,8 @@ def streams_from_dataframe(df: pd.DataFrame,
             indx = pd.IntervalIndex.from_arrays(left=all_edges[0:-1], right=all_edges[1:])
             interval_edges = _upsample_grid_by_factor(indx=indx, factor=interval_edges)
 
-    with TqdmParallel(desc="Creating MassComposition objects", n_jobs=n_jobs, prefer="processes",
-                      total=len(stream_data)) as p:
+    with TqdmParallel(desc="Creating MassComposition objects", n_jobs=n_jobs,
+                      prefer=None, total=len(stream_data)) as p:
         res = p(delayed(create_mass_composition)(stream_data, interval_edges) for stream_data in stream_data.items())
     res = dict(res)
 

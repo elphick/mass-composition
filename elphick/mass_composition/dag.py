@@ -1,10 +1,8 @@
 import logging
-from copy import deepcopy
 from typing import List, Callable, Union, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import networkx as nx
-import pandas as pd
 from joblib import Parallel, delayed
 
 from elphick.mass_composition import MassComposition

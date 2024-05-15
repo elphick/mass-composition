@@ -1,3 +1,35 @@
+Mass_Composition 0.5.0 (2024-05-15)
+===================================
+
+Feature
+-------
+
+- Renamed MCNetwork to Flowsheet for improved context. (#154)
+
+Other Tasks
+-----------
+
+- Removed init files from examples and tests
+
+
+Mass_Composition 0.4.12 (2024-05-15)
+====================================
+
+Feature
+-------
+
+- Added Stream object as a version of MassComposition with source_node and destination_node attributes. (#87)
+
+
+Mass_Composition 0.4.11 (2024-05-14)
+====================================
+
+Other Tasks
+-----------
+
+- Removed default loggers. (#149)
+
+
 Mass_Composition 0.4.10 (2024-05-13)
 ====================================
 

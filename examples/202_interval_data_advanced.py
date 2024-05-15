@@ -22,7 +22,7 @@ import plotly
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.datasets.sample_data import size_by_assay
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.utils.partition import napier_munn
 
 # %%
@@ -73,8 +73,8 @@ mc_undersize.data.to_dataframe()
 #
 # That said, the remaining sizes must be consistent.  Alignment of sizes across streams/mc objects is coming soon.
 
-mcn: MCNetwork = MCNetwork().from_streams([mc_feed, mc_oversize, mc_undersize])
-fig = mcn.table_plot()
+fs: Flowsheet = Flowsheet().from_streams([mc_feed, mc_oversize, mc_undersize])
+fig = fs.table_plot()
 fig
 
 # %%
@@ -85,25 +85,25 @@ fig
 # So we now have our network, but it does not balance.  Perhaps the fractions we removed to generate our test data
 # contained enough mass to breach our balance threshold?  Let's dig deeper with our balance plot.
 
-fig = mcn.plot_balance(color='size')
+fig = fs.plot_balance(color='size')
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
 
 # %%
 # What is the balance threshold set at?
 
-print('Node error tolerance:', mcn.graph.nodes[1]['mc']._tolerance)
+print('Node error tolerance:', fs.graph.nodes[1]['mc']._tolerance)
 
 # %%
 # That plot does not reveal the problem, so we'll resort to another report.
 
-mcn.graph.nodes[1]['mc']._balance_errors
+fs.graph.nodes[1]['mc']._balance_errors
 
 # %%
 # Let's change the node error tolerance.
 
-mcn.graph.nodes[1]['mc']._tolerance = 0.001
-fig = mcn.table_plot()
+fs.graph.nodes[1]['mc']._tolerance = 0.001
+fig = fs.table_plot()
 fig
 
 # %%

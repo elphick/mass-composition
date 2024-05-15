@@ -2,7 +2,7 @@
 Network Layouts
 ===============
 
-Related MassComposition objects can be represented in network using the MCNetwork object.
+Related MassComposition objects can be represented in network using the Flowsheet object.
 
 This example demonstrates layouts of such networks.
 
@@ -11,7 +11,7 @@ This example demonstrates layouts of such networks.
 import plotly
 import pandas as pd
 
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.datasets.sample_data import size_by_assay
 from elphick.mass_composition import MassComposition
 
@@ -46,21 +46,21 @@ mc_5, mc_6 = mc_2.split(0.5, 'split 5', 'split 6')
 #
 # Create a network and plot with both orientations
 
-mcn: MCNetwork = MCNetwork().from_streams([mc_feed,
+fs: Flowsheet = Flowsheet().from_streams([mc_feed,
                                            mc_1, mc_2,
                                            mc_3, mc_4, mc_5, mc_6])
 
-fig = mcn.plot_network(orientation='horizontal')
+fig = fs.plot_network(orientation='horizontal')
 fig
 
 # %%
-fig = mcn.plot_network(orientation='vertical')
+fig = fs.plot_network(orientation='vertical')
 fig
 
 # %%
 #
 # The table plot also supports orientation with the network_orientation argument.
 
-fig = mcn.table_plot(table_pos='left', plot_type='network', network_orientation='vertical')
+fig = fs.table_plot(table_pos='left', plot_type='network', network_orientation='vertical')
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for use in the gallery

@@ -9,7 +9,8 @@ API Reference
    :recursive:
 
     mass_composition
-    network
+    stream
+    flowsheet
     mc_node
     mc_xarray
     datasets

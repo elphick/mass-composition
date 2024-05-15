@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.utils.components import is_compositional
 from elphick.mass_composition.datasets import load_size_by_assay, load_iron_ore_sample_a072391, load_size_distribution, \
     load_a072391_met
@@ -116,8 +116,8 @@ def size_by_assay_2() -> pd.DataFrame:
     mc_size: MassComposition = MassComposition(size_by_assay(), name='feed')
     partition = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
     mc_coarse, mc_fine = mc_size.apply_partition(definition=partition, name_1='coarse', name_2='fine')
-    mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
-    return mcn.to_dataframe()
+    fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse, mc_fine])
+    return fs.to_dataframe()
 
 
 def size_by_assay_3() -> pd.DataFrame:
@@ -130,8 +130,8 @@ def size_by_assay_3() -> pd.DataFrame:
     df_coarse_2 = mc_coarse.data.to_dataframe().apply(lambda x: np.random.normal(loc=x, scale=np.std(x)))
     mc_coarse_2: MassComposition = MassComposition(data=df_coarse_2, name='coarse')
     mc_coarse_2 = mc_coarse_2.set_parent_node(mc_size)
-    mcn_ub: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse_2, mc_fine])
-    return mcn_ub.to_dataframe()
+    fs_ub: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse_2, mc_fine])
+    return fs_ub.to_dataframe()
 
 
 def size_distribution() -> pd.DataFrame:
@@ -153,14 +153,14 @@ def iron_ore_met_sample_data() -> pd.DataFrame:
     return df_met
 
 
-def demo_size_network() -> MCNetwork:
+def demo_size_network() -> Flowsheet:
     mc_size: MassComposition = MassComposition(size_by_assay(), name='size sample')
     partition = partial(perfect, d50=0.150, dim='size')
     mc_coarse, mc_fine = mc_size.apply_partition(definition=partition)
     mc_coarse.name = 'coarse'
     mc_fine.name = 'fine'
-    mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
-    return mcn
+    fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse, mc_fine])
+    return fs
 
 
 if __name__ == '__main__':
