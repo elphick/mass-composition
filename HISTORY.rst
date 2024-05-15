@@ -1,3 +1,13 @@
+Mass_Composition 0.5.1 (2024-05-15)
+==================================
+
+Bugfix
+------
+
+- DAG now seems robust, bug fixed. Streams used in Flowsheet. (#150)
+- Fix for the badges on the Sphinx documentation.
+
+
 Mass_Composition 0.5.0 (2024-05-15)
 ===================================
 

@@ -1,7 +1,7 @@
 # MassComposition
 
-[![Run Tests](https://github.com/Elphick/mass-composition/actions/workflows/build_and_test.yml/badge.svg?branch=main)](https://github.com/Elphick/mass-composition/actions/workflows/build_and_test.yml)
-[![Publish Docs](https://github.com/Elphick/mass-composition/actions/workflows/docs_to_gh_pages.yml/badge.svg?branch=main)](https://github.com/Elphick/mass-composition/actions/workflows/docs_to_gh_pages.yml)
+[![Run Tests](https://github.com/Elphick/mass-composition/actions/workflows/poetry_build_and_test.yml/badge.svg?branch=main)](https://github.com/Elphick/mass-composition/actions/workflows/poetry_build_and_test.yml)
+[![Publish Docs](https://github.com/Elphick/mass-composition/actions/workflows/poetry_sphinx_docs_to_gh_pages.yml/badge.svg?branch=main)](https://github.com/Elphick/mass-composition/actions/workflows/poetry_sphinx_docs_to_gh_pages.yml)
 
 MassComposition is a python package that allows Geoscientists and Metallurgists to easily work with, and visualise
 mass-compositional data.
