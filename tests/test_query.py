@@ -1,9 +1,8 @@
 import pandas as pd
 
-from elphick.mass_composition import MassComposition
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition import MassComposition, Flowsheet
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data
+from .fixtures import demo_data
 
 
 def test_query(demo_data):
@@ -27,9 +26,9 @@ def test_query(demo_data):
 def test_query_network(demo_data):
     obj_mc: MassComposition = MassComposition(demo_data, name='demo')
     obj_one, obj_two = obj_mc.split(fraction=0.6, name_1='one', name_2='two')
-    mcn: MCNetwork = MCNetwork.from_streams([obj_mc, obj_one, obj_two], name='Network')
+    fs: Flowsheet = Flowsheet.from_streams([obj_mc, obj_one, obj_two], name='Network')
 
-    df_report: pd.DataFrame = mcn.query(mc_name='demo', queries={'index': 'Fe>58'}).report()
+    df_report: pd.DataFrame = fs.query(mc_name='demo', queries={'index': 'Fe>58'}).report()
 
     df_expected: pd.DataFrame = pd.DataFrame.from_dict({'mass_wet': [200., 120., 80.],
                                                         'mass_dry': [170., 102., 68.],

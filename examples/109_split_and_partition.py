@@ -8,7 +8,7 @@ import plotly
 import pandas as pd
 from functools import partial
 
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.utils.partition import perfect
 from elphick.mass_composition.datasets.sample_data import sample_data, size_by_assay
 from elphick.mass_composition import MassComposition
@@ -105,13 +105,13 @@ mc_coarse, mc_fine = mc_size.apply_partition(definition=partition)
 mc_coarse.name = 'coarse'
 mc_fine.name = 'fine'
 
-mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
-fig = mcn.plot_network()
+fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse, mc_fine])
+fig = fs.plot_network()
 fig.show()
 
 # %%
 
-fig = mcn.table_plot(table_pos='top',
+fig = fs.table_plot(table_pos='top',
                      sankey_color_var='Fe', sankey_edge_colormap='copper_r', sankey_vmin=50, sankey_vmax=70)
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for use in the gallery

@@ -3,7 +3,7 @@ import xarray.tests
 import xarray as xr
 
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data
+from .fixtures import demo_data
 from elphick.mass_composition import MassComposition
 
 

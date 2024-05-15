@@ -6,11 +6,10 @@ import pandas as pd
 import pytest
 from pandas import Interval
 
-from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.partition import napier_munn
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data, size_assay_data
-from elphick.mass_composition import MassComposition
+from .fixtures import demo_data, size_assay_data
+from elphick.mass_composition import MassComposition, Flowsheet
 
 
 def test_indexes(demo_data):
@@ -18,7 +17,7 @@ def test_indexes(demo_data):
     obj_mc_2: MassComposition = MassComposition(demo_data.drop(index=[0]), name='two').set_parent_node(obj_mc)
 
     with pytest.raises(KeyError):
-        mcn: MCNetwork = MCNetwork().from_streams([obj_mc, obj_mc_2])
+        fs: Flowsheet = Flowsheet().from_streams([obj_mc, obj_mc_2])
 
 
 def test_missing_sizes(size_assay_data):
@@ -33,8 +32,8 @@ def test_missing_sizes(size_assay_data):
     df_fine = df_fine.loc[df_fine.index.left < 0.5, :]
     mc_undersize.set_data(df_fine)
 
-    mcn: MCNetwork = MCNetwork().from_streams([mc_feed, mc_oversize, mc_undersize])
-    df_test: pd.DataFrame = mcn.get_edge_by_name('US').data.to_dataframe()
+    fs: Flowsheet = Flowsheet().from_streams([mc_feed, mc_oversize, mc_undersize])
+    df_test: pd.DataFrame = fs.get_edge_by_name('US').data.to_dataframe()
     df_test = df_test.loc[df_test.index.left >= 0.5, :]
     d_expected: Dict = {'mass_wet': {Interval(0.85, 2.0, closed='left'): 0.0,
                                      Interval(0.5, 0.85, closed='left'): 0.0},

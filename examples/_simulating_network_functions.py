@@ -13,18 +13,18 @@ import time
 from random import random
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 
 
-def my_simulator(args) -> tuple[int, MCNetwork]:
+def my_simulator(args) -> tuple[int, Flowsheet]:
     mc: MassComposition
     sid, mc = args
     mc.name = 'feed'
     fraction = random()
     time.sleep(fraction * 10)
     lump, fines = mc.split(fraction, name_1='lump', name_2='fines')
-    mcn: MCNetwork = MCNetwork.from_streams(streams=[mc, lump, fines], name=f'Sample {sid}')
-    return sid, mcn
+    fs: Flowsheet = Flowsheet.from_streams(streams=[mc, lump, fines], name=f'Sample {sid}')
+    return sid, fs
 
 
 

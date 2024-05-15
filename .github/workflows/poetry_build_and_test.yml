@@ -37,11 +37,7 @@ jobs:
       - name: Install dependencies
         #        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
-          poetry install --all-extras --no-interaction --no-root --no-dev
-
-      - name: Install pytest
-        run: |
-          poetry run pip install pytest
+          poetry install --all-extras --no-interaction
 
       - name: Test with pytest
         run: |

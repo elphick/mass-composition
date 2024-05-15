@@ -3,7 +3,7 @@ import pandas as pd
 import xarray as xr
 
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data, size_assay_data
+from .fixtures import demo_data, size_assay_data
 from elphick.mass_composition import MassComposition
 
 
