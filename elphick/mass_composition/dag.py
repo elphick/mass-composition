@@ -1,9 +1,10 @@
 import logging
-from typing import List, Callable, Union, Optional, Tuple
+from typing import List, Callable, Union, Tuple
 
 import matplotlib.pyplot as plt
 import networkx as nx
 from joblib import Parallel, delayed
+from tqdm import tqdm
 
 from elphick.mass_composition import Stream, MassComposition
 
@@ -25,35 +26,6 @@ class DAG:
         self.n_jobs = n_jobs  # Number of workers for parallel execution
         self.graph = nx.DiGraph()
         self.node_executed = {}  # Store the execution state of nodes
-
-    # @property
-    # def mass_compositions(self) -> dict[str, Stream]:
-    #     """
-    #     Retrieves all the Stream objects associated with the nodes in the DAG.
-    #
-    #     This property iterates over all the nodes in the DAG, checks if the node has been executed,
-    #     and if so, retrieves the result of the node execution. If the node has not been executed,
-    #     it retrieves the Stream object associated with the node in the graph.
-    #
-    #     Returns:
-    #         dict[str, Stream]: A dictionary where the keys are node names and the values
-    #         are Stream objects associated with those nodes.
-    #     """
-    #     mass_compositions = {}
-    #     for node in self.graph.nodes:
-    #         if node in self.node_executed:
-    #             result = self.node_executed[node]
-    #             if isinstance(result, Stream):
-    #                 mass_compositions[node] = result
-    #             elif isinstance(result, tuple) and all(isinstance(r, Stream) for r in result):
-    #                 for r in result:
-    #                     mass_compositions[r.name] = r
-    #         else:
-    #             # If the node is not in the results dictionary, it is a leaf node
-    #             # Retrieve its result from the Stream objects associated with the node in the graph
-    #             mc = self.graph.nodes[node]['mc']
-    #             mass_compositions[node] = mc
-    #     return mass_compositions
 
     @property
     def streams(self):
@@ -93,7 +65,8 @@ class DAG:
         self.stream_parent_node[name] = name
         return self
 
-    def add_step(self, name: str, operation: Callable, streams: List[str], kwargs: dict = None, defined: bool = True) -> 'DAG':
+    def add_step(self, name: str, operation: Callable, streams: List[str], kwargs: dict = None,
+                 defined: bool = True) -> 'DAG':
         # Determine dependencies from the input streams
         dependencies = [self.stream_parent_node[stream] for stream in streams]
         self.graph.add_node(name, operation=operation, dependencies=dependencies, kwargs=kwargs, defined=defined)
@@ -133,12 +106,16 @@ class DAG:
         Returns:
         None
         """
-        logger.info("Running the DAG")  # Log the node that is being executed
+        logger.info("Preparing the DAG")
         self._finalize()
+        logger.info("Executing the DAG")
 
         # Initialize the execution state of all nodes to False
         for node in self.graph.nodes:
             self.node_executed[node] = False
+
+        # Initialise a progressbar that will count up to the number of nodes in the graph
+        pbar = tqdm(total=len(self.graph.nodes), desc="Executing nodes", unit="node")
 
         executed_nodes = set()  # Keep track of nodes that have been executed
 
@@ -159,7 +136,7 @@ class DAG:
                     logger.debug(f"Node {node} is waiting for {predecessors}")
 
             # Create a job for each ready node
-            jobs = [delayed(self.execute_node)(node, input_streams, executed_nodes) for node in ready_nodes]
+            jobs = [delayed(self.execute_node)(node, input_streams) for node in ready_nodes]
 
             # Execute the jobs in parallel
             if jobs:
@@ -169,11 +146,21 @@ class DAG:
             else:
                 results = []
 
-            # Update executed_nodes with the returned value of each job
-            for i, result in enumerate(results):
-                executed_nodes.add(ready_nodes[i])
+            # Update executed_nodes and self.graph.edges with the returned values
+            for node, result, updated_edges in results:
+                executed_nodes.add(node)
+                self.node_executed[node] = True
+                for edge, strm in updated_edges.items():
+                    logger.debug(f"Updating edge {edge} with stream {strm.name}")
+                    self.graph.edges[edge]['mc'] = strm
+                # update the progress bar by one step
+                pbar.set_postfix_str(f"Processed node: {node}")
+                pbar.update()
 
-    def execute_node(self, node: str, strms: dict, executed_nodes: set) -> Optional[Union[Stream, Tuple[Stream, ...]]]:
+        pbar.close()  # Close the progress bar
+        logger.info(f"DAG execution complete for the nodes: {executed_nodes}")
+
+    def execute_node(self, node: str, strms: dict):
         """
         Executes a node in the DAG.
 
@@ -188,7 +175,7 @@ class DAG:
         Returns:
         Union[Stream, Tuple[Stream, ...]]: The result of the node execution, or None if the node is waiting for its predecessors.
         """
-        logger.info(f"Executing node {node}")  # Log the node that is being executed
+        logger.debug(f"Executing node {node}")  # Log the node that is being executed
         operation = self.graph.nodes[node]['operation']
         kwargs = self.graph.nodes[node]['kwargs']
         defined = self.graph.nodes[node]['defined']
@@ -220,50 +207,34 @@ class DAG:
                 # In this case, execute the operation with the results of its dependencies as inputs
                 # Check if the results of the predecessors are available
 
-                if all(self.node_executed[dependency] for dependency in self.graph.predecessors(node)):
-                    inputs = [self.graph.get_edge_data(*edge)['mc'] for edge in self.graph.in_edges(node)]
-                    # If only one input stream is provided, retrieve the corresponding Stream object
-                    if len(inputs) == 1:
-                        inputs = inputs[0]
-                        # Check if kwargs is not None before passing it to the operation
-                        result = operation(inputs, **kwargs) if kwargs is not None else operation(inputs)
-                    else:
-                        # Ensure inputs is always an iterable
-                        if isinstance(inputs, Stream):
-                            inputs = [inputs]
-                        # Check if kwargs is not None before passing it to the operation
-                        result = operation(*inputs, **kwargs) if kwargs is not None else operation(*inputs)
+                inputs = [self.graph.get_edge_data(*edge)['mc'] for edge in self.graph.in_edges(node)]
+                # If only one input stream is provided, retrieve the corresponding Stream object
+                if len(inputs) == 1:
+                    inputs = inputs[0]
+                    # Check if kwargs is not None before passing it to the operation
+                    result = operation(inputs, **kwargs) if kwargs is not None else operation(inputs)
                 else:
-                    logger.debug(f"Waiting for predecessors of node {node}")
-                    return None
+                    # Ensure inputs is always an iterable
+                    if isinstance(inputs, Stream):
+                        inputs = [inputs]
+                    # Check if kwargs is not None before passing it to the operation
+                    result = operation(*inputs, **kwargs) if kwargs is not None else operation(*inputs)
 
         except AttributeError as e:
             logger.error(f"Error while executing node {node}: {e}")
             raise
 
-        # If the node has successors and is defined, store the result of the node execution in the edges of the graph
+        # Return the node, result, and the updated edges
+        updated_edges = {}
         if list(self.graph.successors(node)) and defined:
             if isinstance(result, tuple):
                 for i, strm in enumerate(result):
-                    self.graph.edges[(node, list(self.graph.successors(node))[i])]['mc'] = strm
-                    logger.debug(f"Stored results for stream {strm.name}")  # Log the node for which a result was stored
+                    updated_edges[(node, list(self.graph.successors(node))[i])] = strm
             else:
                 for successor in self.graph.successors(node):
-                    self.graph.edges[(node, successor)]['mc'] = result
-                logger.debug(f"Stored results for stream {node}")  # Log the node for which a result was stored
+                    updated_edges[(node, successor)] = result
 
-        # After executing the operation, update the execution state of the node
-        executed_nodes.add(node)
-        self.node_executed[node] = True  # Update the execution state in the self.node_executed dictionary
-
-        # Log the state of the self.streams dictionary
-        logger.debug(f"State of self.streams after executing node {node}: {self.streams}")
-
-        # Ensure the result is always a tuple
-        if isinstance(result, Stream):
-            return (result, None)
-
-        return result
+        return node, result, updated_edges
 
     def plot(self):
         plt.figure(figsize=(8, 6))
