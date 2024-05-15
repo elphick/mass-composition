@@ -4,9 +4,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from elphick.mass_composition import MassComposition
+from elphick.mass_composition import MassComposition, Flowsheet
 from elphick.mass_composition.datasets.sample_data import sample_data, size_by_assay
-from elphick.mass_composition.network import MCNetwork
 from elphick.mass_composition.utils.partition import perfect
 
 
@@ -37,8 +36,8 @@ def demo_size_network(size_assay_data):
     mc_coarse, mc_fine = mc_size.apply_partition(definition=partition)
     mc_coarse.name = 'coarse'
     mc_fine.name = 'fine'
-    mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
-    return mcn
+    fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse, mc_fine])
+    return fs
 
 
 @pytest.fixture()

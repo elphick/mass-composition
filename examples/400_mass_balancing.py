@@ -2,7 +2,7 @@
 Mass Balancing
 ==============
 
-In the examples so far, MCNetwork objects are created by math operations, so they inherently balance.
+In the examples so far, Flowsheet objects are created by math operations, so they inherently balance.
 A common problem in Mineral Processing (Metallurgy/Chemical/Process Engineering) is mass (or metallurgical) balancing.
 When auditing a processing plant the data is collected by measurement and sampling/assaying. This data will never
 balance of course due to sampling and measurement errors.
@@ -21,7 +21,7 @@ import plotly
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.balance import MCBalance
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.utils.partition import napier_munn
 from elphick.mass_composition.datasets.sample_data import size_by_assay
 
@@ -62,17 +62,17 @@ partition = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
 
 mc_coarse, mc_fine = mc_size.apply_partition(definition=partition, name_1='coarse', name_2='fine')
 
-mcn: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse, mc_fine])
-print(mcn.balanced)
+fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse, mc_fine])
+print(fs.balanced)
 
-fig = mcn.table_plot(plot_type='network', table_pos='left', table_area=0.3)
+fig = fs.table_plot(plot_type='network', table_pos='left', table_area=0.3)
 fig
 
 # %%
 #
 # Demonstrate that the data balances with the balance plot
 
-fig = mcn.plot_balance()
+fig = fs.plot_balance()
 # noinspection PyTypeChecker
 plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
 
@@ -80,7 +80,7 @@ plotly.io.show(fig)  # this call to show will set the thumbnail for the gallery
 #
 # The balance plot can be colored by a specified column or index/dimension.
 
-fig = mcn.plot_balance(color='size')
+fig = fs.plot_balance(color='size')
 fig
 
 # %%
@@ -94,14 +94,14 @@ mc_coarse_2: MassComposition = MassComposition(data=df_coarse_2, name='coarse')
 mc_coarse_2 = mc_coarse_2.set_parent_node(mc_size)
 
 # create a new network - which does not balance
-mcn_ub: MCNetwork = MCNetwork().from_streams([mc_size, mc_coarse_2, mc_fine])
-print(mcn_ub.balanced)
+fs_ub: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse_2, mc_fine])
+print(fs_ub.balanced)
 
-fig = mcn_ub.table_plot(plot_type='network', table_pos='left', table_area=0.3)
+fig = fs_ub.table_plot(plot_type='network', table_pos='left', table_area=0.3)
 fig
 
 # %%
-fig = mcn_ub.plot_balance()
+fig = fs_ub.plot_balance()
 fig
 
 # %%
@@ -113,7 +113,7 @@ fig
 #
 #     This example has not yet been completed...
 
-mcb: MCBalance = MCBalance(mcn=mcn_ub)
+mcb: MCBalance = MCBalance(fs=fs_ub)
 
 # SD configuration
 # df_sds: pd.DataFrame = mcb.create_balance_config(best_measurements='input')
@@ -122,13 +122,13 @@ mcb: MCBalance = MCBalance(mcn=mcn_ub)
 cfs: Dict = mcb._create_cost_functions()
 # check for a zero cost when passing the measured values
 for k, v in cfs.items():
-    x = mcb.mcn.to_dataframe().loc[k, :].drop(columns=['mass_wet']).values.ravel()
+    x = mcb.fs.to_dataframe().loc[k, :].drop(columns=['mass_wet']).values.ravel()
     y = v(x=x)
     print(k, y)
 
 df_bal: pd.DataFrame = mcb.optimise()
 
 # create a network using the balanced data
-mcn_bal: MCNetwork = MCNetwork.from_dataframe(df=df_bal, name='balanced', mc_name_col='name')
-fig = mcn_bal.plot_parallel(color='name')
+fs_bal: Flowsheet = Flowsheet.from_dataframe(df=df_bal, name='balanced', mc_name_col='name')
+fig = fs_bal.plot_parallel(color='name')
 fig.show()

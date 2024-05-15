@@ -20,7 +20,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.datasets.sample_data import sample_data
 
 logging.basicConfig(level=logging.INFO,
@@ -79,10 +79,10 @@ obj_mc_oor.status.oor
 
 obj_mc_feed: MassComposition = MassComposition(df_data, name='feed', constraints={'Fe': [0.0, 69.97]})
 obj_mc_1, obj_mc_2 = obj_mc_feed.split(0.4, name_1='stream_1', name_2='stream_2')
-mcn: MCNetwork = MCNetwork().from_streams([obj_mc_feed, obj_mc_1, obj_mc_2])
-mcn.plot()
+fs: Flowsheet = Flowsheet().from_streams([obj_mc_feed, obj_mc_1, obj_mc_2])
+fs.plot()
 plt.show()
-print(mcn.balanced)
+print(fs.balanced)
 
 # %%
 # Now we will modify the grades of a single stream so that they are OOR.
@@ -92,21 +92,21 @@ obj_mc_2.update_data(obj_mc_2.data['Fe'] + 10.0)
 obj_mc_2.data.to_dataframe()
 
 # %%
-mcn.plot()
+fs.plot()
 plt.show()
-print(mcn.balanced)
+print(fs.balanced)
 
 # %%
 # Display the offending edge records
-print(mcn.get_edge_by_name('stream_2').status.failing_components)
-mcn.get_edge_by_name('stream_2').status.oor
+print(fs.get_edge_by_name('stream_2').status.failing_components)
+fs.get_edge_by_name('stream_2').status.oor
 
 # %%
 # The red edge is caused by the Fe of 71.0 on stream_2 exceeding 69.97.
 #
 # The red node is caused by the mass not balancing across that node - we would expect the imbalance to be in Fe.
 
-mcn.graph.nodes[1]['mc'].node_balance()
+fs.graph.nodes[1]['mc'].node_balance()
 
 # %%
 # We have confirmed the imbalance is in Fe by inspecting the balance across node 1.
@@ -114,5 +114,5 @@ mcn.graph.nodes[1]['mc'].node_balance()
 # %%
 # The interactive network plot applies equivalent formatting.
 
-fig = mcn.plot_network()
+fig = fs.plot_network()
 fig

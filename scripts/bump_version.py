@@ -16,7 +16,7 @@ def process_command_line_parameters():
 
 
 def adjust_changelog():
-    with open('CHANGELOG.md', 'r') as file:
+    with open('HISTORY.rst', 'r') as file:
         lines = file.readlines()
 
     # Remove 'Elphick.' prefix from the first line
@@ -28,7 +28,7 @@ def adjust_changelog():
     if lines[1].startswith('='):
         lines[1] = '=' * (len(lines[0].strip()) - 1) + '\n'  # -1 for the newline character
 
-    with open('CHANGELOG.md', 'w') as file:
+    with open('HISTORY.rst', 'w') as file:
         file.writelines(lines)
 
 

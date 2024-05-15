@@ -1,8 +1,4 @@
-from typing import Tuple, Optional
-
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.datasets.sample_data import sample_data
-from elphick.mass_composition.utils.sampling import random_int
 
 
 class Stream(MassComposition):

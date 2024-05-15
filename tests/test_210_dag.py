@@ -1,6 +1,6 @@
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.dag import DAG
-from .fixtures import demo_data
+from tests.fixtures import demo_data
 
 
 def test_dag_instance(demo_data):

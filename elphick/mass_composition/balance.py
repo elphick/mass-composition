@@ -2,7 +2,7 @@
 For managing the mass balance across a mc-network.
 
 DESIGN NOTE: Use a balance config file for the standard deviation definition rather than
-appending more properties to the MCNetwork object (at least for now), since mass balancing
+appending more properties to the Flowsheet object (at least for now), since mass balancing
 may be more for advanced users - keeps those properties in the scope of this class.
 
 DESIGN NOTE: Early attempts to optimise error/cost in absolute space (mass/grade differences) while
@@ -19,13 +19,13 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize, LinearConstraint
 
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.mc_node import NodeType
 
 
 class MCBalance:
-    def __init__(self, mcn: MCNetwork):
-        self.mcn: MCNetwork = mcn
+    def __init__(self, fs: Flowsheet):
+        self.fs: Flowsheet = fs
         self.sd: pd.DataFrame = self.create_balance_config(best_measurements='input')
 
     def _create_cost_functions(self) -> Dict[str, Callable]:
@@ -42,16 +42,16 @@ class MCBalance:
             float which is the cost to be minimised
         """
 
-        xm: pd.DataFrame = self.mcn.to_dataframe().drop(columns=['mass_wet'])
+        xm: pd.DataFrame = self.fs.to_dataframe().drop(columns=['mass_wet'])
 
         # xi: pd.DataFrame = df_x[[col for col in df_x.columns if col != 'mass_wet']]
         # sd: pd.DataFrame = self.sd
 
-        stream_map: Dict = {n: i for i, n in enumerate(self.mcn.get_stream_names())}
-        nodes = [n for n in self.mcn.graph.nodes.data() if n[1]['mc'].node_type == NodeType.BALANCE]
+        stream_map: Dict = {n: i for i, n in enumerate(self.fs.get_stream_names())}
+        nodes = [n for n in self.fs.graph.nodes.data() if n[1]['mc'].node_type == NodeType.BALANCE]
         node_ins_outs: List = []
         for n in nodes:
-            inputs, outputs = self.mcn.get_node_input_outputs(n[0])
+            inputs, outputs = self.fs.get_node_input_outputs(n[0])
             node_ins_outs.append(([stream_map[i.name] for i in inputs], [stream_map[o.name] for o in outputs]))
 
         def cost_fn(x: np.ndarray, xm: np.ndarray, sd: np.ndarray, node_relationships: List) -> float:
@@ -87,9 +87,9 @@ class MCBalance:
 
         # create one cost function per record
         d_fns: Dict = {}
-        df_network: pd.DataFrame = self.mcn.to_dataframe()
+        df_network: pd.DataFrame = self.fs.to_dataframe()
         cols = [col for col in df_network.columns if col != 'mass_wet']
-        for i in self.mcn.get_input_streams()[0].data.to_dataframe().index:
+        for i in self.fs.get_input_streams()[0].data.to_dataframe().index:
             df_x: pd.DataFrame = df_network.loc[i, :][cols]
             d_fns[i] = partial(cost_fn, xm=df_x.values, sd=self.sd.values, node_relationships=node_ins_outs)
 
@@ -105,9 +105,9 @@ class MCBalance:
         Returns:
 
         """
-        xm: pd.DataFrame = self.mcn.to_dataframe().drop(columns=['mass_wet'])
+        xm: pd.DataFrame = self.fs.to_dataframe().drop(columns=['mass_wet'])
 
-        streams = self.mcn.streams_to_dict()
+        streams = self.fs.streams_to_dict()
         linear_constraints: List[LinearConstraint] = []
         for i, (s, mc) in enumerate(streams.items()):
             cons = mc.constraints
@@ -133,13 +133,13 @@ class MCBalance:
 
         """
         pass
-        # stream_map: Dict = {n: i for i, n in enumerate(self.mcn.get_edge_names())}
-        # nodes = [n for n in self.mcn.graph.nodes.data() if n[1]['mc'].node_type == NodeType.BALANCE]
+        # stream_map: Dict = {n: i for i, n in enumerate(self.fs.get_edge_names())}
+        # nodes = [n for n in self.fs.graph.nodes.data() if n[1]['mc'].node_type == NodeType.BALANCE]
         # node_ins_outs: List = []
         # for n in nodes:
-        #     inputs, outputs = self.mcn.get_node_input_outputs(n[0])
+        #     inputs, outputs = self.fs.get_node_input_outputs(n[0])
         #     node_ins_outs.append(([stream_map[i.name] for i in inputs], [stream_map[o.name] for o in outputs]))
-        # num_components: int = len(self.mcn.get_input_edges()[0].variables.chemistry.get_var_names()) + 2
+        # num_components: int = len(self.fs.get_input_edges()[0].variables.chemistry.get_var_names()) + 2
         #
         # def constraint_fn(x: np.ndarray, node_relationships: List, num_comp: int) -> Callable:
         #     x_2d = x.reshape(len(x) // num_comp, num_comp)
@@ -167,15 +167,15 @@ class MCBalance:
             the SDs used to normalise the residuals in the cost function that is minimised during balancing.
         """
 
-        df_sd: pd.DataFrame = self.mcn.report().drop(columns=['mass_wet'])
+        df_sd: pd.DataFrame = self.fs.report().drop(columns=['mass_wet'])
         df_sd.loc[:, :] = 1.0
         if best_measurements:
             tight_sd: float = 0.001 if best_locked else 0.1
             if best_measurements == 'input':
-                for strm in [e.name for e in self.mcn.get_input_streams()]:
+                for strm in [e.name for e in self.fs.get_input_streams()]:
                     df_sd.loc[strm, :] = tight_sd
             elif best_measurements == 'output':
-                for strm in [e.name for e in self.mcn.get_output_streams()]:
+                for strm in [e.name for e in self.fs.get_output_streams()]:
                     df_sd.loc[strm, :] = tight_sd
             else:
                 raise KeyError("best_measurements argument must be 'input'|'output'")
@@ -193,7 +193,7 @@ class MCBalance:
 
         d_cost_fns: Dict[str, Callable] = self._create_cost_functions()
         constraints: List[LinearConstraint] = self._create_constraints()
-        df_measured: pd.DataFrame = self.mcn.to_dataframe().fillna(0)
+        df_measured: pd.DataFrame = self.fs.to_dataframe().fillna(0)
         cols: List[str] = [col for col in df_measured.columns if col != 'mass_wet']
 
         chunks: List = []

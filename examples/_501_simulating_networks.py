@@ -16,7 +16,7 @@ from joblib import delayed
 
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.datasets.sample_data import sample_data
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.utils.parallel import TqdmParallel
 from examples._simulating_network_functions import my_simulator
 
@@ -28,11 +28,11 @@ df_data: pd.DataFrame = sample_data()
 obj_mc: MassComposition = MassComposition(df_data, name='sample')
 d_inputs: dict[int, MassComposition] = {1: obj_mc, 2: obj_mc.add(obj_mc), 3: obj_mc.add(obj_mc).add(obj_mc)}
 
-results: list[tuple[int, MCNetwork]] = TqdmParallel(n_jobs=3, prefer="processes", total=len(d_inputs))(
+results: list[tuple[int, Flowsheet]] = TqdmParallel(n_jobs=3, prefer="processes", total=len(d_inputs))(
     delayed(my_simulator)(item) for item in d_inputs.items()
 )
 
-d_results = {sid: mcn for sid, mcn in results}
+d_results = {sid: fs for sid, fs in results}
 
 # %%
 # Print the results

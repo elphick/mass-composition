@@ -23,7 +23,7 @@ import plotly
 from elphick.mass_composition import MassComposition
 from elphick.mass_composition.datasets import datasets
 from elphick.mass_composition.datasets.sample_data import size_by_assay
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.utils.partition import napier_munn
 
 # %%

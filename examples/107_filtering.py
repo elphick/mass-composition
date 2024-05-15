@@ -4,14 +4,14 @@ Filtering
 
 Filtering is often required to reduce the data of a MassComposition object to a specific subset of interest.
 
-Both individual objects can be filtered, as can multiple objects contained within a MCNetwork object.
+Both individual objects can be filtered, as can multiple objects contained within a Flowsheet object.
 
 """
 
 import pandas as pd
 
 from elphick.mass_composition import MassComposition
-from elphick.mass_composition.network import MCNetwork
+from elphick.mass_composition.flowsheet import Flowsheet
 from elphick.mass_composition.datasets.sample_data import sample_data
 
 # %%
@@ -50,19 +50,19 @@ obj_1.data.to_dataframe()
 # Filtering Multiple Objects
 # --------------------------
 #
-# Multiple objects can be loaded into a MCNetwork.  We'll make a small network to demonstrate.
+# Multiple objects can be loaded into a Flowsheet.  We'll make a small network to demonstrate.
 
 obj_one, obj_two = obj_mc.split(fraction=0.6, name_1='one', name_2='two')
 
-mcn: MCNetwork = MCNetwork.from_streams([obj_mc, obj_one, obj_two], name='Network')
+fs: Flowsheet = Flowsheet.from_streams([obj_mc, obj_one, obj_two], name='Network')
 
 # %%
 # The weighted mean mass-composition of each object/edge/stream in the network can be reported out with the
 # report method.
 
-mcn.report()
+fs.report()
 
 # %%
 # Now we'll filter as we did before, though we must specify which object the query criteria is to be applied to.
 
-mcn.query(mc_name='demo', queries={'index': 'Fe>58'}).report()
+fs.query(mc_name='demo', queries={'index': 'Fe>58'}).report()

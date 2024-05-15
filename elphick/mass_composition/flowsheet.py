@@ -23,19 +23,20 @@ from elphick.mass_composition.dag import DAG
 from elphick.mass_composition.layout import digraph_linear_layout
 from elphick.mass_composition.mc_node import MCNode, NodeType
 from elphick.mass_composition.plot import parallel_plot, comparison_plot
+from elphick.mass_composition.stream import Stream
 from elphick.mass_composition.utils.geometry import midpoint
 from elphick.mass_composition.utils.loader import streams_from_dataframe
 from elphick.mass_composition.utils.sampling import random_int
 
 
-class MCNetwork:
+class Flowsheet:
     def __init__(self, name: str = 'Flowsheet'):
         self.name: str = name
         self.graph: nx.DiGraph = nx.DiGraph()
         self._logger: logging.Logger = logging.getLogger(__class__.__name__)
 
     @classmethod
-    def from_streams(cls, streams: List[MassComposition], name: Optional[str] = 'Flowsheet') -> 'MCNetwork':
+    def from_streams(cls, streams: List[Union[Stream, MassComposition]], name: Optional[str] = 'Flowsheet') -> 'Flowsheet':
         """Instantiate from a list of objects
 
         Args:
@@ -46,7 +47,7 @@ class MCNetwork:
 
         """
 
-        streams: List[MassComposition] = cls._check_indexes(streams)
+        streams: List[Union[Stream, MassComposition]] = cls._check_indexes(streams)
         bunch_of_edges: List = []
         for stream in streams:
             if stream._nodes is None:
@@ -79,7 +80,7 @@ class MCNetwork:
     def from_dataframe(cls, df: pd.DataFrame,
                        name: Optional[str] = 'Flowsheet',
                        mc_name_col: Optional[str] = None,
-                       n_jobs: int = 1) -> 'MCNetwork':
+                       n_jobs: int = 1) -> 'Flowsheet':
         """Instantiate from a DataFrame
 
         Args:
@@ -90,7 +91,7 @@ class MCNetwork:
             n_jobs: The number of parallel jobs to run.  If -1, will use all available cores.
 
         Returns:
-            MCNetwork: An instance of the MCNetwork class initialized from the provided DataFrame.
+            Flowsheet: An instance of the Flowsheet class initialized from the provided DataFrame.
 
         """
         streams: Dict[Union[int, str], MassComposition] = streams_from_dataframe(df=df, mc_name_col=mc_name_col,
@@ -98,7 +99,7 @@ class MCNetwork:
         return cls().from_streams(streams=list(streams.values()), name=name)
 
     @classmethod
-    def from_yaml(cls, flowsheet_file: Path) -> 'MCNetwork':
+    def from_yaml(cls, flowsheet_file: Path) -> 'Flowsheet':
         """Construct a flowsheet defined in a yaml file
 
         Args:
@@ -130,7 +131,7 @@ class MCNetwork:
         return obj
 
     @classmethod
-    def from_dag(cls, dag: DAG) -> 'MCNetwork':
+    def from_dag(cls, dag: DAG) -> 'Flowsheet':
         """Construct a flowsheet from a dag object
 
         Args:
@@ -140,27 +141,27 @@ class MCNetwork:
 
         """
 
-        # Create a new instance of MCNetwork
-        mcn = cls(name=dag.name)
+        # Create a new instance of Flowsheet
+        fs = cls(name=dag.name)
 
-        # Copy the nodes from the dag to the MCNetwork
+        # Copy the nodes from the dag to the Flowsheet
         for nid, (node, data) in enumerate(dag.graph.nodes(data=True)):
-            mcn.graph.add_node(data['name'], mc=MCNode(node_id=nid, node_name=data['name']))
+            fs.graph.add_node(data['name'], mc=MCNode(node_id=nid, node_name=data['name']))
 
-        # Copy the edges from the dag to the MCNetwork
+        # Copy the edges from the dag to the Flowsheet
         for edge in dag.graph.edges:
             # Retrieve the MassComposition object from the edge
             mc = dag.graph.edges[edge]['mc']
             # Use the name of the MassComposition object as the name of the edge
-            mcn.graph.add_edge(*edge, name=mc.name, **dag.graph.edges[edge])
+            fs.graph.add_edge(*edge, name=mc.name, **dag.graph.edges[edge])
 
         # Populate the inputs and outputs properties of the MCNode objects
-        for node in mcn.graph.nodes:
-            mc_node = mcn.graph.nodes[node]['mc']
-            mc_node.inputs = [mcn.graph.edges[edge]['mc'] for edge in mcn.graph.in_edges(node)]
-            mc_node.outputs = [mcn.graph.edges[edge]['mc'] for edge in mcn.graph.out_edges(node)]
+        for node in fs.graph.nodes:
+            mc_node = fs.graph.nodes[node]['mc']
+            mc_node.inputs = [fs.graph.edges[edge]['mc'] for edge in fs.graph.in_edges(node)]
+            mc_node.outputs = [fs.graph.edges[edge]['mc'] for edge in fs.graph.out_edges(node)]
 
-        return mcn
+        return fs
 
     @property
     def balanced(self) -> bool:
@@ -192,7 +193,7 @@ class MCNetwork:
 
         """
 
-        res: Optional[MassComposition] = None
+        res: Optional[Union[Stream, MassComposition]] = None
         for u, v, a in self.graph.edges(data=True):
             if a['mc'].name == name:
                 res = a['mc']
@@ -214,7 +215,7 @@ class MCNetwork:
             res.append(a['mc'].name)
         return res
 
-    def get_input_streams(self) -> List[MassComposition]:
+    def get_input_streams(self) -> List[Union[Stream, MassComposition]]:
         """Get the input (feed) streams (edge objects)
 
         Returns:
@@ -224,10 +225,10 @@ class MCNetwork:
         # Create a dictionary that maps node names to their degrees
         degrees = {n: d for n, d in self.graph.degree()}
 
-        res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[u] == 1]
+        res: List[Union[Stream, MassComposition]] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[u] == 1]
         return res
 
-    def get_output_streams(self) -> List[MassComposition]:
+    def get_output_streams(self) -> List[Union[Stream, MassComposition]]:
         """Get the output (product) streams (edge objects)
 
         Returns:
@@ -237,7 +238,7 @@ class MCNetwork:
         # Create a dictionary that maps node names to their degrees
         degrees = {n: d for n, d in self.graph.degree()}
 
-        res: List[MassComposition] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[v] == 1]
+        res: List[Union[Stream, MassComposition]] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[v] == 1]
         return res
 
     def get_column_formats(self, columns: List[str], strip_percent: bool = False) -> Dict[str, str]:
@@ -286,7 +287,7 @@ class MCNetwork:
         rpt: Path = mc_node.imbalance_report()
         webbrowser.open(str(rpt))
 
-    def query(self, mc_name: str, queries: Dict) -> 'MCNetwork':
+    def query(self, mc_name: str, queries: Dict) -> 'Flowsheet':
         """Query/filter across the network
 
         The queries provided will be applied to the MassComposition object in the network with the mc_name.
@@ -306,7 +307,7 @@ class MCNetwork:
         index = mc_obj_ref.data[coord]
 
         # iterate through all other objects on the edges and filter them to the same indexes
-        mc_objects: List[MassComposition] = []
+        mc_objects: List[Union[Stream, MassComposition]] = []
         for u, v, a in self.graph.edges(data=True):
             if a['mc'].name == mc_name:
                 mc_objects.append(mc_obj_ref)
@@ -315,7 +316,7 @@ class MCNetwork:
                 mc_obj._data = mc_obj._data.sel({coord: index.values})
                 mc_objects.append(mc_obj)
 
-        res: MCNetwork = MCNetwork.from_streams(mc_objects)
+        res: Flowsheet = Flowsheet.from_streams(mc_objects)
 
         return res
 
@@ -651,7 +652,7 @@ class MCNetwork:
             streams: Dict[str, MassComposition] = self.streams_to_dict()
             for k, v in streams.items():
                 streams[k] = v.set_stream_nodes((random_int(), random_int()))
-            self.graph = MCNetwork(name=self.name).from_streams(streams=list(streams.values())).graph
+            self.graph = Flowsheet(name=self.name).from_streams(streams=list(streams.values())).graph
         else:
             mc: MassComposition = self.get_edge_by_name(stream)
             mc.set_stream_nodes((random_int(), random_int()))
@@ -667,13 +668,13 @@ class MCNetwork:
 
         """
         # brutal approach - rebuild from streams
-        strms: List[MassComposition] = []
+        strms: List[Union[Stream, MassComposition]] = []
         for u, v, a in self.graph.edges(data=True):
             if a['mc'].name == mc.name:
                 strms.append(mc)
             else:
                 strms.append(a['mc'])
-        self.graph = MCNetwork(name=self.name).from_streams(streams=strms).graph
+        self.graph = Flowsheet(name=self.name).from_streams(streams=strms).graph
 
     def set_node_names(self, node_names: Dict[int, str]):
         """Set the names of network nodes with a Dict
