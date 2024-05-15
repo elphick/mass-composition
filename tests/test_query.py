@@ -2,7 +2,7 @@ import pandas as pd
 
 from elphick.mass_composition import MassComposition, Flowsheet
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data
+from .fixtures import demo_data
 
 
 def test_query(demo_data):

@@ -7,7 +7,7 @@ from elphick.mass_composition.utils.pd_utils import column_prefixes, column_pref
     composition_to_mass, mass_to_composition, calculate_recovery
 
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data
+from .fixtures import demo_data
 
 
 def test_col_prefixes():

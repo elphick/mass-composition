@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 
 from elphick.mass_composition import MassComposition
-from tests.fixtures import demo_data
+from .fixtures import demo_data
 
 
 def test_init(demo_data):

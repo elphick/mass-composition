@@ -9,7 +9,7 @@ from dev.debugging_tools import pretty_print_graph
 from elphick.mass_composition import MassComposition, Flowsheet
 from elphick.mass_composition.mc_node import MCNode
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data, size_assay_data, demo_size_network, script_loc
+from .fixtures import demo_data, size_assay_data, demo_size_network, script_loc
 
 
 def test_graph_object_types_and_attributes(demo_size_network):

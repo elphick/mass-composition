@@ -8,7 +8,7 @@ import pandas as pd
 from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.variables import Variables
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data, demo_data_2
+from .fixtures import demo_data, demo_data_2
 from elphick.mass_composition import MassComposition
 import xarray as xr
 

@@ -8,7 +8,7 @@ from pandas import Interval
 
 from elphick.mass_composition.utils.partition import napier_munn
 # noinspection PyUnresolvedReferences
-from tests.fixtures import demo_data, size_assay_data
+from .fixtures import demo_data, size_assay_data
 from elphick.mass_composition import MassComposition, Flowsheet
 
 

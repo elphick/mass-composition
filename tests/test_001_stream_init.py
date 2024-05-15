@@ -1,7 +1,7 @@
 import pandas as pd
 
 from elphick.mass_composition import MassComposition, Stream
-from tests.fixtures import demo_data
+from .fixtures import demo_data
 
 
 def test_stream_init(demo_data):
