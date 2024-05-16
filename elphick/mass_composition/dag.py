@@ -83,7 +83,7 @@ class DAG:
         if parent_node is None:
             raise ValueError(f"No parent node found for stream {stream}")
         self.graph.add_node(name, operation=DAG.output, dependencies=[stream], kwargs=None, defined=True, name=name)
-        self.graph.add_edge(parent_node, name)
+        self.graph.add_edge(parent_node, name, name=stream)
         return self
 
     def _topological_sort(self) -> List[str]:

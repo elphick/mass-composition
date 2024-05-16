@@ -1,3 +1,12 @@
+Mass_Composition 0.6.4 (2024-05-16)
+===================================
+
+Bugfix
+------
+
+- Added missing name attribute on the output edges. (#165)
+
+
 Mass_Composition 0.6.3 (2024-05-16)
 ===================================
 
