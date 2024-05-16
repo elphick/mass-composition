@@ -1,3 +1,12 @@
+Mass_Composition 0.6.3 (2024-05-16)
+===================================
+
+Bugfix
+------
+
+- Fixed DAG incorrect edge successors using name lookup from graph. (#163)
+
+
 Mass_Composition 0.6.2 (2024-05-16)
 ===================================
 
