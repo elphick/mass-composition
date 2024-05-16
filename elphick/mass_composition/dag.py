@@ -89,7 +89,7 @@ class DAG:
     def _topological_sort(self) -> List[str]:
         return list(nx.topological_sort(self.graph))
 
-    def run(self, input_streams: dict):
+    def run(self, input_streams: dict, progress_bar: bool = True):
         """
         Executes the Directed Acyclic Graph (DAG).
 
@@ -102,6 +102,7 @@ class DAG:
         Parameters:
         input_streams (dict): A dictionary mapping node names to Stream objects. These are the initial Stream objects
                     for the input nodes of the DAG.
+        progress_bar (bool): If True, a progress bar is displayed during the execution of the DAG.
 
         Returns:
         None
@@ -114,8 +115,9 @@ class DAG:
         for node in self.graph.nodes:
             self.node_executed[node] = False
 
-        # Initialise a progressbar that will count up to the number of nodes in the graph
-        pbar = tqdm(total=len(self.graph.nodes), desc="Executing nodes", unit="node")
+        if progress_bar:
+            # Initialise a progressbar that will count up to the number of nodes in the graph
+            pbar = tqdm(total=len(self.graph.nodes), desc="Executing nodes", unit="node")
 
         executed_nodes = set()  # Keep track of nodes that have been executed
 
@@ -153,11 +155,12 @@ class DAG:
                 for edge, strm in updated_edges.items():
                     logger.debug(f"Updating edge {edge} with stream {strm.name}")
                     self.graph.edges[edge]['mc'] = strm
-                # update the progress bar by one step
-                pbar.set_postfix_str(f"Processed node: {node}")
-                pbar.update()
-
-        pbar.close()  # Close the progress bar
+                if progress_bar:
+                    # update the progress bar by one step
+                    pbar.set_postfix_str(f"Processed node: {node}")
+                    pbar.update()
+        if progress_bar:
+            pbar.close()  # Close the progress bar
         logger.info(f"DAG execution complete for the nodes: {executed_nodes}")
 
     def execute_node(self, node: str, strms: dict):
@@ -234,7 +237,7 @@ class DAG:
                 for successor in self.graph.successors(node):
                     updated_edges[(node, successor)] = result
 
-        return node, result, updated_edges
+        return node, list(result), updated_edges
 
     def plot(self):
         plt.figure(figsize=(8, 6))

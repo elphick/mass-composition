@@ -39,9 +39,14 @@ dag.add_step(name='split', operation=Stream.split, streams=['feed'],
              kwargs={'fraction': 0.3, 'name_1': 'lump', 'name_2': 'fines'})
 dag.add_step(name='split_2', operation=Stream.split, streams=['lump'],
              kwargs={'fraction': 0.3, 'name_1': 'lumpier', 'name_2': 'less_lumpy'})
-dag.add_output(name='lumpier', stream='lumpier')
-dag.add_output(name='mid', stream='less_lumpy')
-dag.add_output(name='fines', stream='fines')
+dag.add_step(name='split_3', operation=Stream.split, streams=['fines'],
+             kwargs={'fraction': 0.3, 'name_1': 'finer', 'name_2': 'less_fine'})
+dag.add_step(name='joiner_1', operation=Stream.add, streams=['less_lumpy', 'less_fine'],
+             kwargs={'name': 'mix_1'})
+dag.add_step(name='joiner_2', operation=Stream.add, streams=['lumpier', 'finer'],
+             kwargs={'name': 'mix_2'})
+dag.add_output(name='product_1', stream='mix_1')
+dag.add_output(name='product_2', stream='mix_2')
 
 
 # %%
@@ -53,7 +58,7 @@ dag.add_output(name='fines', stream='fines')
 
 dag.run({'feed_1': mc_sample,
          'feed_2': deepcopy(mc_sample).rename('sample_2')  # names must be unique
-         })
+         }, progress_bar=False)
 
 # %%
 # Create a Flowsheet object from the dag, enabling all the usual network plotting and analysis methods.
