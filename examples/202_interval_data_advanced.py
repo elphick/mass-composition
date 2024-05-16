@@ -47,7 +47,7 @@ mc_feed.data.to_dataframe()
 # We partially initialise a partition function, and split the feed stream accordingly.
 
 partition = partial(napier_munn, d50=0.150, ep=0.05, dim='size')
-mc_oversize, mc_undersize = mc_feed.apply_partition(definition=partition, name_1='OS', name_2='US')
+mc_oversize, mc_undersize = mc_feed.split_by_partition(partition_definition=partition, name_1='OS', name_2='US')
 
 # %%
 # Drop the two size fractions from mc_fine that have near zero mass.

@@ -269,7 +269,7 @@ class MassCompositionAccessor:
 
         return out._obj, comp._obj
 
-    def apply_partition(self, definition: Callable) -> Tuple[xr.Dataset, xr.Dataset]:
+    def split_by_partition(self, partition_definition: Callable) -> Tuple[xr.Dataset, xr.Dataset]:
         """Partition the object along a given dimension.
 
         This method applies the defined partition resulting in two new objects.
@@ -277,7 +277,7 @@ class MassCompositionAccessor:
         See also: split
 
         Args:
-            definition: A partition function that defines the efficiency of separation along a dimension
+            partition_definition: A partition function that defines the efficiency of separation along a dimension
 
         Returns:
             tuple of two datasets, the first defined by the function, the other the complement
@@ -288,13 +288,13 @@ class MassCompositionAccessor:
         out = deepcopy(self)
         comp = deepcopy(self)
 
-        if not isinstance(definition, Callable):
+        if not isinstance(partition_definition, Callable):
             raise TypeError("The definition is not a callable function")
-        if 'dim' not in definition.keywords.keys():
+        if 'dim' not in partition_definition.keywords.keys():
             raise NotImplementedError("The callable function passed does not have a dim")
 
-        dim = definition.keywords['dim']
-        definition.keywords.pop('dim')
+        dim = partition_definition.keywords['dim']
+        partition_definition.keywords.pop('dim')
         if isinstance(self._obj[dim].data[0], pd.Interval):
             if dim == 'size':
                 x = mean_size(pd.arrays.IntervalArray(self._obj[dim].data))
@@ -306,7 +306,7 @@ class MassCompositionAccessor:
                                  'not an interval. This is not typical usage.  It is assumed that the '
                                  'dimension data represents the centre/mean, and not an edge like '
                                  'retained or passing.')
-        pn = definition(x)
+        pn = partition_definition(x)
         if not ((dim in self._obj.dims) and (len(self._obj.dims) == 1)):
             # TODO: Set the dim to match the partition if it does not already
             # obj_mass = obj_mass.swap_dims(dim=)

@@ -54,7 +54,7 @@ part_cyclone = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
 # %%
 # Separate the object using the defined partitions.  UF = Underflow, OF = Overflow
 
-mc_uf, mc_of = mc_feed.apply_partition(definition=part_cyclone, name_1='underflow', name_2='overflow')
+mc_uf, mc_of = mc_feed.split_by_partition(partition_definition=part_cyclone, name_1='underflow', name_2='overflow')
 fs: Flowsheet = Flowsheet().from_streams([mc_feed, mc_uf, mc_of])
 
 fig = fs.table_plot(table_pos='left',

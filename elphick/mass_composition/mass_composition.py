@@ -495,6 +495,8 @@ class MassComposition:
 
         A simple mass split maintaining the same composition
 
+        See also: split_by_partition, split_by_function, split_by_estimator
+
         Args:
             fraction: A constant in the range [0.0, 1.0]
             name_1: The name of the reference stream created by the split
@@ -515,18 +517,18 @@ class MassComposition:
 
         return out, comp
 
-    def apply_partition(self,
-                        definition: Callable,
-                        name_1: Optional[str] = None,
-                        name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+    def split_by_partition(self,
+                           partition_definition: Callable,
+                           name_1: Optional[str] = None,
+                           name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
         """Partition the object along a given dimension.
 
         This method applies the defined separation resulting in two new objects.
 
-        See also: split
+        See also: split, split_by_function, split_by_estimator
 
         Args:
-            definition: A partition function that defines the efficiency of separation along a dimension
+            partition_definition: A partition function that defines the efficiency of separation along a dimension
             name_1: The name of the reference stream created by the split
             name_2: The name of the complement stream created by the split
 
@@ -536,10 +538,71 @@ class MassComposition:
         out = deepcopy(self)
         comp = deepcopy(self)
 
-        xr_ds_1, xr_ds_2 = self._data.mc.apply_partition(definition=definition)
+        xr_ds_1, xr_ds_2 = self._data.mc.split_by_partition(partition_definition=partition_definition)
 
         out._data = xr_ds_1
         comp._data = xr_ds_2
+
+        self._post_process_split(out, comp, name_1, name_2)
+
+        return out, comp
+
+    def split_by_function(self,
+                          split_function: Callable,
+                          name_1: Optional[str] = None,
+                          name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+        """Split an object using a function.
+
+        This method applies the function to self, resulting in two new objects. The object returned with name_1
+        is the result of the function.  The object returned with name_2 is the complement.
+
+        See also: split, split_by_estimator, split_by_partition
+
+        Args:
+            split_function: Any function that transforms the dataframe from a MassComposition object into a new
+             dataframe with values representing a new (output) stream.  The returned dataframe structure must be
+             identical to the input dataframe.
+            name_1: The name of the stream created by the function
+            name_2: The name of the complement stream created by the split, which is calculated automatically.
+
+        Returns:
+            tuple of two datasets, the first with the mass fraction specified, the other the complement
+        """
+        out_data: pd.DataFrame = split_function(self.data.to_dataframe())
+        out: MassComposition = MassComposition(name=name_1, constraints=self.constraints, data=out_data)
+        comp: MassComposition = self.sub(other=out, name=name_2)
+
+        self._post_process_split(out, comp, name_1, name_2)
+
+        return out, comp
+
+    def split_by_estimator(self,
+                           estimator: 'sklearn.base.BaseEstimator',
+                           name_1: Optional[str] = None,
+                           name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+        """Split an object using a sklearn estimator.
+
+        This method applies the function to self, resulting in two new objects. The object returned with name_1
+        is the result of the estimator.predict() method.  The object returned with name_2 is the complement.
+
+        See also: split, split_by_function, split_by_partition
+
+        Args:
+            estimator: Any sklearn estimator that transforms the dataframe from a MassComposition object into a new
+             dataframe with values representing a new (output) stream using the predict method.  The returned
+             dataframe structure must be identical to the input dataframe.
+            name_1: The name of the stream created by the estimator.
+            name_2: The name of the complement stream created by the split, which is calculated automatically.
+
+        Returns:
+            tuple of two datasets, the first with the mass fraction specified, the other the complement
+        """
+        out_data: Union[pd.DataFrame, np.ndarray] = estimator.predict(self.data.to_dataframe())
+        if isinstance(out_data, np.ndarray):
+            out_data = pd.DataFrame(out_data, index=self.data.to_dataframe().index,
+                                    columns=self.data.to_dataframe().columns)
+        out: MassComposition = MassComposition(name=name_1, constraints=self.constraints, data=out_data)
+        comp: MassComposition = self.sub(other=out, name=name_2)
 
         self._post_process_split(out, comp, name_1, name_2)
 
@@ -578,7 +641,7 @@ class MassComposition:
                                                             include_original_edges=include_original_edges)
 
         obj: MassComposition = MassComposition(df_upsampled, name=self.name)
-        obj.nodes = self._nodes
+        obj._nodes = self._nodes
         obj.constraints = self.constraints
         return obj
 
@@ -991,7 +1054,7 @@ class MassComposition:
         res: MassComposition = MassComposition(name=xr_sub.mc.name, constraints=self.constraints)
         res.set_data(data=xr_sub, constraints=self.constraints)
 
-        res.nodes = [self._nodes[1], random_int()]
+        res._nodes = [self._nodes[1], random_int()]
         return res
 
     def __truediv__(self, other: 'MassComposition') -> 'MassComposition':
@@ -1050,6 +1113,7 @@ class MassComposition:
         obj_2._nodes = [self._nodes[1], random_int()]
         obj_1._name = name_1
         obj_2._name = name_2
+
         return obj_1, obj_2
 
     def _intervals_to_columns(self, interval_index: pd.IntervalIndex) -> pd.DataFrame:

@@ -1,3 +1,13 @@
+Mass_Composition 0.6.0 (2024-05-16)
+===================================
+
+Feature
+-------
+
+- Added support for splitting with function and sklearn estimator.
+- BREAKING CHANGE: renamed apply_partition to split_by_partition for method name consistency. (#147)
+
+
 Mass_Composition 0.5.2 (2024-05-16)
 ===================================
 

@@ -26,7 +26,7 @@ def test_missing_sizes(size_assay_data):
     # We partially initialise a partition function
     partition = partial(napier_munn, d50=0.150, ep=0.05, dim='size')
     # Create a Network using the partition
-    mc_oversize, mc_undersize = mc_feed.apply_partition(definition=partition, name_1='OS', name_2='US')
+    mc_oversize, mc_undersize = mc_feed.split_by_partition(partition_definition=partition, name_1='OS', name_2='US')
     # drop the two size fractions from mc_fine that have near zero mass
     df_fine: pd.DataFrame = mc_undersize.data.to_dataframe()
     df_fine = df_fine.loc[df_fine.index.left < 0.5, :]

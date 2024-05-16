@@ -60,7 +60,7 @@ partition = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
 #
 # Separate the object using the defined partition
 
-mc_coarse, mc_fine = mc_size.apply_partition(definition=partition, name_1='coarse', name_2='fine')
+mc_coarse, mc_fine = mc_size.split_by_partition(partition_definition=partition, name_1='coarse', name_2='fine')
 
 fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse, mc_fine])
 print(fs.balanced)

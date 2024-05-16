@@ -101,7 +101,7 @@ partition = partial(perfect, d50=0.150, dim='size')
 #
 # Separate the object using the defined partition
 
-mc_coarse, mc_fine = mc_size.apply_partition(definition=partition)
+mc_coarse, mc_fine = mc_size.split_by_partition(partition_definition=partition)
 mc_coarse.name = 'coarse'
 mc_fine.name = 'fine'
 
