@@ -115,7 +115,7 @@ def size_by_assay_2() -> pd.DataFrame:
     """
     mc_size: MassComposition = MassComposition(size_by_assay(), name='feed')
     partition = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
-    mc_coarse, mc_fine = mc_size.apply_partition(definition=partition, name_1='coarse', name_2='fine')
+    mc_coarse, mc_fine = mc_size.split_by_partition(partition_definition=partition, name_1='coarse', name_2='fine')
     fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse, mc_fine])
     return fs.to_dataframe()
 
@@ -125,7 +125,7 @@ def size_by_assay_3() -> pd.DataFrame:
     """
     mc_size: MassComposition = MassComposition(size_by_assay(), name='feed')
     partition = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
-    mc_coarse, mc_fine = mc_size.apply_partition(definition=partition, name_1='coarse', name_2='fine')
+    mc_coarse, mc_fine = mc_size.split_by_partition(partition_definition=partition, name_1='coarse', name_2='fine')
     # add error to the coarse stream to create an imbalance
     df_coarse_2 = mc_coarse.data.to_dataframe().apply(lambda x: np.random.normal(loc=x, scale=np.std(x)))
     mc_coarse_2: MassComposition = MassComposition(data=df_coarse_2, name='coarse')
@@ -156,7 +156,7 @@ def iron_ore_met_sample_data() -> pd.DataFrame:
 def demo_size_network() -> Flowsheet:
     mc_size: MassComposition = MassComposition(size_by_assay(), name='size sample')
     partition = partial(perfect, d50=0.150, dim='size')
-    mc_coarse, mc_fine = mc_size.apply_partition(definition=partition)
+    mc_coarse, mc_fine = mc_size.split_by_partition(partition_definition=partition)
     mc_coarse.name = 'coarse'
     mc_fine.name = 'fine'
     fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_coarse, mc_fine])

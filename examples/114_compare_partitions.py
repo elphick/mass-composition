@@ -79,9 +79,9 @@ part_sim = partial(napier_munn, d50=0.150, ep=0.1, dim='size')
 #
 # Separate the object using the defined partitions
 
-mc_ideal_coarse, mc_ideal_fine = mc_ideal_feed.apply_partition(definition=part_ideal,
-                                                               name_1='ideal_coarse', name_2='ideal_fine')
-mc_sim_coarse, mc_sim_fine = mc_sim_feed.apply_partition(definition=part_sim, name_1='sim_coarse', name_2='sim_fine')
+mc_ideal_coarse, mc_ideal_fine = mc_ideal_feed.split_by_partition(partition_definition=part_ideal,
+                                                                  name_1='ideal_coarse', name_2='ideal_fine')
+mc_sim_coarse, mc_sim_fine = mc_sim_feed.split_by_partition(partition_definition=part_sim, name_1='sim_coarse', name_2='sim_fine')
 
 
 fs: Flowsheet = Flowsheet().from_streams([mc_size, mc_ideal_feed, mc_sim_feed,
