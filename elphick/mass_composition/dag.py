@@ -169,7 +169,7 @@ class DAG:
 
         This method takes a node and a dictionary of Stream objects. It executes the operation associated with the
         node using the Stream objects as inputs. If the node has successors and is defined, the result of the node
-        execution is stored in the edges of the graph.
+        execution is stored in the edges of the graph. Otherwise, the result is returned as is.
 
         Parameters:
         node (str): The name of the node to be executed.
@@ -229,11 +229,19 @@ class DAG:
 
         # Return the node, result, and the updated edges
         updated_edges = {}
-        if list(self.graph.successors(node)) and defined:
-            if isinstance(result, tuple):
-                for i, strm in enumerate(result):
-                    updated_edges[(node, list(self.graph.successors(node))[i])] = strm
-            else:
+        if list(self.graph.successors(node)) and defined:  # If the node has successors and is defined, so not outputs.
+            if isinstance(result, tuple):  # Multiple outputs
+                # Assign each output stream to the corresponding successor
+                for strm in result:
+                    # Look up the edge by the name of the output stream
+                    edge = next(
+                        ((n1, n2) for n1, n2, data in self.graph.edges(data=True) if data.get('name') == strm.name),
+                        None)
+                    if edge is not None:
+                        updated_edges[edge] = strm
+                    else:
+                        raise ValueError(f"Edge not found for stream {strm.name}")
+            else:  # Single outputs
                 for successor in self.graph.successors(node):
                     updated_edges[(node, successor)] = result
 
