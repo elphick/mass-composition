@@ -5,9 +5,6 @@ import sys
 
 def run_command(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    print(f"stdout: {stdout.decode()}")
-    print(f"stderr: {stderr.decode()}")
     process.wait()
 
 

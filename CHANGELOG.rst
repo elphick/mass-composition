@@ -1,3 +1,12 @@
+Mass_Composition 0.6.2 (2024-05-16)
+===================================
+
+Bugfix
+------
+
+- Second fix for DAG.run ValueError('generator already running') - managed result type. (160a)
+
+
 Mass_Composition 0.6.1 (2024-05-16)
 ===================================
 
