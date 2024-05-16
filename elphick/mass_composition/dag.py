@@ -237,7 +237,13 @@ class DAG:
                 for successor in self.graph.successors(node):
                     updated_edges[(node, successor)] = result
 
-        return node, list(result), updated_edges
+        # Check the type of the result
+        if isinstance(result, MassComposition):
+            # If the result is a Stream object, return it as is
+            return node, result, updated_edges
+        else:
+            # If the result is a generator or a tuple of Stream objects, convert it to a list
+            return node, list(result), updated_edges
 
     def plot(self):
         plt.figure(figsize=(8, 6))
