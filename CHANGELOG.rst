@@ -1,3 +1,17 @@
+Mass_Composition 0.6.1 (2024-05-16)
+===================================
+
+Feature
+-------
+
+- DAG progress bar now optional.
+
+Bugfix
+------
+
+- Attempted fix for DAG.run ValueError('generator already running') (#160)
+
+
 Mass_Composition 0.6.0 (2024-05-16)
 ===================================
 
