@@ -1,3 +1,18 @@
+Mass_Composition 0.6.5 (2024-05-17)
+===================================
+
+Bugfix
+------
+
+- Fix for rogue edge creation in DAG.add_step method. (#167)
+
+
+Feature
+-------
+
+- DAGs using Stream operations can join more than 2 streams.  see example 503_dag_with_partition. (#168)
+
+
 Mass_Composition 0.6.4 (2024-05-16)
 ===================================
 

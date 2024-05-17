@@ -34,16 +34,16 @@ mc_sample: MassComposition = MassComposition(sample_data(), name='sample')
 dag = DAG(n_jobs=1)
 dag.add_input(name='feed_1')
 dag.add_input(name='feed_2')
-dag.add_step(name='joiner', operation=Stream.add, streams=['feed_1', 'feed_2'], kwargs={'name': 'feed'})
-dag.add_step(name='split', operation=Stream.split, streams=['feed'],
+dag.add_step(name='joiner', operation=MassComposition.add, streams=['feed_1', 'feed_2'], kwargs={'name': 'feed'})
+dag.add_step(name='split', operation=MassComposition.split, streams=['feed'],
              kwargs={'fraction': 0.3, 'name_1': 'lump', 'name_2': 'fines'})
-dag.add_step(name='split_2', operation=Stream.split, streams=['lump'],
+dag.add_step(name='split_2', operation=MassComposition.split, streams=['lump'],
              kwargs={'fraction': 0.3, 'name_1': 'lumpier', 'name_2': 'less_lumpy'})
-dag.add_step(name='split_3', operation=Stream.split, streams=['fines'],
+dag.add_step(name='split_3', operation=MassComposition.split, streams=['fines'],
              kwargs={'fraction': 0.3, 'name_1': 'finer', 'name_2': 'less_fine'})
-dag.add_step(name='joiner_1', operation=Stream.add, streams=['less_lumpy', 'less_fine'],
+dag.add_step(name='joiner_1', operation=MassComposition.add, streams=['less_lumpy', 'less_fine'],
              kwargs={'name': 'mix_1'})
-dag.add_step(name='joiner_2', operation=Stream.add, streams=['lumpier', 'finer'],
+dag.add_step(name='joiner_2', operation=MassComposition.add, streams=['lumpier', 'finer'],
              kwargs={'name': 'mix_2'})
 dag.add_output(name='product_1', stream='mix_1')
 dag.add_output(name='product_2', stream='mix_2')

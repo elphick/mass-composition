@@ -71,7 +71,12 @@ class DAG:
         dependencies = [self.stream_parent_node[stream] for stream in streams]
         self.graph.add_node(name, operation=operation, dependencies=dependencies, kwargs=kwargs, defined=defined)
         for stream in streams:
-            self.graph.add_edge(self.stream_parent_node[stream], name, name=stream)
+            # Only add the edge if no edge with the same name attribute already exists in the graph
+            if not any(data.get('name') == stream for _, _, data in self.graph.edges(data=True)):
+                self.graph.add_edge(self.stream_parent_node[stream], name, name=stream)
+            else:
+                logger.error(f"Edge with name {stream} already exists in the graph.")
+                raise KeyError(f"Edge with name {stream} already exists in the graph.")
         if kwargs is not None:
             for key, value in kwargs.items():
                 if key in ['name', 'name_1', 'name_2']:
@@ -81,6 +86,7 @@ class DAG:
     def add_output(self, name: str, stream: str) -> 'DAG':
         parent_node = self.stream_parent_node.get(stream)
         if parent_node is None:
+            logger.error(f"No parent node found for stream {stream}")
             raise ValueError(f"No parent node found for stream {stream}")
         self.graph.add_node(name, operation=DAG.output, dependencies=[stream], kwargs=None, defined=True, name=name)
         self.graph.add_edge(parent_node, name, name=stream)
@@ -220,8 +226,15 @@ class DAG:
                     # Ensure inputs is always an iterable
                     if isinstance(inputs, Stream):
                         inputs = [inputs]
-                    # Check if kwargs is not None before passing it to the operation
-                    result = operation(*inputs, **kwargs) if kwargs is not None else operation(*inputs)
+                    if operation == Stream.add:
+                        # If the operation is Stream.add, then the inputs should be passed as a tuple
+                        inputs = tuple(inputs)  # supports > 2 streams
+                        # don't unpack inputs for Stream.add, we unpack on the other side to iterate the sum.
+                        result = operation(inputs[0], inputs[1:], **kwargs) if kwargs is not None else operation(
+                            inputs[0], inputs[1:])
+                    else:
+                        # Check if kwargs is not None before passing it to the operation
+                        result = operation(*inputs, **kwargs) if kwargs is not None else operation(*inputs)
 
         except AttributeError as e:
             logger.error(f"Error while executing node {node}: {e}")

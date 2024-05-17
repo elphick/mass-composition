@@ -53,7 +53,7 @@ def main():
     run_towncrier()
 
     # remove the news fragments manually.
-    run_command("rm -rf newsfragments/*")
+    run_command("rm -rf ./towncrier/newsfragments/*")
 
     # strip the Elphick. prefix from the top heading only.
     adjust_changelog()
