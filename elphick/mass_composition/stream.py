@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Generator
+from typing import Optional, Callable, Generator, Tuple, Union
 
 from elphick.mass_composition import MassComposition
 
@@ -48,8 +48,7 @@ class Stream(MassComposition):
         return Stream.from_mass_composition(mc1), Stream.from_mass_composition(mc2)
 
     def split_by_partition(self, partition_definition: Callable,
-                           name_1: Optional[str] = None, name_2: Optional[str] = None) -> Generator[
-        'Stream', None, None]:
+                           name_1: Optional[str] = None, name_2: Optional[str] = None) -> tuple['Stream', 'Stream']:
         """
         Partition the object along a given dimension.
 
@@ -67,12 +66,12 @@ class Stream(MassComposition):
 
 
         """
-        streams = super().split_by_partition(partition_definition, name_1, name_2)
-        return (Stream.from_mass_composition(stream) for stream in streams)
+        mcs = super().split_by_partition(partition_definition, name_1, name_2)
+        return Stream.from_mass_composition(mcs[0]), Stream.from_mass_composition(mcs[1])
 
     def split_by_function(self, split_function: Callable,
                           name_1: Optional[str] = None,
-                          name_2: Optional[str] = None) -> Generator['Stream', None, None]:
+                          name_2: Optional[str] = None) -> tuple['Stream', 'Stream']:
         """Split an object using a function.
 
         This method applies the function to self, resulting in two new objects. The object returned with name_1
@@ -92,12 +91,12 @@ class Stream(MassComposition):
 
 
         """
-        streams = super().split_by_function(split_function, name_1, name_2)
-        return (Stream.from_mass_composition(stream) for stream in streams)
+        mcs = super().split_by_function(split_function, name_1, name_2)
+        return Stream.from_mass_composition(mcs[0]), Stream.from_mass_composition(mcs[1])
 
     def split_by_estimator(self, estimator: 'sklearn.base.BaseEstimator',
                            name_1: Optional[str] = None,
-                           name_2: Optional[str] = None) -> Generator['Stream', None, None]:
+                           name_2: Optional[str] = None) -> tuple['Stream', 'Stream']:
         """Split an object using a sklearn estimator.
 
         This method applies the function to self, resulting in two new objects. The object returned with name_1
@@ -115,22 +114,38 @@ class Stream(MassComposition):
         Returns:
             tuple of two datasets, the first with the mass fraction specified, the other the complement
         """
-        streams = super().split_by_estimator(estimator, name_1, name_2)
-        return (Stream.from_mass_composition(stream) for stream in streams)
+        mcs = super().split_by_estimator(estimator, name_1, name_2)
+        return Stream.from_mass_composition(mcs[0]), Stream.from_mass_composition(mcs[1])
 
-    def add(self, other: 'Stream', name: Optional[str] = None) -> 'Stream':
+    def add(self, other: Union['Stream', Tuple['Stream', ...]], name: Optional[str] = None) -> 'Stream':
         """
-        Adds the stream to another stream.
+        Adds the stream to another stream or a tuple of streams.
 
         Args:
-            other: The other stream.
+            other: The other stream, or a tuple of other streams
             name: The name of the new stream.
 
         Returns:
             A Stream object.
         """
-        mc = super().add(other, name)
-        return Stream.from_mass_composition(mc)
+
+        # If other is not a tuple, make it a tuple
+        if not isinstance(other, tuple):
+            other = (other,)
+
+        # Initialize the result as the current stream
+        strm: Stream = self
+
+        # Iterate over each stream in other and add it to the result
+        for o in other:
+            if not isinstance(o, Stream):
+                raise ValueError(f'Expected Stream object, got {type(o)}')
+            if isinstance(strm, MassComposition):
+                strm = Stream.from_mass_composition(strm)
+
+            strm = super(Stream, strm).add(o, name=name)
+
+        return strm
 
     def sub(self, other: 'Stream', name: Optional[str] = None) -> 'Stream':
         """Subtract two streams
