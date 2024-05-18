@@ -125,9 +125,9 @@ class MassComposition:
             self._data = xr_ds
 
             if not self._name:
-                self.rename(common_prefix.strip('_'))
+                self.rename('unnamed') if not common_prefix else self.rename(common_prefix.strip('_'))
             else:
-                self.rename('unnamed') if not self._name else self.rename(self._name)
+                self.rename(self._name)
 
         # explicitly define the constraints
         self.constraints: Dict = self.get_constraint_bounds(constraints=constraints)
