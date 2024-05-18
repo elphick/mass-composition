@@ -67,11 +67,7 @@ datasets:
   maintainer: Greg Elphick
   title: Iron Ore Sample xyz
   url: https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
-- author: ''
-  citation: null
-  copyright_holder: ''
-  copyright_year: ''
-  creator: ''
+- citation: null
   description: Sink-float data on Rougher LIMS tailings
   download: :download:`zip <../_static/nordic_iron_ore_sink_float.zip>`
   filename: nordic_iron_ore_sink_float.csv

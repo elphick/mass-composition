@@ -1,3 +1,14 @@
+Mass_Composition 0.6.5 (2024-05-18)
+===================================
+
+Feature
+-------
+
+- Development to support the DAG with estimator example.
+- Cleaned up the iron_ore_met_sample_data method in sample_data.
+- Added estimation extra to pyproject.toml. (#171)
+
+
 Mass_Composition 0.6.5 (2024-05-17)
 ===================================
 

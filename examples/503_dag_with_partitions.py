@@ -30,8 +30,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 # %%
-# Define the DAG
-# --------------
+# Define the Partitions
+# ---------------------
 #
 # These partitions are defined in the `napier_munn` function.  The function is partially applied to set the d50 and ep.
 # The `dim` argument is used to select the dimension to partition on.
