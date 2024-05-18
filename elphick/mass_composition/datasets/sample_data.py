@@ -150,6 +150,12 @@ def iron_ore_met_sample_data() -> pd.DataFrame:
     df_met['Fe'] = df_met['Fe'].replace('MISSING', np.nan).astype('float64')
     df_met.dropna(subset=['Fe', 'Bulk_Hole_No', 'Dry Weight Fines (kg)'], inplace=True)
     df_met.columns = [col.replace('LOITotal', 'LOI') for col in df_met.columns]
+    df_met.columns = [
+        col.strip().lower().replace(' ', '_').replace('(', '').replace(')', '').replace('%', 'pct').replace('__', '_')
+        for
+        col in df_met.columns]
+    df_met = df_met.pipe(_move_suffix_to_prefix, '_head')
+    df_met = df_met.pipe(_move_suffix_to_prefix, '_lump')
     return df_met
 
 
@@ -163,8 +169,18 @@ def demo_size_network() -> Flowsheet:
     return fs
 
 
+def _move_suffix_to_prefix(df, suffix):
+    suffix_length = len(suffix)
+    for col in df.columns:
+        if col.endswith(suffix):
+            new_col = suffix[1:] + '_' + col[:-suffix_length]  # Remove the suffix and prepend it to the start
+            df.rename(columns={col: new_col}, inplace=True)
+    return df
+
+
 if __name__ == '__main__':
     df1: pd.DataFrame = size_by_assay()
     df2: pd.DataFrame = size_by_assay_2()
     df3: pd.DataFrame = size_by_assay_3()
+    df4: pd.DataFrame = iron_ore_met_sample_data()
     print('done')

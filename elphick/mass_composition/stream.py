@@ -1,5 +1,7 @@
 from typing import Optional, Callable, Generator, Tuple, Union
 
+import pandas as pd
+
 from elphick.mass_composition import MassComposition
 
 
@@ -96,7 +98,11 @@ class Stream(MassComposition):
 
     def split_by_estimator(self, estimator: 'sklearn.base.BaseEstimator',
                            name_1: Optional[str] = None,
-                           name_2: Optional[str] = None) -> tuple['Stream', 'Stream']:
+                           name_2: Optional[str] = None,
+                           extra_features: Optional[pd.DataFrame] = None,
+                           allow_prefix_mismatch: bool = False,
+                           mass_recovery_column: Optional[str] = None,
+                           mass_recovery_max: float = 1.0) -> tuple['Stream', 'Stream']:
         """Split an object using a sklearn estimator.
 
         This method applies the function to self, resulting in two new objects. The object returned with name_1
@@ -110,11 +116,19 @@ class Stream(MassComposition):
              dataframe structure must be identical to the input dataframe.
             name_1: The name of the stream created by the estimator.
             name_2: The name of the complement stream created by the split, which is calculated automatically.
+             extra_features: Optional additional features to pass to the estimator as features.
+            allow_prefix_mismatch: If True, allow feature names to be different and log an info message. If False,
+             raise an error when feature names are different.
+            mass_recovery_column: If provided, this indicates that the model has estimated mass recovery, not mass
+             explicitly.  This will execute a transformation of the predicted `dry` mass recovery to dry mass.
+            mass_recovery_max: The maximum mass recovery value, used to scale the mass recovery to mass.  Only
+             applicable if mass_recovery_column is provided.  Should be either 1.0 or 100.0.
 
         Returns:
-            tuple of two datasets, the first with the mass fraction specified, the other the complement
+            tuple of two Stream objects, the first the output of the estimator, the other the complement
         """
-        mcs = super().split_by_estimator(estimator, name_1, name_2)
+        mcs = super().split_by_estimator(estimator, name_1, name_2, extra_features, allow_prefix_mismatch,
+                                         mass_recovery_column, mass_recovery_max)
         return Stream.from_mass_composition(mcs[0]), Stream.from_mass_composition(mcs[1])
 
     def add(self, other: Union['Stream', Tuple['Stream', ...]], name: Optional[str] = None) -> 'Stream':

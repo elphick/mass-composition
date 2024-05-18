@@ -167,7 +167,7 @@ class DAG:
                     pbar.update()
         if progress_bar:
             pbar.close()  # Close the progress bar
-        logger.info(f"DAG execution complete for the nodes: {executed_nodes}")
+        logger.debug(f"DAG execution complete for the nodes: {executed_nodes}")
 
     def execute_node(self, node: str, strms: dict):
         """

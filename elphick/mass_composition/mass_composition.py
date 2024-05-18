@@ -1,4 +1,5 @@
 import logging
+import os
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set, Literal, Any
@@ -8,6 +9,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import xarray as xr
+from sklearn.base import BaseEstimator, RegressorMixin
 
 from elphick.mass_composition.config import read_yaml
 from elphick.mass_composition.mc_status import Status
@@ -17,6 +19,7 @@ from elphick.mass_composition.utils.amenability import amenability_index
 from elphick.mass_composition.utils.interp import mass_preserving_interp
 from elphick.mass_composition.utils.pd_utils import weight_average, calculate_recovery, calculate_partition
 from elphick.mass_composition.utils.sampling import random_int
+from elphick.mass_composition.utils.sklearn import extract_feature_names, PandasPipeline
 
 from elphick.mass_composition.variables import Variables, VariableGroups
 
@@ -25,7 +28,7 @@ class MassComposition:
 
     def __init__(self,
                  data: Optional[pd.DataFrame] = None,
-                 name: Optional[str] = 'unnamed',
+                 name: Optional[str] = None,
                  mass_wet_var: Optional[str] = None,
                  mass_dry_var: Optional[str] = None,
                  moisture_var: Optional[str] = None,
@@ -74,6 +77,13 @@ class MassComposition:
         if data is not None:
             self.set_data(data, constraints=constraints)
 
+    @staticmethod
+    def _strip_common_prefix(df: pd.DataFrame) -> Tuple[pd.DataFrame, str]:
+        common_prefix = os.path.commonprefix(df.columns.to_list())
+        stripped_df = df.copy()
+        stripped_df.columns = [col.replace(common_prefix, '') for col in df.columns]
+        return stripped_df, common_prefix
+
     def set_data(self, data: Union[pd.DataFrame, xr.Dataset],
                  constraints: Optional[Dict[str, List]] = None):
         if isinstance(data, xr.Dataset):
@@ -83,6 +93,7 @@ class MassComposition:
                                        supplied=[str(v) for v in data.variables if v not in data.dims],
                                        specified_map=self._specified_columns)
         elif isinstance(data, pd.DataFrame):
+
             if sum(data.index.duplicated()) > 0:
                 raise KeyError('The data has duplicate indexes.')
             if isinstance(data.index, pd.MultiIndex) and data.index.nlevels >= 3:
@@ -90,7 +101,11 @@ class MassComposition:
                                      'memory for large datasets.  Is this is what you intend?  Depending on your'
                                      'requirements you may be able to process ths dataset with a single index.')
 
-            data: pd.DataFrame = data.copy()
+            # seek a prefix to self assign the name
+            data, common_prefix = self._strip_common_prefix(data)
+            if common_prefix:
+                self._specified_columns = {k: v.replace(common_prefix, '') for k, v in self._specified_columns.items()
+                                           if v is not None}
 
             self.variables = Variables(config=self.config['vars'],
                                        supplied=list(data.columns),
@@ -108,6 +123,11 @@ class MassComposition:
             xr_ds = self._dataframe_to_mc_dataset(data)
 
             self._data = xr_ds
+
+            if not self._name:
+                self.rename('unnamed') if not common_prefix else self.rename(common_prefix.strip('_'))
+            else:
+                self.rename(self._name)
 
         # explicitly define the constraints
         self.constraints: Dict = self.get_constraint_bounds(constraints=constraints)
@@ -577,9 +597,13 @@ class MassComposition:
         return out, comp
 
     def split_by_estimator(self,
-                           estimator: 'sklearn.base.BaseEstimator',
+                           estimator: PandasPipeline,
                            name_1: Optional[str] = None,
-                           name_2: Optional[str] = None) -> Tuple['MassComposition', 'MassComposition']:
+                           name_2: Optional[str] = None,
+                           extra_features: Optional[pd.DataFrame] = None,
+                           allow_prefix_mismatch: bool = False,
+                           mass_recovery_column: Optional[str] = None,
+                           mass_recovery_max: float = 1.0) -> Tuple['MassComposition', 'MassComposition']:
         """Split an object using a sklearn estimator.
 
         This method applies the function to self, resulting in two new objects. The object returned with name_1
@@ -593,20 +617,111 @@ class MassComposition:
              dataframe structure must be identical to the input dataframe.
             name_1: The name of the stream created by the estimator.
             name_2: The name of the complement stream created by the split, which is calculated automatically.
+            extra_features: Optional additional features to pass to the estimator as features.
+            allow_prefix_mismatch: If True, allow feature names to be different and log an info message. If False,
+             raise an error when feature names are different.
+            mass_recovery_column: If provided, this indicates that the model has estimated mass recovery, not mass
+             explicitly.  This will execute a transformation of the predicted `dry` mass recovery to dry mass.
+            mass_recovery_max: The maximum mass recovery value, used to scale the mass recovery to mass.  Only
+             applicable if mass_recovery_column is provided.  Should be either 1.0 or 100.0.
 
         Returns:
-            tuple of two datasets, the first with the mass fraction specified, the other the complement
+            tuple of two MassComposition objects, the first the output of the estimator, the other the complement
         """
-        out_data: Union[pd.DataFrame, np.ndarray] = estimator.predict(self.data.to_dataframe())
-        if isinstance(out_data, np.ndarray):
-            out_data = pd.DataFrame(out_data, index=self.data.to_dataframe().index,
-                                    columns=self.data.to_dataframe().columns)
-        out: MassComposition = MassComposition(name=name_1, constraints=self.constraints, data=out_data)
+        # Extract feature names from the estimator, and get the actual features
+        feature_names: list[str] = list(extract_feature_names(estimator))
+        features: pd.DataFrame = self._get_features(feature_names, extra_features, allow_prefix_mismatch)
+
+        # Apply the estimator
+        estimates: pd.DataFrame = estimator.predict(X=features)
+        if isinstance(estimates, np.ndarray):
+            raise NotImplementedError("The estimator must return a DataFrame")
+
+        # Detect a possible prefix from the estimate columns
+        features_prefix: str = os.path.commonprefix(features.columns.to_list())
+        estimates_prefix: str = os.path.commonprefix(estimates.columns.to_list())
+
+        # If there is a prefix, check that it matches name_1, subject to allow_prefix_mismatch
+        if estimates_prefix.strip(
+                '_') and not allow_prefix_mismatch and name_1 and not name_1 == estimates_prefix.strip('_'):
+            raise ValueError(f"Common prefix mismatch: {features_prefix} and name_1: {name_1}")
+
+        # assign the output names, based on specified names, allow for prefix mismatch
+        name_1 = name_1 if name_1 else estimates_prefix.strip('_')
+
+        if mass_recovery_column:
+            # Transform the mass recovery to mass by applying the mass recovery to the dry mass of the input stream
+            if mass_recovery_max not in [1.0, 100.0]:
+                raise ValueError(f"mass_recovery_max must be either 1.0 or 100.0, not {mass_recovery_max}")
+            if mass_recovery_column not in estimates.columns:
+                raise KeyError(f"mass_recovery_column: {mass_recovery_column} not found in the estimates.")
+
+            dry_mass_var: str = self.data.mass_dry.name
+            estimates[mass_recovery_column] = estimates[mass_recovery_column] * self.data[
+                dry_mass_var].values / mass_recovery_max
+            estimates.rename(columns={mass_recovery_column: dry_mass_var}, inplace=True)
+
+        estimates.columns = [f.replace(estimates_prefix, "") for f in estimates.columns]
+
+        out: MassComposition = MassComposition(name=name_1, constraints=self.constraints, data=estimates)
         comp: MassComposition = self.sub(other=out, name=name_2)
 
         self._post_process_split(out, comp, name_1, name_2)
 
         return out, comp
+
+    def _get_features(self, feature_names: List[str], allow_prefix_mismatch: bool,
+                      extra_features: Optional[pd.DataFrame] = None,) -> pd.DataFrame:
+        """
+        This method checks if the feature names required by an estimator are present in the data. If not, it tries to
+        match the feature names by considering a common prefix. If a match is found, the columns in the data are renamed
+        accordingly. If a match is not found and `allow_prefix_mismatch` is False, an error is raised. If
+        `allow_prefix_mismatch` is True, the method proceeds with the mismatched feature names.
+
+        If `extra_features` is provided, these features are added to the data.
+
+        Args:
+            feature_names (List[str]): A list of feature names required by the estimator.
+            allow_prefix_mismatch (bool): If True, allows the feature names in the data and the estimator to be different.
+            extra_features (Optional[pd.DataFrame]): Additional features to be added to the data.
+
+        Returns:
+            pd.DataFrame: The data with the correct feature names.
+
+        Raises:
+            ValueError: If `allow_prefix_mismatch` is False and the feature names in the data and the estimator do not match.
+        """
+
+        # Create a mapping of lower-case feature names to original feature names
+        feature_name_map = {name.lower(): name for name in feature_names}
+
+        df_features: pd.DataFrame = self.data.to_dataframe()
+        if extra_features:
+            df_features = pd.concat([df_features, extra_features], axis=1)
+
+        missing_features = set(f.lower() for f in feature_names) - set(c.lower() for c in df_features.columns)
+
+        if missing_features:
+            prefix: str = f"{self.name}_"
+            common_prefix: str = os.path.commonprefix(feature_names)
+            if common_prefix and common_prefix != prefix and allow_prefix_mismatch:
+                prefix = common_prefix
+
+            # create a map to support renaming the columns
+            prefixed_feature_map: dict[str, str] = {f: feature_name_map.get(f"{prefix}{f.lower()}") for f in
+                                                    df_features.columns if
+                                                    feature_name_map.get(f"{prefix}{f.lower()}") is not None}
+            df_features.rename(columns=prefixed_feature_map, inplace=True)
+            missing_features = set(f.lower() for f in feature_names) - set(c.lower() for c in df_features.columns)
+
+            if missing_features:
+                raise ValueError(f"Missing features: {missing_features}, with mc.name: {self.name}, prefix: {prefix}"
+                                 f" and allow_prefix_mismatch set to {allow_prefix_mismatch}.")
+
+        # Return the dataframe with the selected features
+        df_features: pd.DataFrame = df_features[feature_names]
+
+        return df_features
 
     def calculate_partition(self, ref: 'MassComposition') -> pd.DataFrame:
         """Calculate the partition of the ref stream relative to self"""

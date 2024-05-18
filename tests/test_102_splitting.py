@@ -2,10 +2,12 @@ from functools import partial
 
 import pandas as pd
 from sklearn.dummy import DummyRegressor
+from sklearn.pipeline import make_pipeline
 
 from elphick.mass_composition import MassComposition, Stream
 from elphick.mass_composition.mc_node import MCNode
 from elphick.mass_composition.utils.partition import perfect
+from elphick.mass_composition.utils.sklearn import PandasPipeline
 from .fixtures import size_assay_data
 
 from elphick.mass_composition import Flowsheet
@@ -92,7 +94,7 @@ def test_split_by_estimator(size_assay_data):
 
     x = mc_size.data.to_dataframe()
     y = x.copy().div(2)
-    dummy_regressor = DummyRegressor(strategy='mean').fit(X=x, y=y)
+    dummy_regressor = PandasPipeline.from_pipeline(make_pipeline(DummyRegressor(strategy='mean'))).fit(X=x, y=y)
 
     mc_1, mc_2 = mc_size.split_by_estimator(estimator=dummy_regressor, name_1='one', name_2='two')
 
@@ -108,7 +110,7 @@ def test_split_by_estimator_stream(size_assay_data):
 
     x = mc_size.data.to_dataframe()
     y = x.copy().div(2)
-    dummy_regressor = DummyRegressor(strategy='mean').fit(X=x, y=y)
+    dummy_regressor = PandasPipeline.from_pipeline(make_pipeline(DummyRegressor(strategy='mean'))).fit(X=x, y=y)
 
     strm_size: Stream = Stream.from_mass_composition(mc_size)
     strm_1, strm_2 = strm_size.split_by_estimator(estimator=dummy_regressor, name_1='one', name_2='two')
