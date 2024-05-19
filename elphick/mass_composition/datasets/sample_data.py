@@ -154,6 +154,16 @@ def iron_ore_met_sample_data() -> pd.DataFrame:
         col.strip().lower().replace(' ', '_').replace('(', '').replace(')', '').replace('%', 'pct').replace('__', '_')
         for
         col in df_met.columns]
+
+    # clean up some values and types
+    df_met = df_met.replace('-', np.nan).replace('#VALUE!', np.nan)
+    head_cols: List[str] = [col for col in df_met.columns if 'head' in col]
+    df_met[head_cols] = df_met[head_cols].astype('float64')
+    df_met['bulk_hole_no'] = df_met['bulk_hole_no'].astype('category')
+    df_met['sample_number'] = df_met['sample_number'].astype('int64')
+    df_met.set_index('sample_number', inplace=True)
+
+    # moves suffixes to prefix
     df_met = df_met.pipe(_move_suffix_to_prefix, '_head')
     df_met = df_met.pipe(_move_suffix_to_prefix, '_lump')
     return df_met

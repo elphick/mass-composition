@@ -67,6 +67,8 @@ class DAG:
 
     def add_step(self, name: str, operation: Callable, streams: List[str], kwargs: dict = None,
                  defined: bool = True) -> 'DAG':
+        if name in self.all_nodes_:
+            raise ValueError(f"A step with the name '{name}' already exists.")
         # Determine dependencies from the input streams
         dependencies = [self.stream_parent_node[stream] for stream in streams]
         self.graph.add_node(name, operation=operation, dependencies=dependencies, kwargs=kwargs, defined=defined)

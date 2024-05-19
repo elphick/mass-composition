@@ -17,7 +17,6 @@ import logging
 # This import at the top to guard against the estimator extras not being installed
 from elphick.mass_composition.utils.sklearn import PandasPipeline
 
-import numpy as np
 import pandas as pd
 import plotly
 from sklearn.ensemble import RandomForestRegressor
@@ -39,18 +38,19 @@ logger = logging.getLogger(__name__)
 # ---------
 #
 # We load some metallurgical data from a drill program, REF: A072391
+# Since we are not concerned about the model performance in this example, we'll convert the categorical feature
+# bulk_hole_no to an integer
 
 df: pd.DataFrame = iron_ore_met_sample_data()
 
 base_components = ['fe', 'p', 'sio2', 'al2o3', 'loi']
-cols_x = ['dry_weight_lump_kg'] + [f'head_{comp}' for comp in base_components]
+cols_x = ['dry_weight_lump_kg'] + [f'head_{comp}' for comp in base_components] + ['bulk_hole_no']
 cols_y = ['lump_pct'] + [f'lump_{comp}' for comp in base_components]
 
-# %%
-df = df.loc[:, ['sample_number'] + cols_x + cols_y].query('lump_pct>0').replace('-', np.nan).astype(float).dropna(
-    how='any')
-df = df.rename(columns={'dry_weight_lump_kg': 'head_mass_dry'}).set_index('sample_number')
-df.index = df.index.astype(int)
+df = df.loc[:, cols_x + cols_y].query('lump_pct>0').dropna(how='any')
+df = df.rename(columns={'dry_weight_lump_kg': 'head_mass_dry'})
+df['bulk_hole_no'] = df['bulk_hole_no'].astype('category').cat.codes
+
 logger.info(df.shape)
 df.head()
 
@@ -86,40 +86,65 @@ y_pred.head()
 # ------------------------------------
 # Now we will create a MassComposition object and use it to apply the model to the feed stream.
 
-head: MassComposition = MassComposition(data=X[[col for col in X.columns if 'head' in col]],
+head: MassComposition = MassComposition(data=X_test.drop(columns=['bulk_hole_no']), name='head',
                                         mass_dry_var='head_mass_dry')
 lump, fines = head.split_by_estimator(estimator=pipe, name_2='fines',
-                                      mass_recovery_column='lump_pct', mass_recovery_max=100)
+                                      mass_recovery_column='lump_pct', mass_recovery_max=100,
+                                      extra_features=X_test['bulk_hole_no'])
+lump.data.to_dataframe().head()
 
-lump
 # %%
-fines
+fines.data.to_dataframe().head()
 
 # %%
 # Define the DAG
 # --------------
 #
-# The DAG is defined by adding nodes to the graph.  Each node is an input, output or Stream operation
-# (e.g. add, split, etc.).  The nodes are connected by the streams they operate on.
+# First we define a simple DAG, where the feed stream is split into two streams, lump and fines.
+# The lump estimator requires the usual mass-composition variables plus an addition feature/variable
+# called `bulk_hole_no`. Since the `bulk_hole_no` is available in the feed stream, it is immediately accessible
+# to the estimator.
 
-dag = DAG(name='A072391', n_jobs=2)
+head: MassComposition = MassComposition(data=X_test, name='head',
+                                        mass_dry_var='head_mass_dry')
+
+dag = DAG(name='A072391', n_jobs=1)
 dag.add_input(name='head')
 dag.add_step(name='screen', operation=Stream.split_by_estimator, streams=['head'],
              kwargs={'estimator': pipe, 'name_1': 'lump', 'name_2': 'fines',
                      'mass_recovery_column': 'lump_pct', 'mass_recovery_max': 100})
 dag.add_output(name='lump', stream='lump')
 dag.add_output(name='fines', stream='fines')
+dag.run(input_streams={'head': head}, progress_bar=True)
+
+fig = Flowsheet.from_dag(dag).plot_network()
+fig
 
 # %%
-# Run the DAG
-# -----------
+# More Complex DAG
+# ----------------
+# This DAG is to test a more complex flowsheet where the estimator may have all the features
+# immediately available in the parent stream.
 #
-# The dag is run by providing a Stream object for the input.
+# .. note::
+#    This example works, but it does so since all attribute (extra) variables are passed all the way around
+#    the network in the current design.  This is to be changed in the future to allow for more efficient processing.
+#    Once attributes are no longer passed, changes will be needed to the DAG to marshall
+#    features from other streams in the network (most often the input stream).
 
-dag.run({'head': head}, progress_bar=True)
-
-# %%
-# Create a Flowsheet object from the dag, enabling all the usual network plotting and analysis methods.
+dag = DAG(name='A072391', n_jobs=1)
+dag.add_input(name='head')
+dag.add_step(name='screen', operation=Stream.split_by_estimator, streams=['head'],
+             kwargs={'estimator': pipe, 'name_1': 'lump', 'name_2': 'fines',
+                     'mass_recovery_column': 'lump_pct', 'mass_recovery_max': 100})
+dag.add_step(name='screen_2', operation=Stream.split_by_estimator, streams=['fines'],
+             kwargs={'estimator': pipe, 'name_1': 'lump_2', 'name_2': 'fines_2',
+                     'mass_recovery_column': 'lump_pct', 'mass_recovery_max': 100,
+                     'allow_prefix_mismatch': True})
+dag.add_output(name='lump', stream='lump_2')
+dag.add_output(name='fines', stream='fines_2')
+dag.add_output(name='stockpile', stream='lump')
+dag.run(input_streams={'head': head}, progress_bar=True)
 
 fs: Flowsheet = Flowsheet.from_dag(dag)
 

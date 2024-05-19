@@ -1,4 +1,15 @@
-Mass_Composition 0.6.5 (2024-05-18)
+Mass_Composition 0.6.7 (2024-05-19)
+===================================
+
+Feature
+-------
+
+- Improved prefix management on mc init from dataframe
+- Added cleaning code to iron_ore_met_sample_data" method in sample_data
+- No changes need to provide additional features to split_by_estimator since attr vars are already
+  passed to outputs of math operations. (#172)
+
+Mass_Composition 0.6.6 (2024-05-18)
 ===================================
 
 Feature
