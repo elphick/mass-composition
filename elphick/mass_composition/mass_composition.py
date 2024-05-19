@@ -1,5 +1,6 @@
 import logging
 import os
+from collections import Counter
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Optional, Union, Tuple, Iterable, Callable, Set, Literal, Any
@@ -75,14 +76,36 @@ class MassComposition:
         self.status: Optional[Status] = None
 
         if data is not None:
+            data = deepcopy(data)  # preserve the incoming data variable.
             self.set_data(data, constraints=constraints)
 
     @staticmethod
     def _strip_common_prefix(df: pd.DataFrame) -> Tuple[pd.DataFrame, str]:
-        common_prefix = os.path.commonprefix(df.columns.to_list())
-        stripped_df = df.copy()
-        stripped_df.columns = [col.replace(common_prefix, '') for col in df.columns]
-        return stripped_df, common_prefix
+        # Extract prefixes
+        common_prefix = MassComposition.get_common_prefix(df.columns.to_list())
+
+        res = df
+        # Create a copy of the dataframe and strip the most common prefix from column names
+        if common_prefix:
+            res = df.copy()
+            res.columns = [col.replace(common_prefix + '_', '') if col.startswith(common_prefix) else col for col in
+                           df.columns]
+
+        return res, common_prefix
+
+    @staticmethod
+    def get_common_prefix(columns: List[str]) -> str:
+        prefixes = [col.split('_')[0] for col in columns]
+        # Count the frequency of each prefix
+        prefix_counter = Counter(prefixes)
+        # Check if prefix_counter is not empty
+        if prefix_counter:
+            # Find the most common prefix
+            common_prefix, freq = prefix_counter.most_common(1)[0]
+            # Only return the prefix if its frequency is 3 or more
+            if freq >= 3:
+                return common_prefix
+        return ""
 
     def set_data(self, data: Union[pd.DataFrame, xr.Dataset],
                  constraints: Optional[Dict[str, List]] = None):
@@ -104,7 +127,8 @@ class MassComposition:
             # seek a prefix to self assign the name
             data, common_prefix = self._strip_common_prefix(data)
             if common_prefix:
-                self._specified_columns = {k: v.replace(common_prefix, '') for k, v in self._specified_columns.items()
+                self._specified_columns = {k: v.replace(f"{common_prefix}_", '') for k, v in
+                                           self._specified_columns.items()
                                            if v is not None}
 
             self.variables = Variables(config=self.config['vars'],
@@ -630,7 +654,8 @@ class MassComposition:
         """
         # Extract feature names from the estimator, and get the actual features
         feature_names: list[str] = list(extract_feature_names(estimator))
-        features: pd.DataFrame = self._get_features(feature_names, extra_features, allow_prefix_mismatch)
+        features: pd.DataFrame = self._get_features(feature_names, allow_prefix_mismatch=allow_prefix_mismatch,
+                                                    extra_features=extra_features)
 
         # Apply the estimator
         estimates: pd.DataFrame = estimator.predict(X=features)
@@ -638,16 +663,15 @@ class MassComposition:
             raise NotImplementedError("The estimator must return a DataFrame")
 
         # Detect a possible prefix from the estimate columns
-        features_prefix: str = os.path.commonprefix(features.columns.to_list())
-        estimates_prefix: str = os.path.commonprefix(estimates.columns.to_list())
+        features_prefix: str = self.get_common_prefix(features.columns.to_list())
+        estimates_prefix: str = self.get_common_prefix(estimates.columns.to_list())
 
         # If there is a prefix, check that it matches name_1, subject to allow_prefix_mismatch
-        if estimates_prefix.strip(
-                '_') and not allow_prefix_mismatch and name_1 and not name_1 == estimates_prefix.strip('_'):
+        if estimates_prefix and not allow_prefix_mismatch and name_1 and not name_1 == estimates_prefix:
             raise ValueError(f"Common prefix mismatch: {features_prefix} and name_1: {name_1}")
 
         # assign the output names, based on specified names, allow for prefix mismatch
-        name_1 = name_1 if name_1 else estimates_prefix.strip('_')
+        name_1 = name_1 if name_1 else estimates_prefix
 
         if mass_recovery_column:
             # Transform the mass recovery to mass by applying the mass recovery to the dry mass of the input stream
@@ -661,7 +685,9 @@ class MassComposition:
                 dry_mass_var].values / mass_recovery_max
             estimates.rename(columns={mass_recovery_column: dry_mass_var}, inplace=True)
 
-        estimates.columns = [f.replace(estimates_prefix, "") for f in estimates.columns]
+        if estimates_prefix:
+            col_name_map: dict[str, str] = {f: f.replace(estimates_prefix + '_', "") for f in estimates.columns}
+            estimates.rename(columns=col_name_map, inplace=True)
 
         out: MassComposition = MassComposition(name=name_1, constraints=self.constraints, data=estimates)
         comp: MassComposition = self.sub(other=out, name=name_2)
@@ -671,7 +697,7 @@ class MassComposition:
         return out, comp
 
     def _get_features(self, feature_names: List[str], allow_prefix_mismatch: bool,
-                      extra_features: Optional[pd.DataFrame] = None,) -> pd.DataFrame:
+                      extra_features: Optional[pd.DataFrame] = None, ) -> pd.DataFrame:
         """
         This method checks if the feature names required by an estimator are present in the data. If not, it tries to
         match the feature names by considering a common prefix. If a match is found, the columns in the data are renamed
@@ -696,16 +722,16 @@ class MassComposition:
         feature_name_map = {name.lower(): name for name in feature_names}
 
         df_features: pd.DataFrame = self.data.to_dataframe()
-        if extra_features:
+        if extra_features is not None:
             df_features = pd.concat([df_features, extra_features], axis=1)
 
         missing_features = set(f.lower() for f in feature_names) - set(c.lower() for c in df_features.columns)
 
         if missing_features:
             prefix: str = f"{self.name}_"
-            common_prefix: str = os.path.commonprefix(feature_names)
-            if common_prefix and common_prefix != prefix and allow_prefix_mismatch:
-                prefix = common_prefix
+            common_prefix: str = self.get_common_prefix(feature_names)
+            if common_prefix and common_prefix + '_' != prefix and allow_prefix_mismatch:
+                prefix = common_prefix + '_'
 
             # create a map to support renaming the columns
             prefixed_feature_map: dict[str, str] = {f: feature_name_map.get(f"{prefix}{f.lower()}") for f in
