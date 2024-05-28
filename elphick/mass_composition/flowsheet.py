@@ -36,7 +36,8 @@ class Flowsheet:
         self._logger: logging.Logger = logging.getLogger(__class__.__name__)
 
     @classmethod
-    def from_streams(cls, streams: List[Union[Stream, MassComposition]], name: Optional[str] = 'Flowsheet') -> 'Flowsheet':
+    def from_streams(cls, streams: List[Union[Stream, MassComposition]],
+                     name: Optional[str] = 'Flowsheet') -> 'Flowsheet':
         """Instantiate from a list of objects
 
         Args:
@@ -161,6 +162,43 @@ class Flowsheet:
 
         return fs
 
+    def to_simple(self, node_name: Optional[str] = None) -> 'Flowsheet':
+        """Return the simplified flowsheet"""
+
+        node_name = node_name if node_name is not None else self.name
+
+        # Identify the degree-1 nodes
+        degree_one_nodes = [node for node, degree in self.graph.degree() if degree == 1]
+
+        # Create a subgraph that only includes the degree-1 nodes and their edges
+        subgraph = self.graph.subgraph(degree_one_nodes).copy()
+
+        # Create a new node that represents the "system-internals"
+        system_node = max(self.graph.nodes) + 1  # Ensure the new node has a unique identifier
+        subgraph.add_node(system_node, mc=MCNode(node_id=system_node, node_name=node_name))
+
+        # Connect the degree-one nodes to the "system-internals" node
+        for node in degree_one_nodes:
+            # For in-edges, connect the node to the "system-internals" node
+            for edge in self.graph.in_edges(node, data=True):
+                subgraph.add_edge(system_node, node, **edge[2])
+
+            # For out-edges, connect the "system-internals" node to the node
+            for edge in self.graph.out_edges(node, data=True):
+                subgraph.add_edge(node, system_node, **edge[2])
+
+        # Populate the inputs and outputs properties of the MCNode objects
+        for node in subgraph.nodes:
+            mc_node = subgraph.nodes[node]['mc']
+            mc_node.inputs = [subgraph.edges[edge]['mc'] for edge in subgraph.in_edges(node)]
+            mc_node.outputs = [subgraph.edges[edge]['mc'] for edge in subgraph.out_edges(node)]
+
+        # Create a new Flowsheet from the subgraph
+        fs = self.__class__(name=self.name)
+        fs.graph = subgraph
+
+        return fs
+
     @property
     def balanced(self) -> bool:
         bal_vals: List = [self.graph.nodes[n]['mc'].balanced for n in self.graph.nodes]
@@ -223,7 +261,8 @@ class Flowsheet:
         # Create a dictionary that maps node names to their degrees
         degrees = {n: d for n, d in self.graph.degree()}
 
-        res: List[Union[Stream, MassComposition]] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[u] == 1]
+        res: List[Union[Stream, MassComposition]] = [d['mc'] for u, v, d in self.graph.edges(data=True) if
+                                                     degrees[u] == 1]
         return res
 
     def get_output_streams(self) -> List[Union[Stream, MassComposition]]:
@@ -236,7 +275,8 @@ class Flowsheet:
         # Create a dictionary that maps node names to their degrees
         degrees = {n: d for n, d in self.graph.degree()}
 
-        res: List[Union[Stream, MassComposition]] = [d['mc'] for u, v, d in self.graph.edges(data=True) if degrees[v] == 1]
+        res: List[Union[Stream, MassComposition]] = [d['mc'] for u, v, d in self.graph.edges(data=True) if
+                                                     degrees[v] == 1]
         return res
 
     def get_column_formats(self, columns: List[str], strip_percent: bool = False) -> Dict[str, str]:

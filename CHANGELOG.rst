@@ -1,3 +1,12 @@
+Mass_Composition 0.6.8 (2024-05-28)
+===================================
+
+Feature
+-------
+
+- Added to_simple method to Flowsheet.  New test and example. (#177)
+
+
 Mass_Composition 0.6.7 (2024-05-19)
 ===================================
 
