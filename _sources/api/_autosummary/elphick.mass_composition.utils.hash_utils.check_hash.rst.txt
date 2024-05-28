@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.hash\_utils.check\_hash
+=======================================================
+
+.. currentmodule:: elphick.mass_composition.utils.hash_utils
+
+.. autofunction:: check_hash

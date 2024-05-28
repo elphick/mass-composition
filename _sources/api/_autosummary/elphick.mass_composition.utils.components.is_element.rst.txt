@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.components.is\_element
+======================================================
+
+.. currentmodule:: elphick.mass_composition.utils.components
+
+.. autofunction:: is_element

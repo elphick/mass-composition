@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.partition.perfect
+=================================================
+
+.. currentmodule:: elphick.mass_composition.utils.partition
+
+.. autofunction:: perfect

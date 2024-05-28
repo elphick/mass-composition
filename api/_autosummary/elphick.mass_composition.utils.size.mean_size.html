@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elphick.mass_composition.utils.size.mean_size &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="elphick.mass_composition.utils.size_distribution" href="elphick.mass_composition.utils.size_distribution.html" />
+    <link rel="prev" title="elphick.mass_composition.utils.size" href="elphick.mass_composition.utils.size.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mass_composition.html">elphick.mass_composition.mass_composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.stream.html">elphick.mass_composition.stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.flowsheet.html">elphick.mass_composition.flowsheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mc_node.html">elphick.mass_composition.mc_node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mc_xarray.html">elphick.mass_composition.mc_xarray</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.datasets.html">elphick.mass_composition.datasets</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="elphick.mass_composition.utils.html">elphick.mass_composition.utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.amenability.html">elphick.mass_composition.utils.amenability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.components.html">elphick.mass_composition.utils.components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.geometry.html">elphick.mass_composition.utils.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.hash_utils.html">elphick.mass_composition.utils.hash_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.interp.html">elphick.mass_composition.utils.interp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.loader.html">elphick.mass_composition.utils.loader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.moisture.html">elphick.mass_composition.utils.moisture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.parallel.html">elphick.mass_composition.utils.parallel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.partition.html">elphick.mass_composition.utils.partition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.pd_utils.html">elphick.mass_composition.utils.pd_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.sampling.html">elphick.mass_composition.utils.sampling</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="elphick.mass_composition.utils.size.html">elphick.mass_composition.utils.size</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">elphick.mass_composition.utils.size.mean_size</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.size_distribution.html">elphick.mass_composition.utils.size_distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.sklearn.html">elphick.mass_composition.utils.sklearn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.utils.viz.html">elphick.mass_composition.utils.viz</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="elphick.mass_composition.utils.html">elphick.mass_composition.utils</a></li>
+          <li class="breadcrumb-item"><a href="elphick.mass_composition.utils.size.html">elphick.mass_composition.utils.size</a></li>
+      <li class="breadcrumb-item active">elphick.mass_composition.utils.size.mean_size</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/_autosummary/elphick.mass_composition.utils.size.mean_size.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="elphick-mass-composition-utils-size-mean-size">
+<h1>elphick.mass_composition.utils.size.mean_size<a class="headerlink" href="#elphick-mass-composition-utils-size-mean-size" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="elphick.mass_composition.utils.size.mean_size">
+<span class="sig-prename descclassname"><span class="pre">elphick.mass_composition.utils.size.</span></span><span class="sig-name descname"><span class="pre">mean_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size_intervals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/utils/size.html#mean_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.utils.size.mean_size" title="Permalink to this definition"></a></dt>
+<dd><p>Geometric mean size</p>
+<p>Size calculations are performed using the geometric mean, not the arithmetic mean</p>
+<p>NOTE: If geometric mean is used for the pan fraction (0.0mm retained) it will return zero, which is an
+edge size not mean size.  So the mean ratio of the geometric mean to the arithmetic mean for all other
+fractions is used for the bottom fraction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size_intervals</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">IntervalArray</span></code>) – A pandas IntervalArray</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="elphick.mass_composition.utils.size.html" class="btn btn-neutral float-left" title="elphick.mass_composition.utils.size" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="elphick.mass_composition.utils.size_distribution.html" class="btn btn-neutral float-right" title="elphick.mass_composition.utils.size_distribution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

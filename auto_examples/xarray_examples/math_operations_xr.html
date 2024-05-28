@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Operations XR &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Datasets" href="../../datasets/datasets.html" />
+    <link rel="prev" title="Basic usage XR" href="basic_usage_xr.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Example Gallery</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#xarray-gallery">Xarray Gallery</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Xarray Gallery</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="basic_usage_xr.html">Basic usage XR</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Math Operations XR</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-a-mass-composition-mc-enabled-xarray-dataset">Create a mass-composition (mc) enabled Xarray Dataset</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Example Gallery</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Xarray Gallery</a></li>
+      <li class="breadcrumb-item active">Math Operations XR</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/auto_examples/xarray_examples/math_operations_xr.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-xarray-examples-math-operations-xr-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="math-operations-xr">
+<span id="sphx-glr-auto-examples-xarray-examples-math-operations-xr-py"></span><h1>Math Operations XR<a class="headerlink" href="#math-operations-xr" title="Permalink to this heading"></a></h1>
+<p>Demonstrate splitting and math operations that preserve the mass balance of components.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition</span> <span class="kn">import</span> <span class="n">MassComposition</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.datasets.sample_data</span> <span class="kn">import</span> <span class="n">sample_data</span>
+<span class="c1"># noinspection PyUnresolvedReferences</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.mc_xarray</span> <span class="kn">import</span> <span class="n">MassCompositionAccessor</span>
+</pre></div>
+</div>
+<section id="create-a-mass-composition-mc-enabled-xarray-dataset">
+<h2>Create a mass-composition (mc) enabled Xarray Dataset<a class="headerlink" href="#create-a-mass-composition-mc-enabled-xarray-dataset" title="Permalink to this heading"></a></h2>
+<p>We get some demo data in the form of a pandas DataFrame</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">sample_data</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>       wet_mass  mass_dry    FE  SIO2  al2o3  LOI  group
+index
+0         100.0      90.0  57.0   5.2    3.0  5.0  grp_1
+1          90.0      80.0  59.0   3.1    1.7  4.0  grp_1
+2         110.0      90.0  61.0   2.2    0.9  3.0  grp_2
+</pre></div>
+</div>
+<p>Construct a Xarray Dataset and standardise the chemistry variables</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># noinspection PyProtectedMember</span>
+<span class="n">xr_ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">df_data</span><span class="p">)</span><span class="o">.</span><span class="n">_data</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xr_ds</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xarray.Dataset&gt; Size: 192B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 100.0 90.0 110.0
+    mass_dry  (index) float64 24B 90.0 80.0 90.0
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            unnamed
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Split the original Dataset and return the complement of the split fraction.
+Splitting does not modify the absolute grade of the input.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xr_ds_split</span><span class="p">,</span> <span class="n">xr_ds_comp</span> <span class="o">=</span> <span class="n">xr_ds</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xr_ds_split</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xarray.Dataset&gt; Size: 192B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 10.0 9.0 11.0
+    mass_dry  (index) float64 24B 9.0 8.0 9.0
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            (0.1 * unnamed)
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">xr_ds_comp</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xarray.Dataset&gt; Size: 192B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 90.0 81.0 99.0
+    mass_dry  (index) float64 24B 81.0 72.0 81.0
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            (0.9 * unnamed)
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Add the split and complement parts using the mc.add method</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xr_ds_sum</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_ds_split</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">xr_ds_comp</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xr_ds_sum</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xarray.Dataset&gt; Size: 192B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 100.0 90.0 110.0
+    mass_dry  (index) float64 24B 90.0 80.0 90.0
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            ((0.1 * unnamed) + (0.9 * unnamed))
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Confirm the sum of the splits is materially equivalent to the starting object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">xr_ds</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(),</span> <span class="n">xr_ds_sum</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Add finally add and then subtract the split portion to the original object, and check the output.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xr_ds_sum</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_ds</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">xr_ds_split</span><span class="p">)</span>
+<span class="n">xr_ds_minus</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_ds_sum</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">xr_ds_split</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">xr_ds_minus</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(),</span> <span class="n">xr_ds</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xr_ds_minus</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xarray.Dataset&gt; Size: 192B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 100.0 90.0 110.0
+    mass_dry  (index) float64 24B 90.0 80.0 90.0
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            ((unnamed + (0.1 * unnamed)) - (0.1 * unnamed))
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Demonstrate division</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xr_ds_div</span> <span class="o">=</span> <span class="n">xr_ds_split</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">xr_ds</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xr_ds_div</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xarray.Dataset&gt; Size: 192B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 0.1 0.1 0.1
+    mass_dry  (index) float64 24B 0.1 0.1 0.1
+    Fe        (index) float64 24B 0.1 0.1 0.1
+    SiO2      (index) float64 24B 0.1 0.1 0.1
+    Al2O3     (index) float64 24B 0.1 0.1 0.1
+    LOI       (index) float64 24B 0.1 0.1 0.1
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            ((0.1 * unnamed) / unnamed)
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.104 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-xarray-examples-math-operations-xr-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/1a640aa76c4ae22514ba90181ff2e3f4/math_operations_xr.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">math_operations_xr.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/860216b4dc752fbe27cee277de06fa17/math_operations_xr.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">math_operations_xr.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="basic_usage_xr.html" class="btn btn-neutral float-left" title="Basic usage XR" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../datasets/datasets.html" class="btn btn-neutral float-right" title="Datasets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

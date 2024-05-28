@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.loader.create\_mass\_composition
+================================================================
+
+.. currentmodule:: elphick.mass_composition.utils.loader
+
+.. autofunction:: create_mass_composition

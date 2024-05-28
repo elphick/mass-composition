@@ -1,0 +1,31 @@
+elphick.mass\_composition.utils.sampling
+========================================
+
+.. automodule:: elphick.mass_composition.utils.sampling
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      random_int
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

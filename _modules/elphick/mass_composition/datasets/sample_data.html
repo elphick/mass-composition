@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elphick.mass_composition.datasets.sample_data &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">elphick.mass_composition.datasets.sample_data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for elphick.mass_composition.datasets.sample_data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">To provide sample data</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition</span> <span class="kn">import</span> <span class="n">MassComposition</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.flowsheet</span> <span class="kn">import</span> <span class="n">Flowsheet</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils.components</span> <span class="kn">import</span> <span class="n">is_compositional</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.datasets</span> <span class="kn">import</span> <span class="n">load_size_by_assay</span><span class="p">,</span> <span class="n">load_iron_ore_sample_a072391</span><span class="p">,</span> <span class="n">load_size_distribution</span><span class="p">,</span> \
+    <span class="n">load_a072391_met</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils.partition</span> <span class="kn">import</span> <span class="n">napier_munn</span><span class="p">,</span> <span class="n">perfect</span>
+
+
+<div class="viewcode-block" id="sample_data"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.sample_data.html#elphick.mass_composition.datasets.sample_data.sample_data">[docs]</a><span class="k">def</span> <span class="nf">sample_data</span><span class="p">(</span><span class="n">include_wet_mass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">include_dry_mass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">include_moisture</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates synthetic data for testing</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        include_wet_mass: If True, wet mass is included.</span>
+<span class="sd">        include_dry_mass: If True, dry mass is included.</span>
+<span class="sd">        include_moisture: If True, moisture (H2O) is included.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># mass_wet: pd.Series = pd.Series([100, 90, 110], name=&#39;wet_mass&#39;)</span>
+    <span class="c1"># mass_dry: pd.Series = pd.Series([90, 80, 100], name=&#39;dry_mass&#39;)</span>
+    <span class="n">mass_wet</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mf">100.</span><span class="p">,</span> <span class="mf">90.</span><span class="p">,</span> <span class="mf">110.</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;wet_mass&#39;</span><span class="p">)</span>
+    <span class="n">mass_dry</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mf">90.</span><span class="p">,</span> <span class="mf">80.</span><span class="p">,</span> <span class="mf">90.</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;mass_dry&#39;</span><span class="p">)</span>
+    <span class="n">chem</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s1">&#39;FE&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">57.</span><span class="p">,</span> <span class="mf">59.</span><span class="p">,</span> <span class="mf">61.</span><span class="p">],</span>
+                                                 <span class="s1">&#39;SIO2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.2</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">],</span>
+                                                 <span class="s1">&#39;al2o3&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span>
+                                                 <span class="s1">&#39;LOI&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]})</span>
+    <span class="n">attrs</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s1">&#39;grp_1&#39;</span><span class="p">,</span> <span class="s1">&#39;grp_1&#39;</span><span class="p">,</span> <span class="s1">&#39;grp_2&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">)</span>
+
+    <span class="n">mass</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">mass_wet</span><span class="p">,</span> <span class="n">mass_dry</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">include_wet_mass</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">mass_dry</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">mass_wet</span>
+    <span class="k">elif</span> <span class="n">include_dry_mass</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">mass_dry</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">mass_dry</span>
+    <span class="k">elif</span> <span class="n">include_dry_mass</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">mass_dry</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;Arguments provided result in no mass column&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">include_moisture</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">moisture</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="p">(</span><span class="n">mass_wet</span> <span class="o">-</span> <span class="n">mass_dry</span><span class="p">)</span> <span class="o">/</span> <span class="n">mass_wet</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">moisture</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;H2O&#39;</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">mass</span><span class="p">,</span> <span class="n">moisture</span><span class="p">,</span> <span class="n">chem</span><span class="p">,</span> <span class="n">attrs</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">mass</span><span class="p">,</span> <span class="n">chem</span><span class="p">,</span> <span class="n">attrs</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span>
+
+    <span class="n">res</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;index&#39;</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="dh_intervals"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.dh_intervals.html#elphick.mass_composition.datasets.sample_data.dh_intervals">[docs]</a><span class="k">def</span> <span class="nf">dh_intervals</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                 <span class="n">n_dh</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="n">analytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Fe&#39;</span><span class="p">,</span> <span class="s1">&#39;Al2O3&#39;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Down-samples The drillhole data for testing</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n: Number of samples</span>
+<span class="sd">        n_dh: The number of drill-holes included</span>
+<span class="sd">        analytes: the analytes to include</span>
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">load_iron_ore_sample_a072391</span><span class="p">()</span>
+    <span class="c1"># df_data: pd.DataFrame = pd.read_csv(&#39;../sample_data/iron_ore_sample_data.csv&#39;, index_col=&#39;index&#39;)</span>
+
+    <span class="n">drillholes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_dh</span><span class="p">):</span>
+        <span class="n">drillholes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df_data</span><span class="p">[</span><span class="s1">&#39;DHID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())))</span>
+
+    <span class="n">df_data</span> <span class="o">=</span> <span class="n">df_data</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;DHID in @drillholes&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;DHID&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">cols_to_drop</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">is_compositional</span><span class="p">(</span><span class="n">df_data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analytes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">col</span> <span class="o">!=</span> <span class="s1">&#39;H2O&#39;</span><span class="p">)]</span>
+    <span class="n">df_data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">cols_to_drop</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">df_data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;index&#39;</span>
+
+    <span class="k">return</span> <span class="n">df_data</span></div>
+
+
+<div class="viewcode-block" id="size_by_assay"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.size_by_assay.html#elphick.mass_composition.datasets.sample_data.size_by_assay">[docs]</a><span class="k">def</span> <span class="nf">size_by_assay</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Sample Size x Assay dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">load_size_by_assay</span><span class="p">()</span>
+
+    <span class="c1"># df_data: pd.DataFrame = pd.DataFrame(data=[size_retained, size_passing, mass_pct, fe, sio2, al2o3],</span>
+    <span class="c1">#                                      index=[&#39;size_retained&#39;, &#39;size_passing&#39;, &#39;mass_pct&#39;, &#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;]).T</span>
+
+    <span class="c1"># # convert the sizes from micron to mm</span>
+    <span class="c1"># df_data[[&#39;size_retained&#39;, &#39;size_passing&#39;]] = df_data[[&#39;size_retained&#39;, &#39;size_passing&#39;]] / 1000.0</span>
+
+    <span class="n">df_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;size_retained&#39;</span><span class="p">,</span> <span class="s1">&#39;size_passing&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># ensure we meet the input column name requirements</span>
+    <span class="n">df_data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mass_pct&#39;</span><span class="p">:</span> <span class="s1">&#39;mass_dry&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_data</span></div>
+
+
+<div class="viewcode-block" id="size_by_assay_2"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.size_by_assay_2.html#elphick.mass_composition.datasets.sample_data.size_by_assay_2">[docs]</a><span class="k">def</span> <span class="nf">size_by_assay_2</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; 3 x Sample Size x Assay dataset (balanced)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mc_size</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">size_by_assay</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;feed&#39;</span><span class="p">)</span>
+    <span class="n">partition</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">napier_munn</span><span class="p">,</span> <span class="n">d50</span><span class="o">=</span><span class="mf">0.150</span><span class="p">,</span> <span class="n">ep</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s1">&#39;size&#39;</span><span class="p">)</span>
+    <span class="n">mc_coarse</span><span class="p">,</span> <span class="n">mc_fine</span> <span class="o">=</span> <span class="n">mc_size</span><span class="o">.</span><span class="n">split_by_partition</span><span class="p">(</span><span class="n">partition_definition</span><span class="o">=</span><span class="n">partition</span><span class="p">,</span> <span class="n">name_1</span><span class="o">=</span><span class="s1">&#39;coarse&#39;</span><span class="p">,</span> <span class="n">name_2</span><span class="o">=</span><span class="s1">&#39;fine&#39;</span><span class="p">)</span>
+    <span class="n">fs</span><span class="p">:</span> <span class="n">Flowsheet</span> <span class="o">=</span> <span class="n">Flowsheet</span><span class="p">()</span><span class="o">.</span><span class="n">from_streams</span><span class="p">([</span><span class="n">mc_size</span><span class="p">,</span> <span class="n">mc_coarse</span><span class="p">,</span> <span class="n">mc_fine</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">fs</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="size_by_assay_3"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.size_by_assay_3.html#elphick.mass_composition.datasets.sample_data.size_by_assay_3">[docs]</a><span class="k">def</span> <span class="nf">size_by_assay_3</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; 3 x Sample Size x Assay dataset (unbalanced)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mc_size</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">size_by_assay</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;feed&#39;</span><span class="p">)</span>
+    <span class="n">partition</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">napier_munn</span><span class="p">,</span> <span class="n">d50</span><span class="o">=</span><span class="mf">0.150</span><span class="p">,</span> <span class="n">ep</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s1">&#39;size&#39;</span><span class="p">)</span>
+    <span class="n">mc_coarse</span><span class="p">,</span> <span class="n">mc_fine</span> <span class="o">=</span> <span class="n">mc_size</span><span class="o">.</span><span class="n">split_by_partition</span><span class="p">(</span><span class="n">partition_definition</span><span class="o">=</span><span class="n">partition</span><span class="p">,</span> <span class="n">name_1</span><span class="o">=</span><span class="s1">&#39;coarse&#39;</span><span class="p">,</span> <span class="n">name_2</span><span class="o">=</span><span class="s1">&#39;fine&#39;</span><span class="p">)</span>
+    <span class="c1"># add error to the coarse stream to create an imbalance</span>
+    <span class="n">df_coarse_2</span> <span class="o">=</span> <span class="n">mc_coarse</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="n">mc_coarse_2</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df_coarse_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;coarse&#39;</span><span class="p">)</span>
+    <span class="n">mc_coarse_2</span> <span class="o">=</span> <span class="n">mc_coarse_2</span><span class="o">.</span><span class="n">set_parent_node</span><span class="p">(</span><span class="n">mc_size</span><span class="p">)</span>
+    <span class="n">fs_ub</span><span class="p">:</span> <span class="n">Flowsheet</span> <span class="o">=</span> <span class="n">Flowsheet</span><span class="p">()</span><span class="o">.</span><span class="n">from_streams</span><span class="p">([</span><span class="n">mc_size</span><span class="p">,</span> <span class="n">mc_coarse_2</span><span class="p">,</span> <span class="n">mc_fine</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">fs_ub</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="size_distribution"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.size_distribution.html#elphick.mass_composition.datasets.sample_data.size_distribution">[docs]</a><span class="k">def</span> <span class="nf">size_distribution</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">load_size_distribution</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="iron_ore_sample_data"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.iron_ore_sample_data.html#elphick.mass_composition.datasets.sample_data.iron_ore_sample_data">[docs]</a><span class="k">def</span> <span class="nf">iron_ore_sample_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">load_iron_ore_sample_a072391</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iron_ore_met_sample_data"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.iron_ore_met_sample_data.html#elphick.mass_composition.datasets.sample_data.iron_ore_met_sample_data">[docs]</a><span class="k">def</span> <span class="nf">iron_ore_met_sample_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">df_met</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">load_a072391_met</span><span class="p">()</span>
+    <span class="n">df_met</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Dry Weight Lump (kg)&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df_met</span><span class="p">[</span><span class="s1">&#39;Dry Weight Lump (kg)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_met</span><span class="p">[</span><span class="s1">&#39;Dry Weight Lump (kg)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+        <span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+    <span class="n">df_met</span><span class="p">[</span><span class="s1">&#39;Fe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_met</span><span class="p">[</span><span class="s1">&#39;Fe&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;MISSING&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+    <span class="n">df_met</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Fe&#39;</span><span class="p">,</span> <span class="s1">&#39;Bulk_Hole_No&#39;</span><span class="p">,</span> <span class="s1">&#39;Dry Weight Fines (kg)&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df_met</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;LOITotal&#39;</span><span class="p">,</span> <span class="s1">&#39;LOI&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_met</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">df_met</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;pct&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">for</span>
+        <span class="n">col</span> <span class="ow">in</span> <span class="n">df_met</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+    <span class="c1"># clean up some values and types</span>
+    <span class="n">df_met</span> <span class="o">=</span> <span class="n">df_met</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;#VALUE!&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">head_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_met</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s1">&#39;head&#39;</span> <span class="ow">in</span> <span class="n">col</span><span class="p">]</span>
+    <span class="n">df_met</span><span class="p">[</span><span class="n">head_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_met</span><span class="p">[</span><span class="n">head_cols</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+    <span class="n">df_met</span><span class="p">[</span><span class="s1">&#39;bulk_hole_no&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_met</span><span class="p">[</span><span class="s1">&#39;bulk_hole_no&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="n">df_met</span><span class="p">[</span><span class="s1">&#39;sample_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_met</span><span class="p">[</span><span class="s1">&#39;sample_number&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
+    <span class="n">df_met</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;sample_number&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># moves suffixes to prefix</span>
+    <span class="n">df_met</span> <span class="o">=</span> <span class="n">df_met</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">_move_suffix_to_prefix</span><span class="p">,</span> <span class="s1">&#39;_head&#39;</span><span class="p">)</span>
+    <span class="n">df_met</span> <span class="o">=</span> <span class="n">df_met</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">_move_suffix_to_prefix</span><span class="p">,</span> <span class="s1">&#39;_lump&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df_met</span></div>
+
+
+<div class="viewcode-block" id="demo_size_network"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.datasets.sample_data.demo_size_network.html#elphick.mass_composition.datasets.sample_data.demo_size_network">[docs]</a><span class="k">def</span> <span class="nf">demo_size_network</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Flowsheet</span><span class="p">:</span>
+    <span class="n">mc_size</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">size_by_assay</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;size sample&#39;</span><span class="p">)</span>
+    <span class="n">partition</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">perfect</span><span class="p">,</span> <span class="n">d50</span><span class="o">=</span><span class="mf">0.150</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s1">&#39;size&#39;</span><span class="p">)</span>
+    <span class="n">mc_coarse</span><span class="p">,</span> <span class="n">mc_fine</span> <span class="o">=</span> <span class="n">mc_size</span><span class="o">.</span><span class="n">split_by_partition</span><span class="p">(</span><span class="n">partition_definition</span><span class="o">=</span><span class="n">partition</span><span class="p">)</span>
+    <span class="n">mc_coarse</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;coarse&#39;</span>
+    <span class="n">mc_fine</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;fine&#39;</span>
+    <span class="n">fs</span><span class="p">:</span> <span class="n">Flowsheet</span> <span class="o">=</span> <span class="n">Flowsheet</span><span class="p">()</span><span class="o">.</span><span class="n">from_streams</span><span class="p">([</span><span class="n">mc_size</span><span class="p">,</span> <span class="n">mc_coarse</span><span class="p">,</span> <span class="n">mc_fine</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">fs</span></div>
+
+
+<span class="k">def</span> <span class="nf">_move_suffix_to_prefix</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    <span class="n">suffix_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">):</span>
+            <span class="n">new_col</span> <span class="o">=</span> <span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">col</span><span class="p">[:</span><span class="o">-</span><span class="n">suffix_length</span><span class="p">]</span>  <span class="c1"># Remove the suffix and prepend it to the start</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">new_col</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">df1</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">size_by_assay</span><span class="p">()</span>
+    <span class="n">df2</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">size_by_assay_2</span><span class="p">()</span>
+    <span class="n">df3</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">size_by_assay_3</span><span class="p">()</span>
+    <span class="n">df4</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">iron_ore_met_sample_data</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

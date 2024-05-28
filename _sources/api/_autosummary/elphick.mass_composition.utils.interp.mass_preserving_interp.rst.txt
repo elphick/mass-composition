@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.interp.mass\_preserving\_interp
+===============================================================
+
+.. currentmodule:: elphick.mass_composition.utils.interp
+
+.. autofunction:: mass_preserving_interp

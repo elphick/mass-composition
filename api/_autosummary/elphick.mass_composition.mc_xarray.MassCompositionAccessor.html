@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elphick.mass_composition.mc_xarray.MassCompositionAccessor &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="elphick.mass_composition.datasets" href="elphick.mass_composition.datasets.html" />
+    <link rel="prev" title="elphick.mass_composition.mc_xarray.CompositionContext" href="elphick.mass_composition.mc_xarray.CompositionContext.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mass_composition.html">elphick.mass_composition.mass_composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.stream.html">elphick.mass_composition.stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.flowsheet.html">elphick.mass_composition.flowsheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mc_node.html">elphick.mass_composition.mc_node</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="elphick.mass_composition.mc_xarray.html">elphick.mass_composition.mc_xarray</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.mc_xarray.mc_aggregate.html">elphick.mass_composition.mc_xarray.mc_aggregate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elphick.mass_composition.mc_xarray.CompositionContext.html">elphick.mass_composition.mc_xarray.CompositionContext</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">elphick.mass_composition.mc_xarray.MassCompositionAccessor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor"><code class="docutils literal notranslate"><span class="pre">MassCompositionAccessor</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.datasets.html">elphick.mass_composition.datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.utils.html">elphick.mass_composition.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="elphick.mass_composition.mc_xarray.html">elphick.mass_composition.mc_xarray</a></li>
+      <li class="breadcrumb-item active">elphick.mass_composition.mc_xarray.MassCompositionAccessor</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="elphick-mass-composition-mc-xarray-masscompositionaccessor">
+<h1>elphick.mass_composition.mc_xarray.MassCompositionAccessor<a class="headerlink" href="#elphick-mass-composition-mc-xarray-masscompositionaccessor" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elphick.mass_composition.mc_xarray.</span></span><span class="sig-name descname"><span class="pre">MassCompositionAccessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xarray_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xarray_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>MassComposition xarray Accessor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xarray_obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.__init__" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(xarray_obj)</p></td>
+<td><p>MassComposition xarray Accessor</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.add" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a>(other)</p></td>
+<td><p>Add two objects</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.aggregate" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.aggregate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aggregate</span></code></a>([group_var, group_bins, ...])</p></td>
+<td><p>Calculate the weight average of this dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">column_map</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.composition_to_mass" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.composition_to_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">composition_to_mass</span></code></a>()</p></td>
+<td><p>Transform composition to mass</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.cumulate" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.cumulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cumulate</span></code></a>(direction)</p></td>
+<td><p>Cumulate along the dims</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.div" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.div"><code class="xref py py-obj docutils literal notranslate"><span class="pre">div</span></code></a>(other)</p></td>
+<td><p>Divide self by the supplied object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.mass_to_composition" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.mass_to_composition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass_to_composition</span></code></a>()</p></td>
+<td><p>Transform mass to composition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.mul" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.mul"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mul</span></code></a>(value)</p></td>
+<td><p>Multiply self and retain attrs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename</span></code>(new_name)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.split" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split</span></code></a>(fraction)</p></td>
+<td><p>Split the object by mass</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.split_by_partition" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.split_by_partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_by_partition</span></code></a>(partition_definition)</p></td>
+<td><p>Partition the object along a given dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.sub" title="elphick.mass_composition.mc_xarray.MassCompositionAccessor.sub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sub</span></code></a>(other)</p></td>
+<td><p>Subtract the supplied object from self</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code>([original_column_names, ds])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">composition_context</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.add" title="Permalink to this definition"></a></dt>
+<dd><p>Add two objects</p>
+<p>Perform the addition with the mass-composition variables only and then append any attribute variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>) – object to add to self</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.aggregate">
+<span class="sig-name descname"><span class="pre">aggregate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_column_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.aggregate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.aggregate" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the weight average of this dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_var</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional grouping variable</p></li>
+<li><p><strong>group_bins</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Optional bins to apply to the group_var</p></li>
+<li><p><strong>as_dataframe</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True return a pd.DataFrame</p></li>
+<li><p><strong>original_column_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, and as_dataframe is True, will return with the original column names.</p></li>
+<li><p><strong>column_formats</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – If not None, and as_dataframe is True, will format the dataframe per the dict.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.composition_to_mass">
+<span class="sig-name descname"><span class="pre">composition_to_mass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.composition_to_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.composition_to_mass" title="Permalink to this definition"></a></dt>
+<dd><p>Transform composition to mass</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.cumulate">
+<span class="sig-name descname"><span class="pre">cumulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.cumulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.cumulate" title="Permalink to this definition"></a></dt>
+<dd><p>Cumulate along the dims</p>
+<p>Expected use case is only for Datasets that have been reduced to 1D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>direction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ‘ascending’|’descending’</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.div">
+<span class="sig-name descname"><span class="pre">div</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.div"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.div" title="Permalink to this definition"></a></dt>
+<dd><p>Divide self by the supplied object</p>
+<p>Perform the division with the mass-composition variables only and then append any attribute variables.
+:type other: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>
+:param other: denominator object, self will be divided by this object</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.mass_to_composition">
+<span class="sig-name descname"><span class="pre">mass_to_composition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.mass_to_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.mass_to_composition" title="Permalink to this definition"></a></dt>
+<dd><p>Transform mass to composition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.mul">
+<span class="sig-name descname"><span class="pre">mul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.mul"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.mul" title="Permalink to this definition"></a></dt>
+<dd><p>Multiply self and retain attrs</p>
+<p>Multiply the mass-composition variables only by the value then append any attribute variables.
+NOTE: does not multiply two objects together.  Used for separation (partition) operations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – the multiplier, a scalr or array of floats.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fraction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.split" title="Permalink to this definition"></a></dt>
+<dd><p>Split the object by mass</p>
+<p>A simple mass split maintaining the same composition</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fraction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – A constant in the range [0.0, 1.0]</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of two datasets, the first with the mass fraction specified, the other the complement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.split_by_partition">
+<span class="sig-name descname"><span class="pre">split_by_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_definition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.split_by_partition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.split_by_partition" title="Permalink to this definition"></a></dt>
+<dd><p>Partition the object along a given dimension.</p>
+<p>This method applies the defined partition resulting in two new objects.</p>
+<p>See also: split</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>partition_definition</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – A partition function that defines the efficiency of separation along a dimension</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of two datasets, the first defined by the function, the other the complement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mc_xarray.MassCompositionAccessor.sub">
+<span class="sig-name descname"><span class="pre">sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mc_xarray.html#MassCompositionAccessor.sub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mc_xarray.MassCompositionAccessor.sub" title="Permalink to this definition"></a></dt>
+<dd><p>Subtract the supplied object from self</p>
+<p>Perform the subtraction with the mass-composition variables only and then append any attribute variables.
+:type other: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>
+:param other: object to subtract from self</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="elphick.mass_composition.mc_xarray.CompositionContext.html" class="btn btn-neutral float-left" title="elphick.mass_composition.mc_xarray.CompositionContext" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="elphick.mass_composition.datasets.html" class="btn btn-neutral float-right" title="elphick.mass_composition.datasets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

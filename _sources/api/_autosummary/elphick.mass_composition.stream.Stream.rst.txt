@@ -1,0 +1,68 @@
+elphick.mass\_composition.stream.Stream
+=======================================
+
+.. currentmodule:: elphick.mass_composition.stream
+
+.. autoclass:: Stream
+   :members:
+   :special-members: __add__, __mul__
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Stream.__init__
+      ~Stream.add
+      ~Stream.aggregate
+      ~Stream.binned_mass_composition
+      ~Stream.calculate_partition
+      ~Stream.compare
+      ~Stream.constrain
+      ~Stream.div
+      ~Stream.from_mass_composition
+      ~Stream.from_xarray
+      ~Stream.get_common_prefix
+      ~Stream.get_constraint_bounds
+      ~Stream.ideal_incremental_composition
+      ~Stream.ideal_incremental_recovery
+      ~Stream.ideal_incremental_separation
+      ~Stream.plot_amenability
+      ~Stream.plot_bins
+      ~Stream.plot_comparison
+      ~Stream.plot_grade_recovery
+      ~Stream.plot_intervals
+      ~Stream.plot_parallel
+      ~Stream.plot_ternary
+      ~Stream.query
+      ~Stream.rename
+      ~Stream.resample_1d
+      ~Stream.set_child_node
+      ~Stream.set_data
+      ~Stream.set_parent_node
+      ~Stream.set_stream_nodes
+      ~Stream.split
+      ~Stream.split_by_estimator
+      ~Stream.split_by_function
+      ~Stream.split_by_partition
+      ~Stream.sub
+      ~Stream.to_xarray
+      ~Stream.update_data
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Stream.data
+      ~Stream.destination_node
+      ~Stream.name
+      ~Stream.source_node
+   
+   

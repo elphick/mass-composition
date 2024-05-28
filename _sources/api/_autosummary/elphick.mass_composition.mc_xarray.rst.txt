@@ -1,0 +1,39 @@
+﻿elphick.mass\_composition.mc\_xarray
+====================================
+
+.. automodule:: elphick.mass_composition.mc_xarray
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      mc_aggregate
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+   
+      CompositionContext
+      MassCompositionAccessor
+   
+   
+
+   
+   
+   
+
+
+

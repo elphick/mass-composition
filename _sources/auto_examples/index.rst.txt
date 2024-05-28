@@ -1,0 +1,619 @@
+:orphan:
+
+Example Gallery
+===============
+
+This gallery provides some examples.
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A simple example demonstrating how to use mass-composition.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_001_basic_usage_thumb.png
+    :alt: Basic usage
+
+  :ref:`sphx_glr_auto_examples_001_basic_usage.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Basic usage</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="   **Datasets** are sourced in the public domain, largely unaltered.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_002_data_examples_thumb.png
+    :alt: Datasets and Sample Data
+
+  :ref:`sphx_glr_auto_examples_002_data_examples.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Datasets and Sample Data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A simple example that demonstrates the constrain method of mass-composition.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_003_constrain_thumb.png
+    :alt: Constrain
+
+  :ref:`sphx_glr_auto_examples_003_constrain.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Constrain</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstrating the mass-composition plot methods.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_004_plot_demo_thumb.png
+    :alt: Plot Demo
+
+  :ref:`sphx_glr_auto_examples_004_plot_demo.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plot Demo</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstrate splitting and math operations that preserve the mass balance of components.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_104_math_operations_thumb.png
+    :alt: Math Operations
+
+  :ref:`sphx_glr_auto_examples_104_math_operations.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Math Operations</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Create a network from a DataFrame">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_105_create_network_thumb.png
+    :alt: Create Network
+
+  :ref:`sphx_glr_auto_examples_105_create_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Create Network</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Related MassComposition objects can be managed as a network.  In the Process Engineering/Metall...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_106_network_basics_thumb.png
+    :alt: Network Basics
+
+  :ref:`sphx_glr_auto_examples_106_network_basics.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Network Basics</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Filtering is often required to reduce the data of a MassComposition object to a specific subset...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_107_filtering_thumb.png
+    :alt: Filtering
+
+  :ref:`sphx_glr_auto_examples_107_filtering.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Filtering</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Related MassComposition objects are managed as a network.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_108_sankey_plots_thumb.png
+    :alt: Sankey Plots
+
+  :ref:`sphx_glr_auto_examples_108_sankey_plots.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Sankey Plots</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstrate splitting by mass and partitioning along dimensions.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_109_split_and_partition_thumb.png
+    :alt: Splitting and Partitioning Objects
+
+  :ref:`sphx_glr_auto_examples_109_split_and_partition.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Splitting and Partitioning Objects</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Related MassComposition objects can be represented in network using the Flowsheet object.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_110_network_layouts_thumb.png
+    :alt: Network Layouts
+
+  :ref:`sphx_glr_auto_examples_110_network_layouts.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Network Layouts</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how constraints relate to the status property.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_111_constraints_and_status_thumb.png
+    :alt: Constraints and Status
+
+  :ref:`sphx_glr_auto_examples_111_constraints_and_status.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Constraints and Status</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Consistent MassComposition objects can be compared.  Objects generated by math operations, or c...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_112_compare_thumb.png
+    :alt: Compare
+
+  :ref:`sphx_glr_auto_examples_112_compare.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Compare</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Partition models, (a.k.a. partition curves) define the separation of a unit operation / process...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_113_partition_models_thumb.png
+    :alt: Partition Models
+
+  :ref:`sphx_glr_auto_examples_113_partition_models.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Partition Models</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstrate splitting a single sample and applying two different partition models along a dimen...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_114_compare_partitions_thumb.png
+    :alt: Compare Partition Separations
+
+  :ref:`sphx_glr_auto_examples_114_compare_partitions.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Compare Partition Separations</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="There are times when a simplified view of a complex network is required, to provide a summary o...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_115_simplify_network_thumb.png
+    :alt: Simplify a Network
+
+  :ref:`sphx_glr_auto_examples_115_simplify_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Simplify a Network</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example adds a second dimension.  The second dimension is an interval, of the form interva...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_200_interval_data_thumb.png
+    :alt: Interval Data
+
+  :ref:`sphx_glr_auto_examples_200_interval_data.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Interval Data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This method sorts by the provided direction prior to incrementally removing and discarding the ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_201_incremental_separation_thumb.png
+    :alt: Incremental Separation
+
+  :ref:`sphx_glr_auto_examples_201_incremental_separation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Incremental Separation</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Intervals are encountered in Metallurgy, aka fractions, e.g. size fractions.  In that case the ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_202_interval_data_advanced_thumb.png
+    :alt: Interval Data - Advanced
+
+  :ref:`sphx_glr_auto_examples_202_interval_data_advanced.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Interval Data - Advanced</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Intervals are encountered in Metallurgy, aka fractions, e.g. size fractions.  In that case the ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_300_interval_data_sink_float_thumb.png
+    :alt: Interval Data - Sink Float
+
+  :ref:`sphx_glr_auto_examples_300_interval_data_sink_float.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Interval Data - Sink Float</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In the examples so far, Flowsheet objects are created by math operations, so they inherently ba...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_400_mass_balancing_thumb.png
+    :alt: Mass Balancing
+
+  :ref:`sphx_glr_auto_examples_400_mass_balancing.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Mass Balancing</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Splitting and partitioning will preserve the relationships between streams enabling network cre...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_502_dag_thumb.png
+    :alt: DAG to Define and Simulate
+
+  :ref:`sphx_glr_auto_examples_502_dag.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">DAG to Define and Simulate</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In the context of this script, partitions are used to divide the data into different segments b...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_503_dag_with_partitions_thumb.png
+    :alt: DAG with Partitions
+
+  :ref:`sphx_glr_auto_examples_503_dag_with_partitions.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">DAG with Partitions</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Flowsheet can be used to apply an estimator in a process flowsheet.  This example demonstrates ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_504_dag_with_estimator_thumb.png
+    :alt: DAG with Estimator
+
+  :ref:`sphx_glr_auto_examples_504_dag_with_estimator.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">DAG with Estimator</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="While the ultimate objective is to process multiple fractionated samples together (with sample ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr__501_simulating_networks_thumb.png
+    :alt: Simulating a Network in Parallel
+
+  :ref:`sphx_glr_auto_examples__501_simulating_networks.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Simulating a Network in Parallel</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This is not a runnable example, but are the functions and classes used in the simulating_networ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr__simulating_network_functions_thumb.png
+    :alt: Network Simulation Tools
+
+  :ref:`sphx_glr_auto_examples__simulating_network_functions.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Network Simulation Tools</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The &quot;Grade Tonnage&quot; curve is often used to characterise an entire deposit. It is a cumulative v...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_grade_tonnage_thumb.png
+    :alt: Grade Tonnage
+
+  :ref:`sphx_glr_auto_examples_grade_tonnage.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Grade Tonnage</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstrate with some real data">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_iron_ore_assays_thumb.png
+    :alt: Iron Ore Assays
+
+  :ref:`sphx_glr_auto_examples_iron_ore_assays.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Iron Ore Assays</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Interval (or fractional) data is common in metallurgy and mineral processing.  Samples are size...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_resampling_interval_data_thumb.png
+    :alt: Resampling Interval Data
+
+  :ref:`sphx_glr_auto_examples_resampling_interval_data.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Resampling Interval Data</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/001_basic_usage
+   /auto_examples/002_data_examples
+   /auto_examples/003_constrain
+   /auto_examples/004_plot_demo
+   /auto_examples/104_math_operations
+   /auto_examples/105_create_network
+   /auto_examples/106_network_basics
+   /auto_examples/107_filtering
+   /auto_examples/108_sankey_plots
+   /auto_examples/109_split_and_partition
+   /auto_examples/110_network_layouts
+   /auto_examples/111_constraints_and_status
+   /auto_examples/112_compare
+   /auto_examples/113_partition_models
+   /auto_examples/114_compare_partitions
+   /auto_examples/115_simplify_network
+   /auto_examples/200_interval_data
+   /auto_examples/201_incremental_separation
+   /auto_examples/202_interval_data_advanced
+   /auto_examples/300_interval_data_sink_float
+   /auto_examples/400_mass_balancing
+   /auto_examples/502_dag
+   /auto_examples/503_dag_with_partitions
+   /auto_examples/504_dag_with_estimator
+   /auto_examples/_501_simulating_networks
+   /auto_examples/_simulating_network_functions
+   /auto_examples/grade_tonnage
+   /auto_examples/iron_ore_assays
+   /auto_examples/resampling_interval_data
+
+Xarray Gallery
+==============
+
+This gallery provides some examples related to the low level xarray objects.
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A simple example demonstrating how to use mass-composition.">
+
+.. only:: html
+
+  .. image:: /auto_examples/xarray_examples/images/thumb/sphx_glr_basic_usage_xr_thumb.png
+    :alt: Basic usage XR
+
+  :ref:`sphx_glr_auto_examples_xarray_examples_basic_usage_xr.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Basic usage XR</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstrate splitting and math operations that preserve the mass balance of components.">
+
+.. only:: html
+
+  .. image:: /auto_examples/xarray_examples/images/thumb/sphx_glr_math_operations_xr_thumb.png
+    :alt: Math Operations XR
+
+  :ref:`sphx_glr_auto_examples_xarray_examples_math_operations_xr.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Math Operations XR</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+   :includehidden:
+
+   /auto_examples/xarray_examples/index.rst
+
+
+.. only:: html
+
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

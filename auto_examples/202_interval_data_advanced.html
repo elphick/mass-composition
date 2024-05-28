@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interval Data - Advanced &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Interval Data - Sink Float" href="300_interval_data_sink_float.html" />
+    <link rel="prev" title="Incremental Separation" href="201_incremental_separation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="001_basic_usage.html">Basic usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="002_data_examples.html">Datasets and Sample Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="003_constrain.html">Constrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="004_plot_demo.html">Plot Demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="104_math_operations.html">Math Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="105_create_network.html">Create Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="106_network_basics.html">Network Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="107_filtering.html">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="108_sankey_plots.html">Sankey Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="109_split_and_partition.html">Splitting and Partitioning Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="110_network_layouts.html">Network Layouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="111_constraints_and_status.html">Constraints and Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="112_compare.html">Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="113_partition_models.html">Partition Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="114_compare_partitions.html">Compare Partition Separations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="115_simplify_network.html">Simplify a Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="200_interval_data.html">Interval Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="201_incremental_separation.html">Incremental Separation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Interval Data - Advanced</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-some-data">Create some data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unifying-indexes">Unifying Indexes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#troubleshooting-the-imbalance">Troubleshooting the imbalance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="300_interval_data_sink_float.html">Interval Data - Sink Float</a></li>
+<li class="toctree-l2"><a class="reference internal" href="400_mass_balancing.html">Mass Balancing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="502_dag.html">DAG to Define and Simulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="503_dag_with_partitions.html">DAG with Partitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="504_dag_with_estimator.html">DAG with Estimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_501_simulating_networks.html">Simulating a Network in Parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_simulating_network_functions.html">Network Simulation Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grade_tonnage.html">Grade Tonnage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iron_ore_assays.html">Iron Ore Assays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resampling_interval_data.html">Resampling Interval Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">Interval Data - Advanced</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/auto_examples/202_interval_data_advanced.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-202-interval-data-advanced-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="interval-data-advanced">
+<span id="sphx-glr-auto-examples-202-interval-data-advanced-py"></span><h1>Interval Data - Advanced<a class="headerlink" href="#interval-data-advanced" title="Permalink to this heading"></a></h1>
+<p>Intervals are encountered in Metallurgy, aka fractions,
+e.g. size fractions.  In that case the typical nomenclature is size_retained, size passing, since the data
+originates from a sieve stack.</p>
+<p>This example walks through unifying the intervals across samples to be represented in the same network.
+Consider the case where the feed, oversize and undersize from a screening operation are sampled and sieved.
+It is likely that the undersize size distribution will be generated with fewer sieves in the sieve stack.
+If this data is not unified (made consistent) the network cannot be constructed - by unifying it we can
+construct a network and check the magnitude of any imbalance.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">plotly</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition</span> <span class="kn">import</span> <span class="n">MassComposition</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.datasets.sample_data</span> <span class="kn">import</span> <span class="n">size_by_assay</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.flowsheet</span> <span class="kn">import</span> <span class="n">Flowsheet</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils.partition</span> <span class="kn">import</span> <span class="n">napier_munn</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+                    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1"> </span><span class="si">%(module)s</span><span class="s1"> - </span><span class="si">%(funcName)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S%z&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="create-some-data">
+<h2>Create some data<a class="headerlink" href="#create-some-data" title="Permalink to this heading"></a></h2>
+<p>We get some demo sizing data, split it with a partition, and manually drop sieves for the undersize stream.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># We create this object as 1D based on the pandas index.</span>
+
+<span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">size_by_assay</span><span class="p">()</span>
+<span class="n">mc_feed</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;FEED&#39;</span><span class="p">)</span>
+<span class="n">mc_feed</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mass_wet</th>
+      <th>mass_dry</th>
+      <th>H2O</th>
+      <th>Fe</th>
+      <th>SiO2</th>
+      <th>Al2O3</th>
+    </tr>
+    <tr>
+      <th>size</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>[0.85, 2.0)</th>
+      <td>3.3</td>
+      <td>3.3</td>
+      <td>0.0</td>
+      <td>64.15</td>
+      <td>2.04</td>
+      <td>2.68</td>
+    </tr>
+    <tr>
+      <th>[0.5, 0.85)</th>
+      <td>9.9</td>
+      <td>9.9</td>
+      <td>0.0</td>
+      <td>64.33</td>
+      <td>2.05</td>
+      <td>2.23</td>
+    </tr>
+    <tr>
+      <th>[0.15, 0.5)</th>
+      <td>26.5</td>
+      <td>26.5</td>
+      <td>0.0</td>
+      <td>64.52</td>
+      <td>1.84</td>
+      <td>2.19</td>
+    </tr>
+    <tr>
+      <th>[0.075, 0.15)</th>
+      <td>2.5</td>
+      <td>2.5</td>
+      <td>0.0</td>
+      <td>62.65</td>
+      <td>2.88</td>
+      <td>3.32</td>
+    </tr>
+    <tr>
+      <th>[0.045, 0.075)</th>
+      <td>8.8</td>
+      <td>8.8</td>
+      <td>0.0</td>
+      <td>62.81</td>
+      <td>2.12</td>
+      <td>2.25</td>
+    </tr>
+    <tr>
+      <th>[0.0, 0.045)</th>
+      <td>49.0</td>
+      <td>49.0</td>
+      <td>0.0</td>
+      <td>55.95</td>
+      <td>6.39</td>
+      <td>6.34</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p>We partially initialise a partition function, and split the feed stream accordingly.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">partition</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">napier_munn</span><span class="p">,</span> <span class="n">d50</span><span class="o">=</span><span class="mf">0.150</span><span class="p">,</span> <span class="n">ep</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s1">&#39;size&#39;</span><span class="p">)</span>
+<span class="n">mc_oversize</span><span class="p">,</span> <span class="n">mc_undersize</span> <span class="o">=</span> <span class="n">mc_feed</span><span class="o">.</span><span class="n">split_by_partition</span><span class="p">(</span><span class="n">partition_definition</span><span class="o">=</span><span class="n">partition</span><span class="p">,</span> <span class="n">name_1</span><span class="o">=</span><span class="s1">&#39;OS&#39;</span><span class="p">,</span> <span class="n">name_2</span><span class="o">=</span><span class="s1">&#39;US&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Drop the two size fractions from mc_fine that have near zero mass.</p>
+<p>This simulates a common situation where fines samples will likely have fewer fractions reported in the results.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_fine</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">mc_undersize</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<span class="n">df_fine</span> <span class="o">=</span> <span class="n">df_fine</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_fine</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">left</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">:]</span>
+
+<span class="n">mc_undersize</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">df_fine</span><span class="p">)</span>
+<span class="n">mc_undersize</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mass_wet</th>
+      <th>mass_dry</th>
+      <th>H2O</th>
+      <th>Fe</th>
+      <th>SiO2</th>
+      <th>Al2O3</th>
+    </tr>
+    <tr>
+      <th>size</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>[0.15, 0.5)</th>
+      <td>1.633999</td>
+      <td>1.633999</td>
+      <td>0.0</td>
+      <td>64.52</td>
+      <td>1.84</td>
+      <td>2.19</td>
+    </tr>
+    <tr>
+      <th>[0.075, 0.15)</th>
+      <td>1.810638</td>
+      <td>1.810638</td>
+      <td>0.0</td>
+      <td>62.65</td>
+      <td>2.88</td>
+      <td>3.32</td>
+    </tr>
+    <tr>
+      <th>[0.045, 0.075)</th>
+      <td>7.769423</td>
+      <td>7.769423</td>
+      <td>0.0</td>
+      <td>62.81</td>
+      <td>2.12</td>
+      <td>2.25</td>
+    </tr>
+    <tr>
+      <th>[0.0, 0.045)</th>
+      <td>46.291601</td>
+      <td>46.291601</td>
+      <td>0.0</td>
+      <td>55.95</td>
+      <td>6.39</td>
+      <td>6.34</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p>Notice that the top two fractions are now missing.</p>
+</section>
+<section id="unifying-indexes">
+<h2>Unifying Indexes<a class="headerlink" href="#unifying-indexes" title="Permalink to this heading"></a></h2>
+<p>If the dataset contains a single IntervalIndex called ‘size’ missing coarse size fractions will be added
+automatically.</p>
+<p>That said, the remaining sizes must be consistent.  Alignment of sizes across streams/mc objects is coming soon.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fs</span><span class="p">:</span> <span class="n">Flowsheet</span> <span class="o">=</span> <span class="n">Flowsheet</span><span class="p">()</span><span class="o">.</span><span class="n">from_streams</span><span class="p">([</span><span class="n">mc_feed</span><span class="p">,</span> <span class="n">mc_oversize</span><span class="p">,</span> <span class="n">mc_undersize</span><span class="p">])</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">table_plot</span><span class="p">()</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/mass-composition/mass-composition/elphick/mass_composition/flowsheet.py:1014: FutureWarning:
+
+The previous implementation of stack is deprecated and will be removed in a future version of pandas. See the What&#39;s New notes for pandas 2.1.0 for details. Specify future_stack=True to adopt the new implementation and silence this warning.
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>                <div id="ae0a6491-5e1c-40a3-b828-ac46579a7de7" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("ae0a6491-5e1c-40a3-b828-ac46579a7de7")) {                    Plotly.newPlot(                        "ae0a6491-5e1c-40a3-b828-ac46579a7de7",                        [{"cells":{"align":"left","fill":{"color":[["whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke"]]},"format":["%s",".0f",".0f",".1f",".2f",".2f",".2f"],"values":[["FEED","OS","US"],[100.0,42.49417818392139,57.505661712262466],[100.0,42.49417818392139,57.505661712262466],[0.0,0.0,0.0],[60.09245000000001,63.828979606423694,57.33130564299267],[4.14753,2.2181148691844292,5.573289546815289],[4.277159999999999,2.5216610508322765,5.574402926774747]]},"columnwidth":[2,1,1,1,1,1,1],"header":{"align":"center","fill":{"color":"cornflowerblue"},"font":{"color":"black","size":12},"values":["name","mass_wet","mass_dry","H2O","Fe","SiO2","Al2O3"]},"type":"table","domain":{"x":[0.0,0.36000000000000004],"y":[0.0,1.0]}},{"link":{"customdata":["\u003cbr \u002f\u003emass_wet: 100\u003cbr \u002f\u003emass_dry: 100\u003cbr \u002f\u003eH2O: 0.0\u003cbr \u002f\u003eFe: 60.09\u003cbr \u002f\u003eSiO2: 4.15\u003cbr \u002f\u003eAl2O3: 4.28\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 42\u003cbr \u002f\u003emass_dry: 42\u003cbr \u002f\u003eH2O: 0.0\u003cbr \u002f\u003eFe: 63.83\u003cbr \u002f\u003eSiO2: 2.22\u003cbr \u002f\u003eAl2O3: 2.52\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 58\u003cbr \u002f\u003emass_dry: 58\u003cbr \u002f\u003eH2O: 0.0\u003cbr \u002f\u003eFe: 57.33\u003cbr \u002f\u003eSiO2: 5.57\u003cbr \u002f\u003eAl2O3: 5.57\u003cbr \u002f\u003e"],"hovertemplate":"\u003cb\u003e\u003ci\u003e%{label}\u003c\u002fi\u003e\u003c\u002fb\u003e\u003cbr \u002f\u003eSource: %{source.customdata}\u003cbr \u002f\u003eTarget: %{target.customdata}\u003cbr \u002f\u003e%{customdata}","label":["FEED","OS","US"],"source":[0,1,1],"target":[1,2,3],"value":[100.0,42.49417818392139,57.505661712262466]},"node":{"color":["blue","red","blue","blue"],"customdata":["0","1","2","3"],"label":["0","1","2","3"],"line":{"color":"black","width":0.5},"pad":15,"thickness":20},"type":"sankey","domain":{"x":[0.4600000000000001,1.0],"y":[0.0,1.0]}}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"Flowsheet\u003cbr\u003e\u003csup\u003eBalanced: False, Edge Status OK: True\u003c\u002fsup\u003e"},"font":{"size":12}},                        {"responsive": true}                    )                };                            </script>        </div>
+</div>
+<br />
+<br /></section>
+<section id="troubleshooting-the-imbalance">
+<h2>Troubleshooting the imbalance<a class="headerlink" href="#troubleshooting-the-imbalance" title="Permalink to this heading"></a></h2>
+<p>So we now have our network, but it does not balance.  Perhaps the fractions we removed to generate our test data
+contained enough mass to breach our balance threshold?  Let’s dig deeper with our balance plot.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">plot_balance</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;size&#39;</span><span class="p">)</span>
+<span class="c1"># noinspection PyTypeChecker</span>
+<span class="n">plotly</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>  <span class="c1"># this call to show will set the thumbnail for the gallery</span>
+</pre></div>
+</div>
+<html>
+<head><meta charset="utf-8" /></head>
+<body>
+    <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>                <div id="fde27731-2ad9-4e8c-b036-b6b6159a6d48" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("fde27731-2ad9-4e8c-b036-b6b6159a6d48")) {                    Plotly.newPlot(                        "fde27731-2ad9-4e8c-b036-b6b6159a6d48",                        [{"customdata":[[3.192957009900965e-11]],"hovertemplate":"size=[0.85, 2.0)\u003cbr\u003evariable=mass_wet\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.85, 2.0)","marker":{"color":"#636efa","symbol":"circle"},"mode":"markers","name":"[0.85, 2.0)","orientation":"v","showlegend":true,"x":[3.3],"xaxis":"x4","y":[3.2999999999680703],"yaxis":"y4","type":"scatter"},{"customdata":[[3.192957009900965e-11]],"hovertemplate":"size=[0.85, 2.0)\u003cbr\u003evariable=mass_dry\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.85, 2.0)","marker":{"color":"#636efa","symbol":"circle"},"mode":"markers","name":"[0.85, 2.0)","orientation":"v","showlegend":false,"x":[3.3],"xaxis":"x5","y":[3.2999999999680703],"yaxis":"y5","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.85, 2.0)\u003cbr\u003evariable=H2O\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.85, 2.0)","marker":{"color":"#636efa","symbol":"circle"},"mode":"markers","name":"[0.85, 2.0)","orientation":"v","showlegend":false,"x":[0.0],"xaxis":"x6","y":[0.0],"yaxis":"y6","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.85, 2.0)\u003cbr\u003evariable=Fe\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.85, 2.0)","marker":{"color":"#636efa","symbol":"circle"},"mode":"markers","name":"[0.85, 2.0)","orientation":"v","showlegend":false,"x":[64.15],"xaxis":"x","y":[64.15],"yaxis":"y","type":"scatter"},{"customdata":[[4.440892098500626e-16]],"hovertemplate":"size=[0.85, 2.0)\u003cbr\u003evariable=SiO2\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.85, 2.0)","marker":{"color":"#636efa","symbol":"circle"},"mode":"markers","name":"[0.85, 2.0)","orientation":"v","showlegend":false,"x":[2.04],"xaxis":"x2","y":[2.0399999999999996],"yaxis":"y2","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.85, 2.0)\u003cbr\u003evariable=Al2O3\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.85, 2.0)","marker":{"color":"#636efa","symbol":"circle"},"mode":"markers","name":"[0.85, 2.0)","orientation":"v","showlegend":false,"x":[2.68],"xaxis":"x3","y":[2.68],"yaxis":"y3","type":"scatter"},{"customdata":[[0.00016010378420538984]],"hovertemplate":"size=[0.5, 0.85)\u003cbr\u003evariable=mass_wet\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.5, 0.85)","marker":{"color":"#EF553B","symbol":"circle"},"mode":"markers","name":"[0.5, 0.85)","orientation":"v","showlegend":true,"x":[9.9],"xaxis":"x4","y":[9.899839896215795],"yaxis":"y4","type":"scatter"},{"customdata":[[0.00016010378420538984]],"hovertemplate":"size=[0.5, 0.85)\u003cbr\u003evariable=mass_dry\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.5, 0.85)","marker":{"color":"#EF553B","symbol":"circle"},"mode":"markers","name":"[0.5, 0.85)","orientation":"v","showlegend":false,"x":[9.9],"xaxis":"x5","y":[9.899839896215795],"yaxis":"y5","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.5, 0.85)\u003cbr\u003evariable=H2O\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.5, 0.85)","marker":{"color":"#EF553B","symbol":"circle"},"mode":"markers","name":"[0.5, 0.85)","orientation":"v","showlegend":false,"x":[0.0],"xaxis":"x6","y":[0.0],"yaxis":"y6","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.5, 0.85)\u003cbr\u003evariable=Fe\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.5, 0.85)","marker":{"color":"#EF553B","symbol":"circle"},"mode":"markers","name":"[0.5, 0.85)","orientation":"v","showlegend":false,"x":[64.33],"xaxis":"x","y":[64.33],"yaxis":"y","type":"scatter"},{"customdata":[[-4.440892098500626e-16]],"hovertemplate":"size=[0.5, 0.85)\u003cbr\u003evariable=SiO2\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.5, 0.85)","marker":{"color":"#EF553B","symbol":"circle"},"mode":"markers","name":"[0.5, 0.85)","orientation":"v","showlegend":false,"x":[2.05],"xaxis":"x2","y":[2.0500000000000003],"yaxis":"y2","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.5, 0.85)\u003cbr\u003evariable=Al2O3\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.5, 0.85)","marker":{"color":"#EF553B","symbol":"circle"},"mode":"markers","name":"[0.5, 0.85)","orientation":"v","showlegend":false,"x":[2.23],"xaxis":"x3","y":[2.23],"yaxis":"y3","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.15, 0.5)\u003cbr\u003evariable=mass_wet\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.15, 0.5)","marker":{"color":"#00cc96","symbol":"circle"},"mode":"markers","name":"[0.15, 0.5)","orientation":"v","showlegend":true,"x":[26.5],"xaxis":"x4","y":[26.5],"yaxis":"y4","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.15, 0.5)\u003cbr\u003evariable=mass_dry\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.15, 0.5)","marker":{"color":"#00cc96","symbol":"circle"},"mode":"markers","name":"[0.15, 0.5)","orientation":"v","showlegend":false,"x":[26.5],"xaxis":"x5","y":[26.5],"yaxis":"y5","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.15, 0.5)\u003cbr\u003evariable=H2O\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.15, 0.5)","marker":{"color":"#00cc96","symbol":"circle"},"mode":"markers","name":"[0.15, 0.5)","orientation":"v","showlegend":false,"x":[0.0],"xaxis":"x6","y":[0.0],"yaxis":"y6","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.15, 0.5)\u003cbr\u003evariable=Fe\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.15, 0.5)","marker":{"color":"#00cc96","symbol":"circle"},"mode":"markers","name":"[0.15, 0.5)","orientation":"v","showlegend":false,"x":[64.52],"xaxis":"x","y":[64.52],"yaxis":"y","type":"scatter"},{"customdata":[[2.220446049250313e-16]],"hovertemplate":"size=[0.15, 0.5)\u003cbr\u003evariable=SiO2\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.15, 0.5)","marker":{"color":"#00cc96","symbol":"circle"},"mode":"markers","name":"[0.15, 0.5)","orientation":"v","showlegend":false,"x":[1.84],"xaxis":"x2","y":[1.8399999999999999],"yaxis":"y2","type":"scatter"},{"customdata":[[4.440892098500626e-16]],"hovertemplate":"size=[0.15, 0.5)\u003cbr\u003evariable=Al2O3\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.15, 0.5)","marker":{"color":"#00cc96","symbol":"circle"},"mode":"markers","name":"[0.15, 0.5)","orientation":"v","showlegend":false,"x":[2.19],"xaxis":"x3","y":[2.1899999999999995],"yaxis":"y3","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.075, 0.15)\u003cbr\u003evariable=mass_wet\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.075, 0.15)","marker":{"color":"#ab63fa","symbol":"circle"},"mode":"markers","name":"[0.075, 0.15)","orientation":"v","showlegend":true,"x":[2.5],"xaxis":"x4","y":[2.5],"yaxis":"y4","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.075, 0.15)\u003cbr\u003evariable=mass_dry\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.075, 0.15)","marker":{"color":"#ab63fa","symbol":"circle"},"mode":"markers","name":"[0.075, 0.15)","orientation":"v","showlegend":false,"x":[2.5],"xaxis":"x5","y":[2.5],"yaxis":"y5","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.075, 0.15)\u003cbr\u003evariable=H2O\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.075, 0.15)","marker":{"color":"#ab63fa","symbol":"circle"},"mode":"markers","name":"[0.075, 0.15)","orientation":"v","showlegend":false,"x":[0.0],"xaxis":"x6","y":[0.0],"yaxis":"y6","type":"scatter"},{"customdata":[[1.4210854715202004e-14]],"hovertemplate":"size=[0.075, 0.15)\u003cbr\u003evariable=Fe\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.075, 0.15)","marker":{"color":"#ab63fa","symbol":"circle"},"mode":"markers","name":"[0.075, 0.15)","orientation":"v","showlegend":false,"x":[62.65],"xaxis":"x","y":[62.649999999999984],"yaxis":"y","type":"scatter"},{"customdata":[[8.881784197001252e-16]],"hovertemplate":"size=[0.075, 0.15)\u003cbr\u003evariable=SiO2\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.075, 0.15)","marker":{"color":"#ab63fa","symbol":"circle"},"mode":"markers","name":"[0.075, 0.15)","orientation":"v","showlegend":false,"x":[2.88],"xaxis":"x2","y":[2.879999999999999],"yaxis":"y2","type":"scatter"},{"customdata":[[4.440892098500626e-16]],"hovertemplate":"size=[0.075, 0.15)\u003cbr\u003evariable=Al2O3\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.075, 0.15)","marker":{"color":"#ab63fa","symbol":"circle"},"mode":"markers","name":"[0.075, 0.15)","orientation":"v","showlegend":false,"x":[3.32],"xaxis":"x3","y":[3.3199999999999994],"yaxis":"y3","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.045, 0.075)\u003cbr\u003evariable=mass_wet\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.045, 0.075)","marker":{"color":"#FFA15A","symbol":"circle"},"mode":"markers","name":"[0.045, 0.075)","orientation":"v","showlegend":true,"x":[8.8],"xaxis":"x4","y":[8.8],"yaxis":"y4","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.045, 0.075)\u003cbr\u003evariable=mass_dry\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.045, 0.075)","marker":{"color":"#FFA15A","symbol":"circle"},"mode":"markers","name":"[0.045, 0.075)","orientation":"v","showlegend":false,"x":[8.8],"xaxis":"x5","y":[8.8],"yaxis":"y5","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.045, 0.075)\u003cbr\u003evariable=H2O\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.045, 0.075)","marker":{"color":"#FFA15A","symbol":"circle"},"mode":"markers","name":"[0.045, 0.075)","orientation":"v","showlegend":false,"x":[0.0],"xaxis":"x6","y":[0.0],"yaxis":"y6","type":"scatter"},{"customdata":[[-7.105427357601002e-15]],"hovertemplate":"size=[0.045, 0.075)\u003cbr\u003evariable=Fe\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.045, 0.075)","marker":{"color":"#FFA15A","symbol":"circle"},"mode":"markers","name":"[0.045, 0.075)","orientation":"v","showlegend":false,"x":[62.81],"xaxis":"x","y":[62.81000000000001],"yaxis":"y","type":"scatter"},{"customdata":[[-4.440892098500626e-16]],"hovertemplate":"size=[0.045, 0.075)\u003cbr\u003evariable=SiO2\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.045, 0.075)","marker":{"color":"#FFA15A","symbol":"circle"},"mode":"markers","name":"[0.045, 0.075)","orientation":"v","showlegend":false,"x":[2.12],"xaxis":"x2","y":[2.1200000000000006],"yaxis":"y2","type":"scatter"},{"customdata":[[-4.440892098500626e-16]],"hovertemplate":"size=[0.045, 0.075)\u003cbr\u003evariable=Al2O3\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.045, 0.075)","marker":{"color":"#FFA15A","symbol":"circle"},"mode":"markers","name":"[0.045, 0.075)","orientation":"v","showlegend":false,"x":[2.25],"xaxis":"x3","y":[2.2500000000000004],"yaxis":"y3","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.0, 0.045)\u003cbr\u003evariable=mass_wet\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.0, 0.045)","marker":{"color":"#19d3f3","symbol":"circle"},"mode":"markers","name":"[0.0, 0.045)","orientation":"v","showlegend":true,"x":[49.0],"xaxis":"x4","y":[49.0],"yaxis":"y4","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.0, 0.045)\u003cbr\u003evariable=mass_dry\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.0, 0.045)","marker":{"color":"#19d3f3","symbol":"circle"},"mode":"markers","name":"[0.0, 0.045)","orientation":"v","showlegend":false,"x":[49.0],"xaxis":"x5","y":[49.0],"yaxis":"y5","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.0, 0.045)\u003cbr\u003evariable=H2O\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.0, 0.045)","marker":{"color":"#19d3f3","symbol":"circle"},"mode":"markers","name":"[0.0, 0.045)","orientation":"v","showlegend":false,"x":[0.0],"xaxis":"x6","y":[0.0],"yaxis":"y6","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.0, 0.045)\u003cbr\u003evariable=Fe\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.0, 0.045)","marker":{"color":"#19d3f3","symbol":"circle"},"mode":"markers","name":"[0.0, 0.045)","orientation":"v","showlegend":false,"x":[55.95],"xaxis":"x","y":[55.95],"yaxis":"y","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.0, 0.045)\u003cbr\u003evariable=SiO2\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.0, 0.045)","marker":{"color":"#19d3f3","symbol":"circle"},"mode":"markers","name":"[0.0, 0.045)","orientation":"v","showlegend":false,"x":[6.39],"xaxis":"x2","y":[6.39],"yaxis":"y2","type":"scatter"},{"customdata":[[0.0]],"hovertemplate":"size=[0.0, 0.045)\u003cbr\u003evariable=Al2O3\u003cbr\u003ein=%{x}\u003cbr\u003eout=%{y}\u003cbr\u003eresidual=%{customdata[0]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"[0.0, 0.045)","marker":{"color":"#19d3f3","symbol":"circle"},"mode":"markers","name":"[0.0, 0.045)","orientation":"v","showlegend":false,"x":[6.34],"xaxis":"x3","y":[6.34],"yaxis":"y3","type":"scatter"},{"legendgroup":"y=x","line":{"color":"gray"},"mode":"lines","name":"y=x","showlegend":false,"x":[2.5,49.0],"xaxis":"x4","y":[2.5,49.0],"yaxis":"y4","type":"scatter"},{"legendgroup":"y=x","line":{"color":"gray"},"mode":"lines","name":"y=x","showlegend":false,"x":[2.5,49.0],"xaxis":"x5","y":[2.5,49.0],"yaxis":"y5","type":"scatter"},{"legendgroup":"y=x","line":{"color":"gray"},"mode":"lines","name":"y=x","showlegend":false,"x":[0.0,0.0],"xaxis":"x6","y":[0.0,0.0],"yaxis":"y6","type":"scatter"},{"legendgroup":"y=x","line":{"color":"gray"},"mode":"lines","name":"y=x","showlegend":false,"x":[55.95,64.52],"xaxis":"x","y":[55.95,64.52],"yaxis":"y","type":"scatter"},{"legendgroup":"y=x","line":{"color":"gray"},"mode":"lines","name":"y=x","showlegend":false,"x":[1.8399999999999999,6.39],"xaxis":"x2","y":[1.8399999999999999,6.39],"yaxis":"y2","type":"scatter"},{"legendgroup":"y=x","line":{"color":"gray"},"mode":"lines","name":"y=x","showlegend":true,"x":[2.1899999999999995,6.34],"xaxis":"x3","y":[2.1899999999999995,6.34],"yaxis":"y3","type":"scatter"}],                        {"annotations":[{"showarrow":false,"text":"variable=Fe","x":0.15999999999999998,"xanchor":"center","xref":"paper","y":0.46499999999999997,"yanchor":"bottom","yref":"paper"},{"showarrow":false,"text":"variable=SiO2","x":0.49999999999999994,"xanchor":"center","xref":"paper","y":0.46499999999999997,"yanchor":"bottom","yref":"paper"},{"showarrow":false,"text":"variable=Al2O3","x":0.8399999999999999,"xanchor":"center","xref":"paper","y":0.46499999999999997,"yanchor":"bottom","yref":"paper"},{"showarrow":false,"text":"variable=mass_wet","x":0.15999999999999998,"xanchor":"center","xref":"paper","y":0.9999999999999999,"yanchor":"bottom","yref":"paper"},{"showarrow":false,"text":"variable=mass_dry","x":0.49999999999999994,"xanchor":"center","xref":"paper","y":0.9999999999999999,"yanchor":"bottom","yref":"paper"},{"showarrow":false,"text":"variable=H2O","x":0.8399999999999999,"xanchor":"center","xref":"paper","y":0.9999999999999999,"yanchor":"bottom","yref":"paper"}],"legend":{"title":{"text":"size"},"tracegroupgap":0},"margin":{"t":60},"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.31999999999999995],"scaleanchor":"y","scaleratio":1,"showticklabels":true,"title":{"text":"in"}},"yaxis":{"anchor":"x","domain":[0.0,0.46499999999999997],"showticklabels":true,"title":{"text":"out"}},"xaxis2":{"anchor":"y2","domain":[0.33999999999999997,0.6599999999999999],"scaleanchor":"y2","scaleratio":1,"showticklabels":true,"title":{"text":"in"}},"yaxis2":{"anchor":"x2","domain":[0.0,0.46499999999999997],"showticklabels":true},"xaxis3":{"anchor":"y3","domain":[0.6799999999999999,0.9999999999999999],"scaleanchor":"y3","scaleratio":1,"showticklabels":true,"title":{"text":"in"}},"yaxis3":{"anchor":"x3","domain":[0.0,0.46499999999999997],"showticklabels":true},"xaxis4":{"anchor":"y4","domain":[0.0,0.31999999999999995],"scaleanchor":"y4","scaleratio":1,"showticklabels":true},"yaxis4":{"anchor":"x4","domain":[0.5349999999999999,0.9999999999999999],"showticklabels":true,"title":{"text":"out"}},"xaxis5":{"anchor":"y5","domain":[0.33999999999999997,0.6599999999999999],"scaleanchor":"y5","scaleratio":1,"showticklabels":true},"yaxis5":{"anchor":"x5","domain":[0.5349999999999999,0.9999999999999999],"showticklabels":true},"xaxis6":{"anchor":"y6","domain":[0.6799999999999999,0.9999999999999999],"scaleanchor":"y6","scaleratio":1,"showticklabels":true},"yaxis6":{"anchor":"x6","domain":[0.5349999999999999,0.9999999999999999],"showticklabels":true}},                        {"responsive": true}                    )                };                            </script>        </div>
+</body>
+</html><p>What is the balance threshold set at?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Node error tolerance:&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_tolerance</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Node error tolerance: 1.1920929e-07
+</pre></div>
+</div>
+<p>That plot does not reveal the problem, so we’ll resort to another report.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_balance_errors</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mass_wet</th>
+      <th>mass_dry</th>
+      <th>Fe</th>
+      <th>SiO2</th>
+      <th>Al2O3</th>
+    </tr>
+    <tr>
+      <th>size</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>[0.5, 0.85)</th>
+      <td>0.00016</td>
+      <td>0.00016</td>
+      <td>0.000103</td>
+      <td>0.000003</td>
+      <td>0.000004</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p>Let’s change the node error tolerance.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;mc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_tolerance</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">table_plot</span><span class="p">()</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>                <div id="635b0079-d7da-4653-8a01-3ee6f5f0403f" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("635b0079-d7da-4653-8a01-3ee6f5f0403f")) {                    Plotly.newPlot(                        "635b0079-d7da-4653-8a01-3ee6f5f0403f",                        [{"cells":{"align":"left","fill":{"color":[["whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke"]]},"format":["%s",".0f",".0f",".1f",".2f",".2f",".2f"],"values":[["Node_in","OS","US"],[100.0,42.49417818392139,57.505661712262466],[100.0,42.49417818392139,57.505661712262466],[0.0,0.0,0.0],[60.09245000000001,63.828979606423694,57.33130564299267],[4.14753,2.2181148691844292,5.573289546815289],[4.277159999999999,2.5216610508322765,5.574402926774747]]},"columnwidth":[2,1,1,1,1,1,1],"header":{"align":"center","fill":{"color":"cornflowerblue"},"font":{"color":"black","size":12},"values":["name","mass_wet","mass_dry","H2O","Fe","SiO2","Al2O3"]},"type":"table","domain":{"x":[0.0,0.36000000000000004],"y":[0.0,1.0]}},{"link":{"customdata":["\u003cbr \u002f\u003emass_wet: 100\u003cbr \u002f\u003emass_dry: 100\u003cbr \u002f\u003eH2O: 0.0\u003cbr \u002f\u003eFe: 60.09\u003cbr \u002f\u003eSiO2: 4.15\u003cbr \u002f\u003eAl2O3: 4.28\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 42\u003cbr \u002f\u003emass_dry: 42\u003cbr \u002f\u003eH2O: 0.0\u003cbr \u002f\u003eFe: 63.83\u003cbr \u002f\u003eSiO2: 2.22\u003cbr \u002f\u003eAl2O3: 2.52\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 58\u003cbr \u002f\u003emass_dry: 58\u003cbr \u002f\u003eH2O: 0.0\u003cbr \u002f\u003eFe: 57.33\u003cbr \u002f\u003eSiO2: 5.57\u003cbr \u002f\u003eAl2O3: 5.57\u003cbr \u002f\u003e"],"hovertemplate":"\u003cb\u003e\u003ci\u003e%{label}\u003c\u002fi\u003e\u003c\u002fb\u003e\u003cbr \u002f\u003eSource: %{source.customdata}\u003cbr \u002f\u003eTarget: %{target.customdata}\u003cbr \u002f\u003e%{customdata}","label":["Node_in","OS","US"],"source":[0,1,1],"target":[1,2,3],"value":[100.0,42.49417818392139,57.505661712262466]},"node":{"color":["blue","green","blue","blue"],"customdata":["0","1","2","3"],"label":["0","1","2","3"],"line":{"color":"black","width":0.5},"pad":15,"thickness":20},"type":"sankey","domain":{"x":[0.4600000000000001,1.0],"y":[0.0,1.0]}}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"Flowsheet\u003cbr\u003e\u003csup\u003eBalanced: True, Edge Status OK: True\u003c\u002fsup\u003e"},"font":{"size":12}},                        {"responsive": true}                    )                };                            </script>        </div>
+</div>
+<br />
+<br /><div class="admonition-todo admonition">
+<p class="admonition-title">TODO</p>
+<p>Create a single imbalance report across the entire network.</p>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.112 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-202-interval-data-advanced-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/f6755b91e1bef8122f40f75fe38d3058/202_interval_data_advanced.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">202_interval_data_advanced.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/bce7951f1363d16eb0fa85f97c268d6b/202_interval_data_advanced.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">202_interval_data_advanced.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="201_incremental_separation.html" class="btn btn-neutral float-left" title="Incremental Separation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="300_interval_data_sink_float.html" class="btn btn-neutral float-right" title="Interval Data - Sink Float" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

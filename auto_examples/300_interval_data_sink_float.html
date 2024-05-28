@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interval Data - Sink Float &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mass Balancing" href="400_mass_balancing.html" />
+    <link rel="prev" title="Interval Data - Advanced" href="202_interval_data_advanced.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="001_basic_usage.html">Basic usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="002_data_examples.html">Datasets and Sample Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="003_constrain.html">Constrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="004_plot_demo.html">Plot Demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="104_math_operations.html">Math Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="105_create_network.html">Create Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="106_network_basics.html">Network Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="107_filtering.html">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="108_sankey_plots.html">Sankey Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="109_split_and_partition.html">Splitting and Partitioning Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="110_network_layouts.html">Network Layouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="111_constraints_and_status.html">Constraints and Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="112_compare.html">Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="113_partition_models.html">Partition Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="114_compare_partitions.html">Compare Partition Separations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="115_simplify_network.html">Simplify a Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="200_interval_data.html">Interval Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="201_incremental_separation.html">Incremental Separation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="202_interval_data_advanced.html">Interval Data - Advanced</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Interval Data - Sink Float</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#load-data">Load Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="400_mass_balancing.html">Mass Balancing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="502_dag.html">DAG to Define and Simulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="503_dag_with_partitions.html">DAG with Partitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="504_dag_with_estimator.html">DAG with Estimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_501_simulating_networks.html">Simulating a Network in Parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_simulating_network_functions.html">Network Simulation Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grade_tonnage.html">Grade Tonnage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iron_ore_assays.html">Iron Ore Assays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resampling_interval_data.html">Resampling Interval Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">Interval Data - Sink Float</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/auto_examples/300_interval_data_sink_float.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-300-interval-data-sink-float-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="interval-data-sink-float">
+<span id="sphx-glr-auto-examples-300-interval-data-sink-float-py"></span><h1>Interval Data - Sink Float<a class="headerlink" href="#interval-data-sink-float" title="Permalink to this heading"></a></h1>
+<p>Intervals are encountered in Metallurgy, aka fractions,
+e.g. size fractions.  In that case the typical nomenclature is size_retained, size passing, since the data
+originates from a sieve stack.</p>
+<p>The Sink Float metallurgical test splits/fractionates samples by density.  The density fraction is often conducted by
+size fraction, resulting in 2D fractionation (interval) data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="c1"># noinspection PyUnresolvedReferences</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">plotly</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition</span> <span class="kn">import</span> <span class="n">MassComposition</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.datasets</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.datasets.sample_data</span> <span class="kn">import</span> <span class="n">size_by_assay</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.flowsheet</span> <span class="kn">import</span> <span class="n">Flowsheet</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils.partition</span> <span class="kn">import</span> <span class="n">napier_munn</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+                    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1"> </span><span class="si">%(module)s</span><span class="s1"> - </span><span class="si">%(funcName)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S%z&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="load-data">
+<h2>Load Data<a class="headerlink" href="#load-data" title="Permalink to this heading"></a></h2>
+<p>We load some real data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_nordic_iron_ore_sink_float</span><span class="p">()</span>
+<span class="n">df_data</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>size_retained</th>
+      <th>size_passing</th>
+      <th>density_lo</th>
+      <th>density_hi</th>
+      <th>mass_pct</th>
+      <th>Fe</th>
+      <th>SiO2</th>
+      <th>P</th>
+      <th>TiO2</th>
+      <th>V</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.4</td>
+      <td>22.7</td>
+      <td>50.9</td>
+      <td>0.042</td>
+      <td>0.170</td>
+      <td>0.0049</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.100</td>
+      <td>1.000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>67.1</td>
+      <td>27.3</td>
+      <td>47.7</td>
+      <td>0.107</td>
+      <td>0.178</td>
+      <td>0.0062</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.063</td>
+      <td>0.100</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>12.7</td>
+      <td>18.0</td>
+      <td>57.8</td>
+      <td>0.440</td>
+      <td>0.200</td>
+      <td>0.0056</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.040</td>
+      <td>0.063</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>8.2</td>
+      <td>16.9</td>
+      <td>57.1</td>
+      <td>0.610</td>
+      <td>0.235</td>
+      <td>0.0057</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.000</td>
+      <td>0.040</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>11.6</td>
+      <td>19.4</td>
+      <td>51.6</td>
+      <td>0.650</td>
+      <td>0.310</td>
+      <td>0.0072</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.100</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2.7</td>
+      <td>54.2</td>
+      <td>1.2</td>
+      <td>1.6</td>
+      <td>0.180</td>
+      <td>0.084</td>
+      <td>0.0030</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.100</td>
+      <td>NaN</td>
+      <td>2.7</td>
+      <td>3.3</td>
+      <td>9.7</td>
+      <td>16.6</td>
+      <td>42.6</td>
+      <td>0.980</td>
+      <td>0.380</td>
+      <td>0.0100</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.100</td>
+      <td>NaN</td>
+      <td>3.3</td>
+      <td>NaN</td>
+      <td>36.1</td>
+      <td>68.0</td>
+      <td>78.8</td>
+      <td>0.033</td>
+      <td>0.285</td>
+      <td>0.0120</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.063</td>
+      <td>0.100</td>
+      <td>NaN</td>
+      <td>2.7</td>
+      <td>24.0</td>
+      <td>1.2</td>
+      <td>79.5</td>
+      <td>0.015</td>
+      <td>0.060</td>
+      <td>0.0070</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.063</td>
+      <td>0.100</td>
+      <td>2.7</td>
+      <td>3.3</td>
+      <td>11.9</td>
+      <td>10.2</td>
+      <td>54.0</td>
+      <td>2.320</td>
+      <td>0.280</td>
+      <td>0.0080</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.063</td>
+      <td>0.100</td>
+      <td>3.3</td>
+      <td>NaN</td>
+      <td>64.1</td>
+      <td>67.1</td>
+      <td>1.4</td>
+      <td>0.174</td>
+      <td>0.530</td>
+      <td>0.0020</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>0.040</td>
+      <td>0.063</td>
+      <td>NaN</td>
+      <td>2.7</td>
+      <td>76.6</td>
+      <td>3.1</td>
+      <td>71.3</td>
+      <td>0.850</td>
+      <td>0.145</td>
+      <td>0.0130</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0.040</td>
+      <td>0.063</td>
+      <td>2.7</td>
+      <td>3.3</td>
+      <td>4.3</td>
+      <td>28.5</td>
+      <td>24.5</td>
+      <td>2.780</td>
+      <td>0.460</td>
+      <td>0.1100</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>0.040</td>
+      <td>0.063</td>
+      <td>3.3</td>
+      <td>NaN</td>
+      <td>19.1</td>
+      <td>68.6</td>
+      <td>0.6</td>
+      <td>0.069</td>
+      <td>0.480</td>
+      <td>0.0130</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p>The dataset contains size x assay, plus size x density x assay data.  We’ll drop the size x assay data to leave the
+sink / float data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># df_sink_float: pd.DataFrame = df_data.query(&#39;density_lo != np.nan and density_hi != np.nan&#39;)</span>
+<span class="c1"># df_sink_float</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.346 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-300-interval-data-sink-float-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/0bf67bee8daae81bcc102792527a8c91/300_interval_data_sink_float.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">300_interval_data_sink_float.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/8b813791ee1c158827e86fbb0f07f8e2/300_interval_data_sink_float.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">300_interval_data_sink_float.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="202_interval_data_advanced.html" class="btn btn-neutral float-left" title="Interval Data - Advanced" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="400_mass_balancing.html" class="btn btn-neutral float-right" title="Mass Balancing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

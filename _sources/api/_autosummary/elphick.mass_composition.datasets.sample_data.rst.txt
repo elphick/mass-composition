@@ -1,0 +1,39 @@
+elphick.mass\_composition.datasets.sample\_data
+===============================================
+
+.. automodule:: elphick.mass_composition.datasets.sample_data
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      demo_size_network
+      dh_intervals
+      iron_ore_met_sample_data
+      iron_ore_sample_data
+      sample_data
+      size_by_assay
+      size_by_assay_2
+      size_by_assay_3
+      size_distribution
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

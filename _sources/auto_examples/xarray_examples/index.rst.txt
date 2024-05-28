@@ -1,0 +1,60 @@
+
+
+.. _sphx_glr_auto_examples_xarray_examples:
+
+Xarray Gallery
+==============
+
+This gallery provides some examples related to the low level xarray objects.
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A simple example demonstrating how to use mass-composition.">
+
+.. only:: html
+
+  .. image:: /auto_examples/xarray_examples/images/thumb/sphx_glr_basic_usage_xr_thumb.png
+    :alt: Basic usage XR
+
+  :ref:`sphx_glr_auto_examples_xarray_examples_basic_usage_xr.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Basic usage XR</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstrate splitting and math operations that preserve the mass balance of components.">
+
+.. only:: html
+
+  .. image:: /auto_examples/xarray_examples/images/thumb/sphx_glr_math_operations_xr_thumb.png
+    :alt: Math Operations XR
+
+  :ref:`sphx_glr_auto_examples_xarray_examples_math_operations_xr.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Math Operations XR</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/xarray_examples/basic_usage_xr
+   /auto_examples/xarray_examples/math_operations_xr
+

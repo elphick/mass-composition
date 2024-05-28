@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAG to Define and Simulate &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DAG with Partitions" href="503_dag_with_partitions.html" />
+    <link rel="prev" title="Mass Balancing" href="400_mass_balancing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="001_basic_usage.html">Basic usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="002_data_examples.html">Datasets and Sample Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="003_constrain.html">Constrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="004_plot_demo.html">Plot Demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="104_math_operations.html">Math Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="105_create_network.html">Create Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="106_network_basics.html">Network Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="107_filtering.html">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="108_sankey_plots.html">Sankey Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="109_split_and_partition.html">Splitting and Partitioning Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="110_network_layouts.html">Network Layouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="111_constraints_and_status.html">Constraints and Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="112_compare.html">Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="113_partition_models.html">Partition Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="114_compare_partitions.html">Compare Partition Separations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="115_simplify_network.html">Simplify a Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="200_interval_data.html">Interval Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="201_incremental_separation.html">Incremental Separation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="202_interval_data_advanced.html">Interval Data - Advanced</a></li>
+<li class="toctree-l2"><a class="reference internal" href="300_interval_data_sink_float.html">Interval Data - Sink Float</a></li>
+<li class="toctree-l2"><a class="reference internal" href="400_mass_balancing.html">Mass Balancing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DAG to Define and Simulate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#define-the-dag">Define the DAG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-the-dag">Run the DAG</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="503_dag_with_partitions.html">DAG with Partitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="504_dag_with_estimator.html">DAG with Estimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_501_simulating_networks.html">Simulating a Network in Parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_simulating_network_functions.html">Network Simulation Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grade_tonnage.html">Grade Tonnage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iron_ore_assays.html">Iron Ore Assays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resampling_interval_data.html">Resampling Interval Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">DAG to Define and Simulate</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/auto_examples/502_dag.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-502-dag-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="dag-to-define-and-simulate">
+<span id="sphx-glr-auto-examples-502-dag-py"></span><h1>DAG to Define and Simulate<a class="headerlink" href="#dag-to-define-and-simulate" title="Permalink to this heading"></a></h1>
+<p>Splitting and partitioning will preserve the relationships between streams enabling network creation for simple cases.
+In more complex cases the DAG (Directed Acyclic Graph) construct can be useful to define the relationships between
+streams resulting from transformations (operations) on the streams.</p>
+<p>The DAG can be used to define the network and, with the run method, simulate the network to produce the final results.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">import</span> <span class="nn">plotly</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition</span> <span class="kn">import</span> <span class="n">MassComposition</span><span class="p">,</span> <span class="n">Stream</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.dag</span> <span class="kn">import</span> <span class="n">DAG</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.datasets.sample_data</span> <span class="kn">import</span> <span class="n">sample_data</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.flowsheet</span> <span class="kn">import</span> <span class="n">Flowsheet</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="define-the-dag">
+<h2>Define the DAG<a class="headerlink" href="#define-the-dag" title="Permalink to this heading"></a></h2>
+<p>The DAG is defined by adding nodes to the graph.  Each node is an input, output or Stream operation
+(e.g. add, split, etc.).  The nodes are connected by the streams they operate on.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mc_sample</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">sample_data</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;sample&#39;</span><span class="p">)</span>
+
+<span class="n">dag</span> <span class="o">=</span> <span class="n">DAG</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;feed_1&#39;</span><span class="p">)</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;feed_2&#39;</span><span class="p">)</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_step</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;joiner&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="n">MassComposition</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">streams</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;feed_1&#39;</span><span class="p">,</span> <span class="s1">&#39;feed_2&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;feed&#39;</span><span class="p">})</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_step</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;split&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="n">MassComposition</span><span class="o">.</span><span class="n">split</span><span class="p">,</span> <span class="n">streams</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;feed&#39;</span><span class="p">],</span>
+             <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fraction&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;name_1&#39;</span><span class="p">:</span> <span class="s1">&#39;lump&#39;</span><span class="p">,</span> <span class="s1">&#39;name_2&#39;</span><span class="p">:</span> <span class="s1">&#39;fines&#39;</span><span class="p">})</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_step</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;split_2&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="n">MassComposition</span><span class="o">.</span><span class="n">split</span><span class="p">,</span> <span class="n">streams</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lump&#39;</span><span class="p">],</span>
+             <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fraction&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;name_1&#39;</span><span class="p">:</span> <span class="s1">&#39;lumpier&#39;</span><span class="p">,</span> <span class="s1">&#39;name_2&#39;</span><span class="p">:</span> <span class="s1">&#39;less_lumpy&#39;</span><span class="p">})</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_step</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;split_3&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="n">MassComposition</span><span class="o">.</span><span class="n">split</span><span class="p">,</span> <span class="n">streams</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;fines&#39;</span><span class="p">],</span>
+             <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fraction&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;name_1&#39;</span><span class="p">:</span> <span class="s1">&#39;finer&#39;</span><span class="p">,</span> <span class="s1">&#39;name_2&#39;</span><span class="p">:</span> <span class="s1">&#39;less_fine&#39;</span><span class="p">})</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_step</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;joiner_1&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="n">MassComposition</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">streams</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;less_lumpy&#39;</span><span class="p">,</span> <span class="s1">&#39;less_fine&#39;</span><span class="p">],</span>
+             <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mix_1&#39;</span><span class="p">})</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_step</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;joiner_2&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="n">MassComposition</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">streams</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lumpier&#39;</span><span class="p">,</span> <span class="s1">&#39;finer&#39;</span><span class="p">],</span>
+             <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mix_2&#39;</span><span class="p">})</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;product_1&#39;</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="s1">&#39;mix_1&#39;</span><span class="p">)</span>
+<span class="n">dag</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;product_2&#39;</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="s1">&#39;mix_2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;elphick.mass_composition.dag.DAG object at 0x7f39501ba2f0&gt;
+</pre></div>
+</div>
+</section>
+<section id="run-the-dag">
+<h2>Run the DAG<a class="headerlink" href="#run-the-dag" title="Permalink to this heading"></a></h2>
+<p>The dag is run by providing MassComposition (or Stream) objects for all inputs.  They must be compatible i.e. have the
+same indexes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dag</span><span class="o">.</span><span class="n">run</span><span class="p">({</span><span class="s1">&#39;feed_1&#39;</span><span class="p">:</span> <span class="n">mc_sample</span><span class="p">,</span>
+         <span class="s1">&#39;feed_2&#39;</span><span class="p">:</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">mc_sample</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;sample_2&#39;</span><span class="p">)</span>  <span class="c1"># names must be unique</span>
+         <span class="p">},</span> <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create a Flowsheet object from the dag, enabling all the usual network plotting and analysis methods.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fs</span><span class="p">:</span> <span class="n">Flowsheet</span> <span class="o">=</span> <span class="n">Flowsheet</span><span class="o">.</span><span class="n">from_dag</span><span class="p">(</span><span class="n">dag</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">plot_network</span><span class="p">()</span>
+<span class="n">plotly</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+<html>
+<head><meta charset="utf-8" /></head>
+<body>
+    <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>                <div id="df1c0383-a2f2-4499-865b-c2fd7f082af6" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("df1c0383-a2f2-4499-865b-c2fd7f082af6")) {                    Plotly.newPlot(                        "df1c0383-a2f2-4499-865b-c2fd7f082af6",                        [{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"sample","x":[-1.0,-0.6296296296296295],"y":[0.18518518518518517,0.0],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"sample_2","x":[-1.0,-0.6296296296296295],"y":[-0.18518518518518517,0.0],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"feed","x":[-0.6296296296296295,-0.25925925925925924],"y":[0.0,0.0],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"lump","x":[-0.25925925925925924,0.1111111111111111],"y":[0.0,0.18518518518518517],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"fines","x":[-0.25925925925925924,0.1111111111111111],"y":[0.0,-0.18518518518518517],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"less_lumpy","x":[0.1111111111111111,0.48148148148148145],"y":[0.18518518518518517,0.18518518518518517],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"lumpier","x":[0.1111111111111111,0.48148148148148145],"y":[0.18518518518518517,-0.18518518518518517],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"less_fine","x":[0.1111111111111111,0.48148148148148145],"y":[-0.18518518518518517,0.18518518518518517],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"finer","x":[0.1111111111111111,0.48148148148148145],"y":[-0.18518518518518517,-0.18518518518518517],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"mix_1","x":[0.48148148148148145,0.8518518518518517],"y":[0.18518518518518517,0.18518518518518517],"type":"scatter"},{"hoverinfo":"text","line":{"color":"grey","width":2},"marker":{"angleref":"previous","color":"grey","size":16,"standoff":15,"symbol":"arrow"},"mode":"lines+markers","text":"mix_2","x":[0.48148148148148145,0.8518518518518517],"y":[-0.18518518518518517,-0.18518518518518517],"type":"scatter"},{"hoverinfo":"none","marker":{"color":["grey","grey","green","green","green","green","green","green","grey","grey"],"line":{"width":2},"size":30},"mode":"markers+text","text":["feed_1","feed_2","joiner","split","split_2","split_3","joiner_1","joiner_2","product_1","product_2"],"x":[-1.0,-1.0,-0.6296296296296295,-0.25925925925925924,0.1111111111111111,0.1111111111111111,0.48148148148148145,0.48148148148148145,0.8518518518518517,0.8518518518518517],"y":[0.18518518518518517,-0.18518518518518517,0.0,0.0,0.18518518518518517,-0.18518518518518517,0.18518518518518517,-0.18518518518518517,0.18518518518518517,-0.18518518518518517],"type":"scatter"},{"hoverinfo":"text","marker":{"color":"grey","line":{"width":1},"size":3},"mode":"markers","text":["sample","sample_2","feed","lump","fines","less_lumpy","lumpier","less_fine","finer","mix_1","mix_2"],"x":[-0.8148148148148148,-0.8148148148148148,-0.4444444444444444,-0.07407407407407407,-0.07407407407407407,0.2962962962962963,0.2962962962962963,0.2962962962962963,0.2962962962962963,0.6666666666666666,0.6666666666666666],"y":[0.09259259259259259,-0.09259259259259259,0.0,0.09259259259259259,-0.09259259259259259,0.18518518518518517,0.0,0.0,-0.18518518518518517,0.18518518518518517,-0.18518518518518517],"type":"scatter"}],                        {"hovermode":"closest","margin":{"b":20,"l":5,"r":5,"t":40},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","showlegend":false,"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"title":{"font":{"size":16},"text":"DAG\u003cbr\u003e\u003cbr\u003e\u003csup\u003eBalanced: True\u003cbr\u003eEdge Status OK: True\u003c\u002fsup\u003e"},"xaxis":{"showgrid":false,"showticklabels":false,"zeroline":false},"yaxis":{"showgrid":false,"showticklabels":false,"zeroline":false}},                        {"responsive": true}                    )                };                            </script>        </div>
+</body>
+</html><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">table_plot</span><span class="p">(</span><span class="n">plot_type</span><span class="o">=</span><span class="s1">&#39;sankey&#39;</span><span class="p">)</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>                <div id="1597de78-701b-4b4b-a0dd-0b27c68563e7" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("1597de78-701b-4b4b-a0dd-0b27c68563e7")) {                    Plotly.newPlot(                        "1597de78-701b-4b4b-a0dd-0b27c68563e7",                        [{"cells":{"align":"left","fill":{"color":[["whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke","lightgray","whitesmoke"]]},"format":["%s",".0f",".0f",".1f",".2f",".2f",".2f",".2f"],"values":[["sample","sample_2","feed","lump","fines","less_lumpy","lumpier","less_fine","finer","mix_1","mix_2"],[300.0,300.0,600.0,180.0,420.0,126.0,54.0,294.0,126.0,420.0,180.0],[260.0,260.0,520.0,156.0,364.0,109.19999999999999,46.8,254.79999999999995,109.2,363.99999999999994,156.0],[13.333333333333334,13.333333333333334,13.333333333333334,13.333333333333334,13.333333333333334,13.333333333333341,13.33333333333334,13.33333333333335,13.33333333333333,13.333333333333346,13.333333333333334],[59.0,59.0,59.0,59.0,58.99999999999999,59.0,59.0,59.00000000000001,59.00000000000001,59.0,59.0],[3.5153846153846153,3.5153846153846153,3.5153846153846153,3.5153846153846158,3.5153846153846153,3.5153846153846158,3.5153846153846153,3.5153846153846158,3.515384615384616,3.5153846153846158,3.5153846153846158],[1.873076923076923,1.873076923076923,1.8730769230769233,1.8730769230769233,1.8730769230769229,1.8730769230769235,1.8730769230769235,1.8730769230769233,1.8730769230769235,1.8730769230769233,1.8730769230769233],[4.0,4.0,4.0,4.0,4.0,4.0,4.000000000000001,4.0,4.0,4.0,4.0]]},"columnwidth":[2,1,1,1,1,1,1,1],"header":{"align":"center","fill":{"color":"cornflowerblue"},"font":{"color":"black","size":12},"values":["name","mass_wet","mass_dry","H2O","Fe","SiO2","Al2O3","LOI"]},"type":"table","domain":{"x":[0.0,0.36000000000000004],"y":[0.0,1.0]}},{"link":{"customdata":["\u003cbr \u002f\u003emass_wet: 300\u003cbr \u002f\u003emass_dry: 260\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 300\u003cbr \u002f\u003emass_dry: 260\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 600\u003cbr \u002f\u003emass_dry: 520\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 180\u003cbr \u002f\u003emass_dry: 156\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 420\u003cbr \u002f\u003emass_dry: 364\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 126\u003cbr \u002f\u003emass_dry: 109\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 54\u003cbr \u002f\u003emass_dry: 47\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 294\u003cbr \u002f\u003emass_dry: 255\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 126\u003cbr \u002f\u003emass_dry: 109\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 420\u003cbr \u002f\u003emass_dry: 364\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e","\u003cbr \u002f\u003emass_wet: 180\u003cbr \u002f\u003emass_dry: 156\u003cbr \u002f\u003eH2O: 13.3\u003cbr \u002f\u003eFe: 59.00\u003cbr \u002f\u003eSiO2: 3.52\u003cbr \u002f\u003eAl2O3: 1.87\u003cbr \u002f\u003eLOI: 4.00\u003cbr \u002f\u003e"],"hovertemplate":"\u003cb\u003e\u003ci\u003e%{label}\u003c\u002fi\u003e\u003c\u002fb\u003e\u003cbr \u002f\u003eSource: %{source.customdata}\u003cbr \u002f\u003eTarget: %{target.customdata}\u003cbr \u002f\u003e%{customdata}","label":["sample","sample_2","feed","lump","fines","less_lumpy","lumpier","less_fine","finer","mix_1","mix_2"],"source":[0,1,2,3,3,4,4,5,5,6,7],"target":[2,2,3,4,5,6,7,6,7,8,9],"value":[300.0,300.0,600.0,180.0,420.0,126.0,54.0,294.0,126.0,420.0,180.0]},"node":{"color":["blue","blue","green","green","green","green","green","green","blue","blue"],"customdata":["feed_1","feed_2","joiner","split","split_2","split_3","joiner_1","joiner_2","product_1","product_2"],"label":["feed_1","feed_2","joiner","split","split_2","split_3","joiner_1","joiner_2","product_1","product_2"],"line":{"color":"black","width":0.5},"pad":15,"thickness":20},"type":"sankey","domain":{"x":[0.4600000000000001,1.0],"y":[0.0,1.0]}}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"DAG\u003cbr\u003e\u003csup\u003eBalanced: True, Edge Status OK: True\u003c\u002fsup\u003e"},"font":{"size":12}},                        {"responsive": true}                    )                };                            </script>        </div>
+</div>
+<br />
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.558 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-502-dag-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/0d4f04d41fdb599b3a101793df4ea130/502_dag.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">502_dag.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/4cfc61dfd432f3f2703556696798d55c/502_dag.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">502_dag.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="400_mass_balancing.html" class="btn btn-neutral float-left" title="Mass Balancing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="503_dag_with_partitions.html" class="btn btn-neutral float-right" title="DAG with Partitions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

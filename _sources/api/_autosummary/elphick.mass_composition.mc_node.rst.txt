@@ -1,0 +1,31 @@
+﻿elphick.mass\_composition.mc\_node
+==================================
+
+.. automodule:: elphick.mass_composition.mc_node
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+   
+      MCNode
+      NodeType
+   
+   
+
+   
+   
+   
+
+
+

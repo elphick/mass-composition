@@ -1,0 +1,45 @@
+elphick.mass\_composition.mc\_xarray.MassCompositionAccessor
+============================================================
+
+.. currentmodule:: elphick.mass_composition.mc_xarray
+
+.. autoclass:: MassCompositionAccessor
+   :members:
+   :special-members: __add__, __mul__
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MassCompositionAccessor.__init__
+      ~MassCompositionAccessor.add
+      ~MassCompositionAccessor.aggregate
+      ~MassCompositionAccessor.column_map
+      ~MassCompositionAccessor.composition_to_mass
+      ~MassCompositionAccessor.cumulate
+      ~MassCompositionAccessor.data
+      ~MassCompositionAccessor.div
+      ~MassCompositionAccessor.mass_to_composition
+      ~MassCompositionAccessor.mul
+      ~MassCompositionAccessor.rename
+      ~MassCompositionAccessor.split
+      ~MassCompositionAccessor.split_by_partition
+      ~MassCompositionAccessor.sub
+      ~MassCompositionAccessor.to_dataframe
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MassCompositionAccessor.composition_context
+      ~MassCompositionAccessor.name
+   
+   

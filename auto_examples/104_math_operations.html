@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Operations &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Create Network" href="105_create_network.html" />
+    <link rel="prev" title="Plot Demo" href="004_plot_demo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="001_basic_usage.html">Basic usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="002_data_examples.html">Datasets and Sample Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="003_constrain.html">Constrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="004_plot_demo.html">Plot Demo</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Math Operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-mass-composition-mc-enabled-xarray-dataset">Create a mass-composition (mc) enabled Xarray Dataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="105_create_network.html">Create Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="106_network_basics.html">Network Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="107_filtering.html">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="108_sankey_plots.html">Sankey Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="109_split_and_partition.html">Splitting and Partitioning Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="110_network_layouts.html">Network Layouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="111_constraints_and_status.html">Constraints and Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="112_compare.html">Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="113_partition_models.html">Partition Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="114_compare_partitions.html">Compare Partition Separations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="115_simplify_network.html">Simplify a Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="200_interval_data.html">Interval Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="201_incremental_separation.html">Incremental Separation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="202_interval_data_advanced.html">Interval Data - Advanced</a></li>
+<li class="toctree-l2"><a class="reference internal" href="300_interval_data_sink_float.html">Interval Data - Sink Float</a></li>
+<li class="toctree-l2"><a class="reference internal" href="400_mass_balancing.html">Mass Balancing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="502_dag.html">DAG to Define and Simulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="503_dag_with_partitions.html">DAG with Partitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="504_dag_with_estimator.html">DAG with Estimator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_501_simulating_networks.html">Simulating a Network in Parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_simulating_network_functions.html">Network Simulation Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grade_tonnage.html">Grade Tonnage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iron_ore_assays.html">Iron Ore Assays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resampling_interval_data.html">Resampling Interval Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">Math Operations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/auto_examples/104_math_operations.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-104-math-operations-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="math-operations">
+<span id="sphx-glr-auto-examples-104-math-operations-py"></span><h1>Math Operations<a class="headerlink" href="#math-operations" title="Permalink to this heading"></a></h1>
+<p>Demonstrate splitting and math operations that preserve the mass balance of components.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.datasets.sample_data</span> <span class="kn">import</span> <span class="n">sample_data</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition</span> <span class="kn">import</span> <span class="n">MassComposition</span>
+</pre></div>
+</div>
+<section id="create-a-mass-composition-mc-enabled-xarray-dataset">
+<h2>Create a mass-composition (mc) enabled Xarray Dataset<a class="headerlink" href="#create-a-mass-composition-mc-enabled-xarray-dataset" title="Permalink to this heading"></a></h2>
+<p>We get some demo data in the form of a pandas DataFrame</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">sample_data</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>       wet_mass  mass_dry    FE  SIO2  al2o3  LOI  group
+index
+0         100.0      90.0  57.0   5.2    3.0  5.0  grp_1
+1          90.0      80.0  59.0   3.1    1.7  4.0  grp_1
+2         110.0      90.0  61.0   2.2    0.9  3.0  grp_2
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Construct a MassComposition object and standardise the chemistry variables</span>
+
+<span class="n">obj_mc</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">df_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_mc</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>unnamed
+&lt;xarray.Dataset&gt; Size: 216B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 100.0 90.0 110.0
+    mass_dry  (index) float64 24B 90.0 80.0 90.0
+    H2O       (index) float64 24B 10.0 11.11 18.18
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            unnamed
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Split the original Dataset and return the complement of the split fraction.
+Splitting does not modify the absolute grade of the input.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc_split</span><span class="p">,</span> <span class="n">obj_mc_comp</span> <span class="o">=</span> <span class="n">obj_mc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_mc_split</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(0.1 * unnamed)
+&lt;xarray.Dataset&gt; Size: 216B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 10.0 9.0 11.0
+    mass_dry  (index) float64 24B 9.0 8.0 9.0
+    H2O       (index) float64 24B 10.0 11.11 18.18
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            (0.1 * unnamed)
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">obj_mc_comp</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(0.9 * unnamed)
+&lt;xarray.Dataset&gt; Size: 216B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 90.0 81.0 99.0
+    mass_dry  (index) float64 24B 81.0 72.0 81.0
+    H2O       (index) float64 24B 10.0 11.11 18.18
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            (0.9 * unnamed)
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Add the split and complement parts using the mc.add method</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc_sum</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">obj_mc_split</span> <span class="o">+</span> <span class="n">obj_mc_comp</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_mc_sum</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>((0.1 * unnamed) + (0.9 * unnamed))
+&lt;xarray.Dataset&gt; Size: 216B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 100.0 90.0 110.0
+    mass_dry  (index) float64 24B 90.0 80.0 90.0
+    H2O       (index) float64 24B 10.0 11.11 18.18
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            ((0.1 * unnamed) + (0.9 * unnamed))
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Confirm the sum of the splits is materially equivalent to the starting object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">obj_mc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(),</span> <span class="n">obj_mc_sum</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Add finally add and then subtract the split portion to the original object, and check the output.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc_sum</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">obj_mc</span> <span class="o">+</span> <span class="n">obj_mc_split</span>
+<span class="n">obj_mc_minus</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">obj_mc_sum</span> <span class="o">-</span> <span class="n">obj_mc_split</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">obj_mc_minus</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(),</span> <span class="n">obj_mc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_mc_minus</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>((unnamed + (0.1 * unnamed)) - (0.1 * unnamed))
+&lt;xarray.Dataset&gt; Size: 216B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 100.0 90.0 110.0
+    mass_dry  (index) float64 24B 90.0 80.0 90.0
+    H2O       (index) float64 24B 10.0 11.11 18.18
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            ((unnamed + (0.1 * unnamed)) - (0.1 * unnamed))
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Demonstrate division.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc_div</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">obj_mc_split</span> <span class="o">/</span> <span class="n">obj_mc</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_mc_div</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>((0.1 * unnamed) / unnamed)
+&lt;xarray.Dataset&gt; Size: 216B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 0.1 0.1 0.1
+    mass_dry  (index) float64 24B 0.1 0.1 0.1
+    H2O       (index) float64 24B 0.0 0.0 0.0
+    Fe        (index) float64 24B 0.1 0.1 0.1
+    SiO2      (index) float64 24B 0.1 0.1 0.1
+    Al2O3     (index) float64 24B 0.1 0.1 0.1
+    LOI       (index) float64 24B 0.1 0.1 0.1
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            ((0.1 * unnamed) / unnamed)
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<p>Math operations with rename
+The alternative syntax, methods rather than operands, allows renaming of the result object</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc_sum_renamed</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">obj_mc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obj_mc_split</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Summed object&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_mc_sum_renamed</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Summed object
+&lt;xarray.Dataset&gt; Size: 216B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 110.0 99.0 121.0
+    mass_dry  (index) float64 24B 99.0 88.0 99.0
+    H2O       (index) float64 24B 10.0 11.11 18.18
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            Summed object
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc_sub_renamed</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">obj_mc</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">obj_mc_split</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Subtracted object&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_mc_sum_renamed</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Summed object
+&lt;xarray.Dataset&gt; Size: 216B
+Dimensions:   (index: 3)
+Coordinates:
+  * index     (index) int64 24B 0 1 2
+Data variables:
+    mass_wet  (index) float64 24B 110.0 99.0 121.0
+    mass_dry  (index) float64 24B 99.0 88.0 99.0
+    H2O       (index) float64 24B 10.0 11.11 18.18
+    Fe        (index) float64 24B 57.0 59.0 61.0
+    SiO2      (index) float64 24B 5.2 3.1 2.2
+    Al2O3     (index) float64 24B 3.0 1.7 0.9
+    LOI       (index) float64 24B 5.0 4.0 3.0
+    group     (index) object 24B &#39;grp_1&#39; &#39;grp_1&#39; &#39;grp_2&#39;
+Attributes:
+    mc_name:            Summed object
+    mc_vars_mass:       [&#39;mass_wet&#39;, &#39;mass_dry&#39;]
+    mc_vars_chem:       [&#39;Fe&#39;, &#39;SiO2&#39;, &#39;Al2O3&#39;, &#39;LOI&#39;]
+    mc_vars_attrs:      [&#39;group&#39;]
+    mc_interval_edges:  {}
+done
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.451 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-104-math-operations-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/b0fa1010878640961640ed041cfa5100/104_math_operations.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">104_math_operations.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/07a75779c64b83cd873d702775bca11e/104_math_operations.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">104_math_operations.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="004_plot_demo.html" class="btn btn-neutral float-left" title="Plot Demo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="105_create_network.html" class="btn btn-neutral float-right" title="Create Network" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

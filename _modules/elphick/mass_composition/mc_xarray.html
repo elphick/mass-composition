@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elphick.mass_composition.mc_xarray &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">elphick.mass_composition.mc_xarray</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for elphick.mass_composition.mc_xarray</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils</span> <span class="kn">import</span> <span class="n">solve_mass_moisture</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils.interp</span> <span class="kn">import</span> <span class="n">interp_monotonic</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils.size</span> <span class="kn">import</span> <span class="n">mean_size</span>
+
+
+<div class="viewcode-block" id="CompositionContext"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.CompositionContext.html#elphick.mass_composition.mc_xarray.CompositionContext">[docs]</a><span class="k">class</span> <span class="nc">CompositionContext</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ABSOLUTE</span> <span class="o">=</span> <span class="s1">&#39;mass&#39;</span>
+    <span class="n">RELATIVE</span> <span class="o">=</span> <span class="s2">&quot;percent&quot;</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MassCompositionAccessor"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor">[docs]</a><span class="nd">@xr</span><span class="o">.</span><span class="n">register_dataset_accessor</span><span class="p">(</span><span class="s2">&quot;mc&quot;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">MassCompositionAccessor</span><span class="p">:</span>
+<div class="viewcode-block" id="MassCompositionAccessor.__init__"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xarray_obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;MassComposition xarray Accessor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            xarray_obj:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">xarray_obj</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mc_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_mass</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_chem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mc_vars_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mc_vars_chem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_chem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mc_vars_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_attrs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chem</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">]</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mc_name&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">moisture</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_wet&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_dry&#39;</span><span class="p">])</span> <span class="o">/</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_wet&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;H2O&#39;</span><span class="p">,</span>
+                                              <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;standard_name&#39;</span><span class="p">:</span> <span class="s1">&#39;H2O&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;mc_type&#39;</span><span class="p">:</span> <span class="s1">&#39;moisture&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;mc_col_orig&#39;</span><span class="p">:</span> <span class="s1">&#39;H2O&#39;</span><span class="p">}</span>
+                                              <span class="p">)</span>
+
+        <span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">],</span> <span class="n">moisture</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">],</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_attrs</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">composition_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompositionContext</span><span class="p">:</span>
+
+        <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">units</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">units</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;%&#39;</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">CompositionContext</span><span class="o">.</span><span class="n">RELATIVE</span>
+            <span class="k">elif</span> <span class="n">units</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_dry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">CompositionContext</span><span class="o">.</span><span class="n">ABSOLUTE</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Chemistry units do not conform&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">CompositionContext</span><span class="o">.</span><span class="n">NONE</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="nf">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mc_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
+
+<div class="viewcode-block" id="MassCompositionAccessor.aggregate"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.aggregate">[docs]</a>    <span class="k">def</span> <span class="nf">aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_var</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">group_bins</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">as_dataframe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                  <span class="n">original_column_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                  <span class="n">column_formats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the weight average of this dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            group_var: Optional grouping variable</span>
+<span class="sd">            group_bins: Optional bins to apply to the group_var</span>
+<span class="sd">            as_dataframe: If True return a pd.DataFrame</span>
+<span class="sd">            original_column_names: If True, and as_dataframe is True, will return with the original column names.</span>
+<span class="sd">            column_formats: If not None, and as_dataframe is True, will format the dataframe per the dict.</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">group_var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">mc_aggregate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group_var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">group_bins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">group_var</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mc_aggregate</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">groupby_bins</span><span class="p">(</span><span class="n">group_var</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">group_bins</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mc_aggregate</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">group_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+                <span class="c1"># TODO: consider a better way - maybe reset the index?</span>
+                <span class="c1"># sum across all dims other than the one of interest...</span>
+                <span class="n">other_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">gv</span> <span class="k">for</span> <span class="n">gv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">dims</span> <span class="k">if</span> <span class="n">gv</span> <span class="o">!=</span> <span class="n">group_var</span><span class="p">]</span>
+                <span class="n">res</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">other_dims</span><span class="p">,</span>
+                                                                 <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">mass_to_composition</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">group_var</span><span class="si">}</span><span class="s1"> not found in dataset&#39;</span><span class="p">)</span>
+
+            <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Aggregate of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> with group </span><span class="si">{</span><span class="n">group_var</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">ds_moisture</span> <span class="o">=</span> <span class="n">solve_mass_moisture</span><span class="p">(</span><span class="n">mass_wet</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                                          <span class="n">mass_dry</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
+        <span class="n">ds_moisture</span><span class="p">[</span><span class="s1">&#39;H2O&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;standard_name&#39;</span><span class="p">:</span> <span class="s1">&#39;H2O&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;mc_type&#39;</span><span class="p">:</span> <span class="s1">&#39;moisture&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;mc_col_orig&#39;</span><span class="p">:</span> <span class="s1">&#39;H2O&#39;</span><span class="p">}</span>
+
+        <span class="n">res</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">res</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">],</span> <span class="n">ds_moisture</span><span class="p">,</span> <span class="n">res</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]])</span>
+
+        <span class="c1"># If the Dataset is 0D add a placeholder index</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">as_dataframe</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">original_column_names</span><span class="o">=</span><span class="n">original_column_names</span><span class="p">,</span> <span class="n">ds</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.cumulate"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.cumulate">[docs]</a>    <span class="k">def</span> <span class="nf">cumulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cumulate along the dims</span>
+
+<span class="sd">        Expected use case is only for Datasets that have been reduced to 1D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            direction: &#39;ascending&#39;|&#39;descending&#39;</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">valid_dirs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ascending&#39;</span><span class="p">,</span> <span class="s1">&#39;descending&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_dirs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid direction provided.  Valid arguments are: </span><span class="si">{</span><span class="n">valid_dirs</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">d_dir</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ascending&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;descending&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Datasets &gt; 1D have not been tested.&#39;</span><span class="p">)</span>
+
+        <span class="n">index_var</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="n">index_var</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Interval</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unexpected use of the cumulate method on non-fractional data.  &quot;</span>
+                                 <span class="s2">&quot;Consider setting the index (dim) as intervals.&quot;</span><span class="p">)</span>
+
+        <span class="n">interval_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="n">index_var</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">interval_index</span><span class="o">.</span><span class="n">is_monotonic_increasing</span> <span class="ow">or</span> <span class="n">interval_index</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Index is not monotonically increasing or decreasing&#39;</span><span class="p">)</span>
+
+        <span class="n">in_data_ascending</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">interval_index</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span><span class="p">:</span>
+            <span class="n">in_data_ascending</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># convert to mass, then cumsum, then convert back to relative composition (grade)</span>
+        <span class="n">mass</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()</span>
+
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">sortby</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">index_var</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="n">d_dir</span><span class="p">[</span><span class="n">direction</span><span class="p">])</span>
+
+        <span class="n">mass_cum</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># put the coords back</span>
+        <span class="n">mass_cum</span> <span class="o">=</span> <span class="n">mass_cum</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="o">**</span><span class="n">mass</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">mass_cum</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">mass_to_composition</span><span class="p">()</span>
+
+        <span class="c1"># put back to original order</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">sortby</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">index_var</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="n">in_data_ascending</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.composition_to_mass"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.composition_to_mass">[docs]</a>    <span class="k">def</span> <span class="nf">composition_to_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform composition to mass</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_context</span> <span class="o">==</span> <span class="n">CompositionContext</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;The dataset composition context is already absolute (mass units)&#39;</span><span class="p">)</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">dsm</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s1">&#39;H2O&#39;</span> <span class="ow">in</span> <span class="n">dsm</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+            <span class="n">dsm</span><span class="p">[</span><span class="s1">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_wet&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_dry&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_context</span> <span class="o">==</span> <span class="n">CompositionContext</span><span class="o">.</span><span class="n">RELATIVE</span><span class="p">:</span>
+            <span class="n">dsm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span> <span class="o">=</span> <span class="n">dsm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_dry&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
+
+            <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">dsm</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mc_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;chemistry&#39;</span><span class="p">:</span>
+                    <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dsm</span><span class="p">[</span><span class="s1">&#39;mass_wet&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dsm</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.mass_to_composition"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.mass_to_composition">[docs]</a>    <span class="k">def</span> <span class="nf">mass_to_composition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform mass to composition.</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_context</span> <span class="o">==</span> <span class="n">CompositionContext</span><span class="o">.</span><span class="n">RELATIVE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;The dataset composition context is already relative (</span><span class="si">% u</span><span class="s1">nits)&#39;</span><span class="p">)</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">dsc</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;H2O&#39;</span> <span class="ow">in</span> <span class="n">dsc</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+            <span class="n">dsc</span><span class="p">[</span><span class="s1">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_wet&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_dry&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_wet&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_context</span> <span class="o">==</span> <span class="n">CompositionContext</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">:</span>
+            <span class="n">dsc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span> <span class="o">=</span> <span class="n">dsc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="s1">&#39;mass_dry&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+
+            <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">dsc</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mc_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;chemistry&#39;</span><span class="p">:</span>
+                    <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dsc</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.split"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fraction</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Split the object by mass</span>
+
+<span class="sd">        A simple mass split maintaining the same composition</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fraction: A constant in the range [0.0, 1.0]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple of two datasets, the first with the mass fraction specified, the other the complement</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">fraction</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The fraction provided is not a float&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">fraction</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fraction</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The fraction provided must be between [0.0, 1.0] - mass cannot be created nor destroyed.&quot;</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># split by mass</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">]</span> <span class="o">*</span> <span class="n">fraction</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">fraction</span><span class="si">}</span><span class="s1"> * </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+        <span class="n">comp</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_mass</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">fraction</span><span class="p">)</span>
+        <span class="n">comp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">fraction</span><span class="si">}</span><span class="s1"> * </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">comp</span><span class="o">.</span><span class="n">_obj</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.split_by_partition"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.split_by_partition">[docs]</a>    <span class="k">def</span> <span class="nf">split_by_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_definition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Partition the object along a given dimension.</span>
+
+<span class="sd">        This method applies the defined partition resulting in two new objects.</span>
+
+<span class="sd">        See also: split</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            partition_definition: A partition function that defines the efficiency of separation along a dimension</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple of two datasets, the first defined by the function, the other the complement</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_definition</span><span class="p">,</span> <span class="n">Callable</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The definition is not a callable function&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;dim&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">partition_definition</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The callable function passed does not have a dim&quot;</span><span class="p">)</span>
+
+        <span class="n">dim</span> <span class="o">=</span> <span class="n">partition_definition</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span>
+        <span class="n">partition_definition</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Interval</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">mean_size</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">arrays</span><span class="o">.</span><span class="n">IntervalArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">arrays</span><span class="o">.</span><span class="n">IntervalArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">mid</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># assume the index is already the mean, not a passing or retained value.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The provided callable is being applied across a dimension that is &#39;</span>
+                                 <span class="s1">&#39;not an interval. This is not typical usage.  It is assumed that the &#39;</span>
+                                 <span class="s1">&#39;dimension data represents the centre/mean, and not an edge like &#39;</span>
+                                 <span class="s1">&#39;retained or passing.&#39;</span><span class="p">)</span>
+        <span class="n">pn</span> <span class="o">=</span> <span class="n">partition_definition</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="c1"># TODO: Set the dim to match the partition if it does not already</span>
+            <span class="c1"># obj_mass = obj_mass.swap_dims(dim=)</span>
+            <span class="k">pass</span>
+
+        <span class="n">out</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">pn</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">comp</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">_obj</span><span class="p">)</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">comp</span><span class="o">.</span><span class="n">_obj</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.add"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add two objects</span>
+
+<span class="sd">        Perform the addition with the mass-composition variables only and then append any attribute variables.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other: object to add to self</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># initially just add the mass and composition, not the attr vars</span>
+        <span class="n">xr_self</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars</span><span class="p">]</span>
+        <span class="n">xr_other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars</span><span class="p">]</span>
+
+        <span class="n">res</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_self</span> <span class="o">+</span> <span class="n">xr_other</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_math_post_process</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">xr_self</span><span class="p">,</span> <span class="s1">&#39;added&#39;</span><span class="p">)</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.sub"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.sub">[docs]</a>    <span class="k">def</span> <span class="nf">sub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subtract the supplied object from self</span>
+
+<span class="sd">        Perform the subtraction with the mass-composition variables only and then append any attribute variables.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            other: object to subtract from self</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># initially just add the mass and composition, not the attr vars</span>
+        <span class="n">xr_self</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars</span><span class="p">]</span>
+        <span class="n">xr_other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars</span><span class="p">]</span>
+
+        <span class="n">res</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_self</span> <span class="o">-</span> <span class="n">xr_other</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_math_post_process</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">xr_self</span><span class="p">,</span> <span class="s1">&#39;subtracted&#39;</span><span class="p">)</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.mul"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.mul">[docs]</a>    <span class="k">def</span> <span class="nf">mul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Multiply self and retain attrs</span>
+
+<span class="sd">        Multiply the mass-composition variables only by the value then append any attribute variables.</span>
+<span class="sd">        NOTE: does not multiply two objects together.  Used for separation (partition) operations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: the multiplier, a scalr or array of floats.</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># initially just add the mass and composition, not the attr vars</span>
+        <span class="n">xr_self</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars</span><span class="p">]</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_self</span> <span class="o">*</span> <span class="n">value</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_math_post_process</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">xr_self</span><span class="p">,</span> <span class="s1">&#39;multiplied&#39;</span><span class="p">)</span>
+
+        <span class="c1"># when two objects (edges) are added, their to-nodes must be set to the same value (merged)</span>
+        <span class="c1"># then the nodes for the summed object will be from that merged node to the next, new node.</span>
+        <span class="c1"># res.attrs[&#39;nodes&#39;] = [xr_self.attrs[&#39;nodes&#39;][1], xr_other.attrs[&#39;nodes&#39;][1] + 2]</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MassCompositionAccessor.div"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.MassCompositionAccessor.html#elphick.mass_composition.mc_xarray.MassCompositionAccessor.div">[docs]</a>    <span class="k">def</span> <span class="nf">div</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Divide self by the supplied object</span>
+
+<span class="sd">        Perform the division with the mass-composition variables only and then append any attribute variables.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            other: denominator object, self will be divided by this object</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># initially just divide the mass and composition, not the attr vars</span>
+        <span class="n">xr_self</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars</span><span class="p">]</span>
+        <span class="n">xr_other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">composition_to_mass</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_vars</span><span class="p">]</span>
+
+        <span class="n">res</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_self</span> <span class="o">/</span> <span class="n">xr_other</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_math_post_process</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">xr_self</span><span class="p">,</span> <span class="s1">&#39;divided&#39;</span><span class="p">)</span>
+
+        <span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+    <span class="k">def</span> <span class="nf">_math_post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">xr_self</span><span class="p">,</span> <span class="n">operator_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Manages cleanup after math operations</span>
+
+<span class="sd">        Math operations occur in absolute composition (mass) space, and these operations lose the attrs</span>
+<span class="sd">        This method adds back the attrs for the Dataset, DataArrays.  It also converts the result back</span>
+<span class="sd">        to relative compositional space.  Attr variables are also added back.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            other: The other object taking part in the operation</span>
+<span class="sd">            res: The result object</span>
+<span class="sd">            xr_self: The xarray of the result object - used to recover attrs - we just use self instead?</span>
+<span class="sd">            operator_string: string representing the operation</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># update attrs</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+        <span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
+        <span class="k">for</span> <span class="n">new_da</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">xr_self</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="n">new_da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+        <span class="c1"># merge in the attr vars</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">res</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc_vars_attrs</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="n">operator_string</span> <span class="o">==</span> <span class="s1">&#39;added&#39;</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">mass_to_composition</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">operator_string</span> <span class="o">==</span> <span class="s1">&#39;subtracted&#39;</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">mass_to_composition</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">operator_string</span> <span class="o">==</span> <span class="s1">&#39;divided&#39;</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="c1"># division returns relative, not absolute - do not convert back to relative composition</span>
+        <span class="k">elif</span> <span class="n">operator_string</span> <span class="o">==</span> <span class="s1">&#39;multiplied&#39;</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> partitioned)&#39;</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">mass_to_composition</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Unexpected operator string&#39;</span><span class="p">)</span>
+
+        <span class="c1"># protect grades from nans and infs - push them to zero</span>
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">mc_vars_chem</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="nf">column_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mc_col_orig&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_column_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                     <span class="n">ds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">ds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+
+        <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+
+        <span class="c1"># order with mass, chem then attr columns last</span>
+        <span class="n">col_order</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_vars_mass</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_vars_chem</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_vars_attrs</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">col_order</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="n">original_column_names</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_map</span><span class="p">(),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+    <span class="c1"># def resample(self, dim: str, num_intervals: int = 50, edge_precision: int = 8) -&gt; xr.Dataset:</span>
+    <span class="c1">#     if len(self._obj.dims) &gt; 1:</span>
+    <span class="c1">#         raise NotImplementedError(&quot;Not yet tested on datasets &gt; 1D&quot;)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     # define the new coordinates</span>
+    <span class="c1">#     right_edges = pd.arrays.IntervalArray(self._obj[dim].data).right</span>
+    <span class="c1">#     new_coords = np.round(np.geomspace(right_edges.min(), right_edges.max(), num_intervals), edge_precision)</span>
+    <span class="c1">#     xr_upsampled: xr.Dataset = interp_monotonic(self._obj, coords={&#39;size&#39;: new_coords},</span>
+    <span class="c1">#                                                 include_original_coords=True)</span>
+    <span class="c1">#     return xr_upsampled</span>
+
+
+<div class="viewcode-block" id="mc_aggregate"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.mc_xarray.mc_aggregate.html#elphick.mass_composition.mc_xarray.mc_aggregate">[docs]</a><span class="k">def</span> <span class="nf">mc_aggregate</span><span class="p">(</span><span class="n">xr_ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A standalone function to aggregate</span>
+
+<span class="sd">    Sum the mass vars and weight average the chem vars by the mass_dry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        xr_ds: A MassComposition compliant xr.Dataset</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chem</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_ds</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">_chem</span><span class="o">.</span><span class="n">weighted</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">xr_ds</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="s1">&#39;mass_dry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mass</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr_ds</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">_mass</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">mass</span><span class="p">,</span> <span class="n">chem</span><span class="p">])</span>
+    <span class="n">res</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mc_vars_attrs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">res</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Aggregate of </span><span class="si">{</span><span class="n">xr_ds</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

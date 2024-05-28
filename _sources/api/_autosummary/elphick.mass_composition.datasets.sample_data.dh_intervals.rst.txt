@@ -1,0 +1,6 @@
+elphick.mass\_composition.datasets.sample\_data.dh\_intervals
+=============================================================
+
+.. currentmodule:: elphick.mass_composition.datasets.sample_data
+
+.. autofunction:: dh_intervals

@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.sklearn.extract\_feature\_names
+===============================================================
+
+.. currentmodule:: elphick.mass_composition.utils.sklearn
+
+.. autofunction:: extract_feature_names

@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elphick.mass_composition.mass_composition.MassComposition &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="elphick.mass_composition.stream" href="elphick.mass_composition.stream.html" />
+    <link rel="prev" title="elphick.mass_composition.mass_composition" href="elphick.mass_composition.mass_composition.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="elphick.mass_composition.mass_composition.html">elphick.mass_composition.mass_composition</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">elphick.mass_composition.mass_composition.MassComposition</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition"><code class="docutils literal notranslate"><span class="pre">MassComposition</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.stream.html">elphick.mass_composition.stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.flowsheet.html">elphick.mass_composition.flowsheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mc_node.html">elphick.mass_composition.mc_node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mc_xarray.html">elphick.mass_composition.mc_xarray</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.datasets.html">elphick.mass_composition.datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.utils.html">elphick.mass_composition.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="elphick.mass_composition.mass_composition.html">elphick.mass_composition.mass_composition</a></li>
+      <li class="breadcrumb-item active">elphick.mass_composition.mass_composition.MassComposition</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/_autosummary/elphick.mass_composition.mass_composition.MassComposition.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="elphick-mass-composition-mass-composition-masscomposition">
+<h1>elphick.mass_composition.mass_composition.MassComposition<a class="headerlink" href="#elphick-mass-composition-mass-composition-masscomposition" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elphick.mass_composition.mass_composition.</span></span><span class="sig-name descname"><span class="pre">MassComposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_wet_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_dry_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chem_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">composition_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_wet_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_dry_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chem_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">composition_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – </p></li>
+<li><p><strong>name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+<li><p><strong>mass_wet_var</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+<li><p><strong>mass_dry_var</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+<li><p><strong>moisture_var</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+<li><p><strong>chem_vars</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – </p></li>
+<li><p><strong>mass_units</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – </p></li>
+<li><p><strong>constraints</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]]) – </p></li>
+<li><p><strong>config_file</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code>]) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.__init__" title="elphick.mass_composition.mass_composition.MassComposition.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([data, name, mass_wet_var, ...])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">type data<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.add" title="elphick.mass_composition.mass_composition.MassComposition.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a>(other[, name])</p></td>
+<td><p>Add two objects</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.aggregate" title="elphick.mass_composition.mass_composition.MassComposition.aggregate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aggregate</span></code></a>([group_var, group_bins, ...])</p></td>
+<td><p>Calculate the weight average.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.binned_mass_composition" title="elphick.mass_composition.mass_composition.MassComposition.binned_mass_composition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">binned_mass_composition</span></code></a>(cutoff_var, bin_width)</p></td>
+<td><p>A.K.A &quot;The Grade-Tonnage&quot; curve.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.calculate_partition" title="elphick.mass_composition.mass_composition.MassComposition.calculate_partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_partition</span></code></a>(ref)</p></td>
+<td><p>Calculate the partition of the ref stream relative to self</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare</span></code>(other[, comparisons, ...])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.constrain" title="elphick.mass_composition.mass_composition.MassComposition.constrain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constrain</span></code></a>([clip_mass, clip_composition, ...])</p></td>
+<td><p>Constrain the mass-composition</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.div" title="elphick.mass_composition.mass_composition.MassComposition.div"><code class="xref py py-obj docutils literal notranslate"><span class="pre">div</span></code></a>(other[, name])</p></td>
+<td><p>Divide two objects</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_xarray</span></code>(ds[, name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_common_prefix</span></code>(columns)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_constraint_bounds</span></code>(constraints)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_composition" title="elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_composition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ideal_incremental_composition</span></code></a>([discard_from])</p></td>
+<td><p>Incrementally separate a fractionated sample.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_recovery" title="elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_recovery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ideal_incremental_recovery</span></code></a>([discard_from, ...])</p></td>
+<td><p>Incrementally separate a fractionated sample.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_separation" title="elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_separation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ideal_incremental_separation</span></code></a>([discard_from])</p></td>
+<td><p>Incrementally separate a fractionated sample.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.plot_amenability" title="elphick.mass_composition.mass_composition.MassComposition.plot_amenability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_amenability</span></code></a>(target_analyte[, ...])</p></td>
+<td><p>The yield-recovery plot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.plot_bins" title="elphick.mass_composition.mass_composition.MassComposition.plot_bins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_bins</span></code></a>(variables, cutoff_var, bin_width)</p></td>
+<td><p>Plot &quot;The Grade-Tonnage&quot; curve.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.plot_comparison" title="elphick.mass_composition.mass_composition.MassComposition.plot_comparison"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_comparison</span></code></a>(other[, color, ...])</p></td>
+<td><p>Create an interactive parallel plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.plot_grade_recovery" title="elphick.mass_composition.mass_composition.MassComposition.plot_grade_recovery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_grade_recovery</span></code></a>(target_analyte[, ...])</p></td>
+<td><p>The grade-recovery plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.plot_intervals" title="elphick.mass_composition.mass_composition.MassComposition.plot_intervals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_intervals</span></code></a>(variables[, cumulative, ...])</p></td>
+<td><p>Plot &quot;The Grade-Tonnage&quot; curve.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.plot_parallel" title="elphick.mass_composition.mass_composition.MassComposition.plot_parallel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_parallel</span></code></a>([color, vars_include, ...])</p></td>
+<td><p>Create an interactive parallel plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.plot_ternary" title="elphick.mass_composition.mass_composition.MassComposition.plot_ternary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_ternary</span></code></a>(variables[, color, title])</p></td>
+<td><p>Plot a ternary diagram</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code>(queries)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename</span></code>(new_name)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.resample_1d" title="elphick.mass_composition.mass_composition.MassComposition.resample_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample_1d</span></code></a>(interval_edges[, precision, ...])</p></td>
+<td><p>Resample a 1D fractional dim/index</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_child_node</span></code>(child)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_data</span></code>(data[, constraints])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_parent_node</span></code>(parent)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_stream_nodes</span></code>(nodes)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.split" title="elphick.mass_composition.mass_composition.MassComposition.split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split</span></code></a>(fraction[, name_1, name_2])</p></td>
+<td><p>Split the object by mass</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.split_by_estimator" title="elphick.mass_composition.mass_composition.MassComposition.split_by_estimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_by_estimator</span></code></a>(estimator[, name_1, ...])</p></td>
+<td><p>Split an object using a sklearn estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.split_by_function" title="elphick.mass_composition.mass_composition.MassComposition.split_by_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_by_function</span></code></a>(split_function[, name_1, ...])</p></td>
+<td><p>Split an object using a function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.split_by_partition" title="elphick.mass_composition.mass_composition.MassComposition.split_by_partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_by_partition</span></code></a>(partition_definition[, ...])</p></td>
+<td><p>Partition the object along a given dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.sub" title="elphick.mass_composition.mass_composition.MassComposition.sub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sub</span></code></a>(other[, name])</p></td>
+<td><p>Subtract two objects</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition.to_xarray" title="elphick.mass_composition.mass_composition.MassComposition.to_xarray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code></a>()</p></td>
+<td><p>Returns the mc compliant xr.Dataset</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_data</span></code>(values)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.__add__" title="Permalink to this definition"></a></dt>
+<dd><p>Add two objects</p>
+<p>Perform the addition with the mass-composition variables only and then append any attribute variables.
+Presently ignores any attribute vars in other
+:type other: <a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>
+:param other: object to add to self</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.add" title="Permalink to this definition"></a></dt>
+<dd><p>Add two objects</p>
+<p>Adds other to self, with optional name of the returned object
+:type other: <a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>
+:param other: object to add to self
+:type name: <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]
+:param name: name of the returned object</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.aggregate">
+<span class="sig-name descname"><span class="pre">aggregate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_column_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.aggregate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.aggregate" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the weight average.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_var</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional grouping variable</p></li>
+<li><p><strong>group_bins</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Optional bins to apply to the group_var</p></li>
+<li><p><strong>as_dataframe</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True return a pd.DataFrame</p></li>
+<li><p><strong>original_column_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, and as_dataframe is True, will return with the original column names.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>]</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.binned_mass_composition">
+<span class="sig-name descname"><span class="pre">binned_mass_composition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutoff_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cumulative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'descending'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.binned_mass_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.binned_mass_composition" title="Permalink to this definition"></a></dt>
+<dd><p>A.K.A “The Grade-Tonnage” curve.</p>
+<p>Mass and grade by bins for a cut-off variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cutoff_var</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The variable that defines the bins</p></li>
+<li><p><strong>bin_width</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The width of the bin</p></li>
+<li><p><strong>cumulative</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, the results are cumulative weight averaged.</p></li>
+<li><p><strong>direction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ‘ascending’|’descending’, if cumulative is True, the direction of accumulation</p></li>
+<li><p><strong>as_dataframe</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True return a pd.DataFrame</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.calculate_partition">
+<span class="sig-name descname"><span class="pre">calculate_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.calculate_partition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.calculate_partition" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the partition of the ref stream relative to self</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.constrain">
+<span class="sig-name descname"><span class="pre">constrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_composition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_composition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.constrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.constrain" title="Permalink to this definition"></a></dt>
+<dd><p>Constrain the mass-composition</p>
+<p>It is possible that a MassComposition object is created from a source that has improbable results.
+In this case this method can help improve the integrity of the mass-composition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clip_mass</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Limit the minimum and maximum values of the mass between a minimum and maximum absolute value.</p></li>
+<li><p><strong>clip_composition</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Limit the minimum and maximum values of the composition between a minimum and
+maximum absolute value.</p></li>
+<li><p><strong>relative_mass</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Constrain the mass recovery of the object to the other object</p></li>
+<li><p><strong>relative_composition</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Constrain the component recovery of the object to the other object</p></li>
+<li><p><strong>other</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>]) – The other object used for recovery calculation.  Must be provided if relative_mass or</p></li>
+<li><p><strong>provided.</strong> (<em>relative_composition are</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns the new object constrained per the provided arguments.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.div">
+<span class="sig-name descname"><span class="pre">div</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.div"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.div" title="Permalink to this definition"></a></dt>
+<dd><p>Divide two objects</p>
+<p>Divides self by other, with optional name of the returned object
+:type other: <a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>
+:param other: the denominator (or reference) object
+:type name: <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]
+:param name: name of the returned object</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_composition">
+<span class="sig-name descname"><span class="pre">ideal_incremental_composition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discard_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lowest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.ideal_incremental_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_composition" title="Permalink to this definition"></a></dt>
+<dd><p>Incrementally separate a fractionated sample.</p>
+<dl class="simple">
+<dt>This method sorts by the provided direction prior to incrementally removing and discarding the first fraction</dt><dd><p>(of the remaining fractions) and recalculating the mass-composition of the portion remaining.
+This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.</p>
+</dd>
+</dl>
+<p>This method is only applicable to a 1D object where the single dimension is a pd.Interval type.</p>
+<p>See also: ideal_incremental_separation, ideal_incremental_recovery.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>discard_from</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'lowest'</span></code>, <code class="docutils literal notranslate"><span class="pre">'highest'</span></code>]) – Defines the discarded direction.  discard_from = “lowest” will discard the lowest value
+first, then the next lowest, etc.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_recovery">
+<span class="sig-name descname"><span class="pre">ideal_incremental_recovery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discard_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lowest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_closure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.ideal_incremental_recovery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_recovery" title="Permalink to this definition"></a></dt>
+<dd><p>Incrementally separate a fractionated sample.</p>
+<dl class="simple">
+<dt>This method sorts by the provided direction prior to incrementally removing and discarding the first fraction</dt><dd><p>(of the remaining fractions) and recalculating the recovery of the portion remaining.
+This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.</p>
+</dd>
+</dl>
+<p>This method is only applicable to a 1D object where the single dimension is a pd.Interval type.</p>
+<p>See also: ideal_incremental_separation, ideal_incremental_composition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>discard_from</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'lowest'</span></code>, <code class="docutils literal notranslate"><span class="pre">'highest'</span></code>]) – Defines the discarded direction.  discard_from = “lowest” will discard the lowest value
+first, then the next lowest, etc.</p></li>
+<li><p><strong>apply_closure</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, Add the missing record (zero recovery) that closes the recovery envelope.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_separation">
+<span class="sig-name descname"><span class="pre">ideal_incremental_separation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discard_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lowest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.ideal_incremental_separation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.ideal_incremental_separation" title="Permalink to this definition"></a></dt>
+<dd><p>Incrementally separate a fractionated sample.</p>
+<dl class="simple">
+<dt>This method sorts by the provided direction prior to incrementally removing and discarding the first fraction</dt><dd><p>(of the remaining fractions) and recalculating the mass-composition and recovery of the portion remaining.
+This is equivalent to incrementally applying a perfect separation (partition) at every interval edge.</p>
+</dd>
+</dl>
+<p>This method is only applicable to a 1D object where the single dimension is a pd.Interval type.</p>
+<p>See also: ideal_incremental_composition, ideal_incremental_recovery.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>discard_from</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'lowest'</span></code>, <code class="docutils literal notranslate"><span class="pre">'highest'</span></code>]) – Defines the discarded direction.  discard_from = “lowest” will discard the lowest value
+first, then the next lowest, etc.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.plot_amenability">
+<span class="sig-name descname"><span class="pre">plot_amenability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_analyte</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lowest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gangue_analytes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.plot_amenability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.plot_amenability" title="Permalink to this definition"></a></dt>
+<dd><p>The yield-recovery plot.</p>
+<p>The yield recovery curve provides an understanding of the amenability of a sample.</p>
+<p>This method is only applicable to a 1D object where the single dimension is a pd.Interval type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_analyte</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The analyte of value.</p></li>
+<li><p><strong>discard_from</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'lowest'</span></code>, <code class="docutils literal notranslate"><span class="pre">'highest'</span></code>]) – Defines the discarded direction.  discard_from = “lowest” will discard the lowest value
+first, then the next lowest, etc.</p></li>
+<li><p><strong>gangue_analytes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The analytes to be rejected</p></li>
+<li><p><strong>title</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional plot title</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A plotly.GraphObjects figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.plot_bins">
+<span class="sig-name descname"><span class="pre">plot_bins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cumulative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'descending'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.plot_bins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.plot_bins" title="Permalink to this definition"></a></dt>
+<dd><p>Plot “The Grade-Tonnage” curve.</p>
+<p>Mass and grade by bins for a cut-off variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variables</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of variables to include in the plot</p></li>
+<li><p><strong>cutoff_var</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The variable that defines the bins</p></li>
+<li><p><strong>bin_width</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The width of the bin</p></li>
+<li><p><strong>cumulative</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, the results are cumulative weight averaged.</p></li>
+<li><p><strong>direction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ‘ascending’|’descending’, if cumulative is True, the direction of accumulation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.plot_comparison">
+<span class="sig-name descname"><span class="pre">plot_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars_include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars_exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facet_col_wrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trendline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trendline_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.plot_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.plot_comparison" title="Permalink to this definition"></a></dt>
+<dd><p>Create an interactive parallel plot</p>
+<p>Useful to compare the difference in component values between two objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>) – the object to compare with self.</p></li>
+<li><p><strong>color</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional color variable</p></li>
+<li><p><strong>vars_include</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Optional List of variables to include in the plot</p></li>
+<li><p><strong>vars_exclude</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Optional List of variables to exclude in the plot</p></li>
+<li><p><strong>trendline</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True and trendlines</p></li>
+<li><p><strong>trendline_kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Allows customising the trendline: ref: <a class="reference external" href="https://plotly.com/python/linear-fits/">https://plotly.com/python/linear-fits/</a></p></li>
+<li><p><strong>title</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional plot title</p></li>
+<li><p><strong>facet_col_wrap</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of subplot columns per row.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.plot_grade_recovery">
+<span class="sig-name descname"><span class="pre">plot_grade_recovery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_analyte</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lowest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.plot_grade_recovery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.plot_grade_recovery" title="Permalink to this definition"></a></dt>
+<dd><p>The grade-recovery plot.</p>
+<p>The grade recovery curve is generated by assuming an ideal separation (for the chosen property, or dimension)
+at each fractional interval.  It defines the theoretical maximum performance, which can only be improved if
+liberation is improved by comminution.</p>
+<p>This method is only applicable to a 1D object where the single dimension is a pd.Interval type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_analyte</strong> – The analyte of value.</p></li>
+<li><p><strong>discard_from</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'lowest'</span></code>, <code class="docutils literal notranslate"><span class="pre">'highest'</span></code>]) – Defines the discarded direction.  discard_from = “lowest” will discard the lowest value
+first, then the next lowest, etc.</p></li>
+<li><p><strong>title</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional plot title</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A plotly.GraphObjects figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.plot_intervals">
+<span class="sig-name descname"><span class="pre">plot_intervals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cumulative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'descending'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.plot_intervals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.plot_intervals" title="Permalink to this definition"></a></dt>
+<dd><p>Plot “The Grade-Tonnage” curve.</p>
+<p>Mass and grade by bins for a cut-off variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variables</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of variables to include in the plot</p></li>
+<li><p><strong>cumulative</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, the results are cumulative weight averaged.</p></li>
+<li><p><strong>direction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – ‘ascending’|’descending’, if cumulative is True, the direction of accumulation</p></li>
+<li><p><strong>show_edges</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, show the edges on the plot.  Applicable to cumulative plots only.</p></li>
+<li><p><strong>min_x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – Optional minimum value for the x-axis, useful to set reasonable visual range with a log</p></li>
+<li><p><strong>data</strong> (<em>scaled x-axis when plotting size</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.plot_parallel">
+<span class="sig-name descname"><span class="pre">plot_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars_include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vars_exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_interval_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.plot_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.plot_parallel" title="Permalink to this definition"></a></dt>
+<dd><p>Create an interactive parallel plot</p>
+<p>Useful to explore multidimensional data like mass-composition data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>color</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional color variable</p></li>
+<li><p><strong>vars_include</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Optional List of variables to include in the plot</p></li>
+<li><p><strong>vars_exclude</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Optional List of variables to exclude in the plot</p></li>
+<li><p><strong>title</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Optional plot title</p></li>
+<li><p><strong>include_dims</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Optional boolean or list of dimension to include in the plot.  True will show all dims.</p></li>
+<li><p><strong>plot_interval_edges</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, interval edges will be plotted instead of interval mid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.plot_ternary">
+<span class="sig-name descname"><span class="pre">plot_ternary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.plot_ternary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.plot_ternary" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a ternary diagram</p>
+<p>variables: List of 3 components to plot
+color: Optional color variable
+title: Optional plot title</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.resample_1d">
+<span class="sig-name descname"><span class="pre">resample_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_original_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.resample_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.resample_1d" title="Permalink to this definition"></a></dt>
+<dd><p>Resample a 1D fractional dim/index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interval_edges</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – The values of the new grid (interval edges).  If an int, will up-sample by that factor, for
+example the value of 10 will automatically define edges that create 10 x the resolution (up-sampled).</p></li>
+<li><p><strong>precision</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Optional integer for the number of decimal places to round the grid values to.</p></li>
+<li><p><strong>include_original_edges</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True include the original edges in the grid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new object interpolated onto the new grid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fraction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.split" title="Permalink to this definition"></a></dt>
+<dd><p>Split the object by mass</p>
+<p>A simple mass split maintaining the same composition</p>
+<p>See also: split_by_partition, split_by_function, split_by_estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fraction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – A constant in the range [0.0, 1.0]</p></li>
+<li><p><strong>name_1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the reference stream created by the split</p></li>
+<li><p><strong>name_2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the complement stream created by the split</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>, <a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of two datasets, the first with the mass fraction specified, the other the complement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.split_by_estimator">
+<span class="sig-name descname"><span class="pre">split_by_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_prefix_mismatch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_recovery_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_recovery_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.split_by_estimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.split_by_estimator" title="Permalink to this definition"></a></dt>
+<dd><p>Split an object using a sklearn estimator.</p>
+<p>This method applies the function to self, resulting in two new objects. The object returned with name_1
+is the result of the estimator.predict() method.  The object returned with name_2 is the complement.</p>
+<p>See also: split, split_by_function, split_by_partition</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimator</strong> (<a class="reference internal" href="elphick.mass_composition.utils.sklearn.PandasPipeline.html#elphick.mass_composition.utils.sklearn.PandasPipeline" title="elphick.mass_composition.utils.sklearn.PandasPipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">PandasPipeline</span></code></a>) – Any sklearn estimator that transforms the dataframe from a MassComposition object into a new
+dataframe with values representing a new (output) stream using the predict method.  The returned
+dataframe structure must be identical to the input dataframe.</p></li>
+<li><p><strong>name_1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the stream created by the estimator.</p></li>
+<li><p><strong>name_2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the complement stream created by the split, which is calculated automatically.</p></li>
+<li><p><strong>extra_features</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – Optional additional features to pass to the estimator as features.</p></li>
+<li><p><strong>allow_prefix_mismatch</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, allow feature names to be different and log an info message. If False,
+raise an error when feature names are different.</p></li>
+<li><p><strong>mass_recovery_column</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – If provided, this indicates that the model has estimated mass recovery, not mass
+explicitly.  This will execute a transformation of the predicted <cite>dry</cite> mass recovery to dry mass.</p></li>
+<li><p><strong>mass_recovery_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The maximum mass recovery value, used to scale the mass recovery to mass.  Only
+applicable if mass_recovery_column is provided.  Should be either 1.0 or 100.0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>, <a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of two MassComposition objects, the first the output of the estimator, the other the complement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.split_by_function">
+<span class="sig-name descname"><span class="pre">split_by_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">split_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.split_by_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.split_by_function" title="Permalink to this definition"></a></dt>
+<dd><p>Split an object using a function.</p>
+<p>This method applies the function to self, resulting in two new objects. The object returned with name_1
+is the result of the function.  The object returned with name_2 is the complement.</p>
+<p>See also: split, split_by_estimator, split_by_partition</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>split_function</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – Any function that transforms the dataframe from a MassComposition object into a new
+dataframe with values representing a new (output) stream.  The returned dataframe structure must be
+identical to the input dataframe.</p></li>
+<li><p><strong>name_1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the stream created by the function</p></li>
+<li><p><strong>name_2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the complement stream created by the split, which is calculated automatically.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>, <a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of two datasets, the first with the mass fraction specified, the other the complement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.split_by_partition">
+<span class="sig-name descname"><span class="pre">split_by_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_definition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.split_by_partition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.split_by_partition" title="Permalink to this definition"></a></dt>
+<dd><p>Partition the object along a given dimension.</p>
+<p>This method applies the defined separation resulting in two new objects.</p>
+<p>See also: split, split_by_function, split_by_estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>partition_definition</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – A partition function that defines the efficiency of separation along a dimension</p></li>
+<li><p><strong>name_1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the reference stream created by the split</p></li>
+<li><p><strong>name_2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the complement stream created by the split</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>, <a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of two datasets, the first with the mass fraction specified, the other the complement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.sub">
+<span class="sig-name descname"><span class="pre">sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.sub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.sub" title="Permalink to this definition"></a></dt>
+<dd><p>Subtract two objects</p>
+<p>Subtracts other from self, with optional name of the returned object
+:type other: <a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>
+:param other: object to subtract from self
+:type name: <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]
+:param name: name of the returned object</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.mass_composition.MassComposition.to_xarray">
+<span class="sig-name descname"><span class="pre">to_xarray</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/mass_composition.html#MassComposition.to_xarray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.mass_composition.MassComposition.to_xarray" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the mc compliant xr.Dataset</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="elphick.mass_composition.mass_composition.html" class="btn btn-neutral float-left" title="elphick.mass_composition.mass_composition" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="elphick.mass_composition.stream.html" class="btn btn-neutral float-right" title="elphick.mass_composition.stream" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elphick.mass_composition.stream &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">elphick.mass_composition.stream</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for elphick.mass_composition.stream</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition</span> <span class="kn">import</span> <span class="n">MassComposition</span>
+
+
+<div class="viewcode-block" id="Stream"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.stream.Stream.html#elphick.mass_composition.stream.Stream">[docs]</a><span class="k">class</span> <span class="nc">Stream</span><span class="p">(</span><span class="n">MassComposition</span><span class="p">):</span>
+<div class="viewcode-block" id="Stream.__init__"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.stream.Stream.html#elphick.mass_composition.stream.Stream.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mc</span><span class="p">:</span> <span class="n">MassComposition</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            mc: MassComposition object to be used as a stream.</span>
+<span class="sd">            **kwargs: The key word arguments for the Mass Composition object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Filter out all private properties</span>
+        <span class="n">mc_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
+                   <span class="ow">not</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;variables&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">])}</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">mc_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">mc</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">mc</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">variables</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">source_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">destination_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_mass_composition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mc</span><span class="p">:</span> <span class="n">MassComposition</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">mc</span><span class="o">=</span><span class="n">mc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Stream.split"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.stream.Stream.html#elphick.mass_composition.stream.Stream.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fraction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+              <span class="n">name_1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name_2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s1">&#39;Stream&#39;</span><span class="p">,</span> <span class="s1">&#39;Stream&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits the stream into two streams.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fraction: The fraction of the stream to be assigned to the first stream.</span>
+<span class="sd">            name_1: The name of the first stream.</span>
+<span class="sd">            name_2: The name of the second stream.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of two Stream objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mc1</span><span class="p">,</span> <span class="n">mc2</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fraction</span><span class="p">,</span> <span class="n">name_1</span><span class="p">,</span> <span class="n">name_2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">mc1</span><span class="p">),</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">mc2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Stream.split_by_partition"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.stream.Stream.html#elphick.mass_composition.stream.Stream.split_by_partition">[docs]</a>    <span class="k">def</span> <span class="nf">split_by_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_definition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+                           <span class="n">name_1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name_2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s1">&#39;Stream&#39;</span><span class="p">,</span> <span class="s1">&#39;Stream&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partition the object along a given dimension.</span>
+
+<span class="sd">        This method applies the defined separation resulting in two new objects.</span>
+
+<span class="sd">        See also: split, split_by_function</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            partition_definition: A partition function that defines the efficiency of separation along a dimension</span>
+<span class="sd">            name_1: The name of the reference stream created by the split</span>
+<span class="sd">            name_2: The name of the complement stream created by the split</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple of two datasets, the first with the mass fraction specified, the other the complement</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mcs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">split_by_partition</span><span class="p">(</span><span class="n">partition_definition</span><span class="p">,</span> <span class="n">name_1</span><span class="p">,</span> <span class="n">name_2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">mcs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">mcs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Stream.split_by_function"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.stream.Stream.html#elphick.mass_composition.stream.Stream.split_by_function">[docs]</a>    <span class="k">def</span> <span class="nf">split_by_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+                          <span class="n">name_1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">name_2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s1">&#39;Stream&#39;</span><span class="p">,</span> <span class="s1">&#39;Stream&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Split an object using a function.</span>
+
+<span class="sd">        This method applies the function to self, resulting in two new objects. The object returned with name_1</span>
+<span class="sd">        is the result of the function.  The object returned with name_2 is the complement.</span>
+
+<span class="sd">        See also: split, split_by_estimator, split_by_partition</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            split_function: Any function that transforms the dataframe from a MassComposition object into a new</span>
+<span class="sd">             dataframe with values representing a new (output) stream.  The returned dataframe structure must be</span>
+<span class="sd">             identical to the input dataframe.</span>
+<span class="sd">            name_1: The name of the stream created by the function</span>
+<span class="sd">            name_2: The name of the complement stream created by the split, which is calculated automatically.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A generator of two Streams,</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mcs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">split_by_function</span><span class="p">(</span><span class="n">split_function</span><span class="p">,</span> <span class="n">name_1</span><span class="p">,</span> <span class="n">name_2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">mcs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">mcs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Stream.split_by_estimator"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.stream.Stream.html#elphick.mass_composition.stream.Stream.split_by_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">split_by_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">estimator</span><span class="p">:</span> <span class="s1">&#39;sklearn.base.BaseEstimator&#39;</span><span class="p">,</span>
+                           <span class="n">name_1</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">name_2</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">extra_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">allow_prefix_mismatch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                           <span class="n">mass_recovery_column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">mass_recovery_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s1">&#39;Stream&#39;</span><span class="p">,</span> <span class="s1">&#39;Stream&#39;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Split an object using a sklearn estimator.</span>
+
+<span class="sd">        This method applies the function to self, resulting in two new objects. The object returned with name_1</span>
+<span class="sd">        is the result of the estimator.predict() method.  The object returned with name_2 is the complement.</span>
+
+<span class="sd">        See also: split, split_by_function, split_by_partition</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            estimator: Any sklearn estimator that transforms the dataframe from a MassComposition object into a new</span>
+<span class="sd">             dataframe with values representing a new (output) stream using the predict method.  The returned</span>
+<span class="sd">             dataframe structure must be identical to the input dataframe.</span>
+<span class="sd">            name_1: The name of the stream created by the estimator.</span>
+<span class="sd">            name_2: The name of the complement stream created by the split, which is calculated automatically.</span>
+<span class="sd">             extra_features: Optional additional features to pass to the estimator as features.</span>
+<span class="sd">            allow_prefix_mismatch: If True, allow feature names to be different and log an info message. If False,</span>
+<span class="sd">             raise an error when feature names are different.</span>
+<span class="sd">            mass_recovery_column: If provided, this indicates that the model has estimated mass recovery, not mass</span>
+<span class="sd">             explicitly.  This will execute a transformation of the predicted `dry` mass recovery to dry mass.</span>
+<span class="sd">            mass_recovery_max: The maximum mass recovery value, used to scale the mass recovery to mass.  Only</span>
+<span class="sd">             applicable if mass_recovery_column is provided.  Should be either 1.0 or 100.0.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple of two Stream objects, the first the output of the estimator, the other the complement</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mcs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">split_by_estimator</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">name_1</span><span class="p">,</span> <span class="n">name_2</span><span class="p">,</span> <span class="n">extra_features</span><span class="p">,</span> <span class="n">allow_prefix_mismatch</span><span class="p">,</span>
+                                         <span class="n">mass_recovery_column</span><span class="p">,</span> <span class="n">mass_recovery_max</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">mcs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">mcs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Stream.add"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.stream.Stream.html#elphick.mass_composition.stream.Stream.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s1">&#39;Stream&#39;</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="s1">&#39;Stream&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Stream&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the stream to another stream or a tuple of streams.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other: The other stream, or a tuple of other streams</span>
+<span class="sd">            name: The name of the new stream.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A Stream object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># If other is not a tuple, make it a tuple</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="p">(</span><span class="n">other</span><span class="p">,)</span>
+
+        <span class="c1"># Initialize the result as the current stream</span>
+        <span class="n">strm</span><span class="p">:</span> <span class="n">Stream</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="c1"># Iterate over each stream in other and add it to the result</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Stream</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected Stream object, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strm</span><span class="p">,</span> <span class="n">MassComposition</span><span class="p">):</span>
+                <span class="n">strm</span> <span class="o">=</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">strm</span><span class="p">)</span>
+
+            <span class="n">strm</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Stream</span><span class="p">,</span> <span class="n">strm</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">strm</span></div>
+
+<div class="viewcode-block" id="Stream.sub"><a class="viewcode-back" href="../../../api/_autosummary/elphick.mass_composition.stream.Stream.html#elphick.mass_composition.stream.Stream.sub">[docs]</a>    <span class="k">def</span> <span class="nf">sub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Stream&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Stream&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subtract two streams</span>
+
+<span class="sd">        Subtracts other from self, with optional name of the returned object</span>
+<span class="sd">        Args:</span>
+<span class="sd">            other: stream to subtract from self</span>
+<span class="sd">            name: name of the returned stream</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Stream</span><span class="o">.</span><span class="n">from_mass_composition</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+elphick.mass\_composition.datasets.sample\_data.demo\_size\_network
+===================================================================
+
+.. currentmodule:: elphick.mass_composition.datasets.sample_data
+
+.. autofunction:: demo_size_network

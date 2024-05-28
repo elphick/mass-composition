@@ -1,0 +1,32 @@
+elphick.mass\_composition.utils.partition
+=========================================
+
+.. automodule:: elphick.mass_composition.utils.partition
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      napier_munn
+      perfect
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

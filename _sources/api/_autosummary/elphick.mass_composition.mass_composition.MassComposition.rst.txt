@@ -1,0 +1,65 @@
+elphick.mass\_composition.mass\_composition.MassComposition
+===========================================================
+
+.. currentmodule:: elphick.mass_composition.mass_composition
+
+.. autoclass:: MassComposition
+   :members:
+   :special-members: __add__, __mul__
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MassComposition.__init__
+      ~MassComposition.add
+      ~MassComposition.aggregate
+      ~MassComposition.binned_mass_composition
+      ~MassComposition.calculate_partition
+      ~MassComposition.compare
+      ~MassComposition.constrain
+      ~MassComposition.div
+      ~MassComposition.from_xarray
+      ~MassComposition.get_common_prefix
+      ~MassComposition.get_constraint_bounds
+      ~MassComposition.ideal_incremental_composition
+      ~MassComposition.ideal_incremental_recovery
+      ~MassComposition.ideal_incremental_separation
+      ~MassComposition.plot_amenability
+      ~MassComposition.plot_bins
+      ~MassComposition.plot_comparison
+      ~MassComposition.plot_grade_recovery
+      ~MassComposition.plot_intervals
+      ~MassComposition.plot_parallel
+      ~MassComposition.plot_ternary
+      ~MassComposition.query
+      ~MassComposition.rename
+      ~MassComposition.resample_1d
+      ~MassComposition.set_child_node
+      ~MassComposition.set_data
+      ~MassComposition.set_parent_node
+      ~MassComposition.set_stream_nodes
+      ~MassComposition.split
+      ~MassComposition.split_by_estimator
+      ~MassComposition.split_by_function
+      ~MassComposition.split_by_partition
+      ~MassComposition.sub
+      ~MassComposition.to_xarray
+      ~MassComposition.update_data
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MassComposition.data
+      ~MassComposition.name
+   
+   

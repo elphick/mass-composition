@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.hash\_utils.read\_hash\_file
+============================================================
+
+.. currentmodule:: elphick.mass_composition.utils.hash_utils
+
+.. autofunction:: read_hash_file

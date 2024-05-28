@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.size\_distribution.gaudin\_schuhmann
+====================================================================
+
+.. currentmodule:: elphick.mass_composition.utils.size_distribution
+
+.. autofunction:: gaudin_schuhmann

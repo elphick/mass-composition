@@ -1,0 +1,33 @@
+﻿elphick.mass\_composition.datasets
+==================================
+
+.. automodule:: elphick.mass_composition.datasets
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   elphick.mass_composition.datasets.datasets
+   elphick.mass_composition.datasets.downloader
+   elphick.mass_composition.datasets.sample_data
+

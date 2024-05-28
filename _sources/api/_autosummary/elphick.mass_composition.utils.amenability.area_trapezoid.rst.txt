@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.amenability.area\_trapezoid
+===========================================================
+
+.. currentmodule:: elphick.mass_composition.utils.amenability
+
+.. autofunction:: area_trapezoid

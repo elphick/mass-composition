@@ -1,0 +1,6 @@
+elphick.mass\_composition.utils.pd\_utils.composition\_to\_mass
+===============================================================
+
+.. currentmodule:: elphick.mass_composition.utils.pd_utils
+
+.. autofunction:: composition_to_mass

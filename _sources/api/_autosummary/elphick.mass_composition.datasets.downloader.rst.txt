@@ -1,0 +1,30 @@
+elphick.mass\_composition.datasets.downloader
+=============================================
+
+.. automodule:: elphick.mass_composition.datasets.downloader
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+   
+      Downloader
+   
+   
+
+   
+   
+   
+
+
+

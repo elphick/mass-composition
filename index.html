@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to mass-composition documentation! &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="usage/installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to mass-composition documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="welcome-to-mass-composition-documentation">
+<h1>Welcome to mass-composition documentation!<a class="headerlink" href="#welcome-to-mass-composition-documentation" title="Permalink to this heading"></a></h1>
+<section id="masscomposition">
+<h2>MassComposition<a class="headerlink" href="#masscomposition" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://github.com/Elphick/mass-composition/actions/workflows/poetry_build_and_test.yml"><img alt="Run Tests" src="https://github.com/Elphick/mass-composition/actions/workflows/poetry_build_and_test.yml/badge.svg?branch=main" /></a>
+<a class="reference external" href="https://github.com/Elphick/mass-composition/actions/workflows/poetry_sphinx_docs_to_gh_pages.yml"><img alt="Publish Docs" src="https://github.com/Elphick/mass-composition/actions/workflows/poetry_sphinx_docs_to_gh_pages.yml/badge.svg?branch=main" /></a></p>
+<p>MassComposition is a python package that allows Geoscientists and Metallurgists to easily work with, and visualise
+mass-compositional data.</p>
+<p>Mass Composition in this context is just that - Mass <em>and</em> Composition.  It is not Compositional Data Analysis (CoDA),
+since here we care more about mathematical operations like weight averaging and technically correct mathematical
+operations.  Of course, we also need to manage moisture correctly - chemical composition is reported on a dry basis
+and moisture on a wet basis.</p>
+<p>The package not only supports individual MassComposition, but collections of objects that are
+mathematically related in a Directional Graph (a.k.a. network or flowsheet).</p>
+<p><a class="reference external" href="https://elphick.github.io/mass-composition/_static/example_plot.html"><img alt="example plot" src="https://elphick.github.io/mass-composition/_static/example_plot.png" /></a></p>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading"></a></h3>
+<p>Before you begin, ensure you have met the following requirements:</p>
+<ul class="simple">
+<li><p>You have installed the latest version of the mass-composition python package.</p></li>
+<li><p>You have a Windows/Linux/Mac machine.</p></li>
+<li><p>You have read the <a class="reference external" href="https://elphick.github.io/mass-composition">docs</a>.</p></li>
+</ul>
+</section>
+<section id="installing-masscomposition">
+<h3>Installing MassComposition<a class="headerlink" href="#installing-masscomposition" title="Permalink to this heading"></a></h3>
+<p>To install MassComposition, follow these steps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">mass</span><span class="o">-</span><span class="n">composition</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">viz</span><span class="p">,</span><span class="n">network</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Or, if poetry is more your flavour.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">add</span> <span class="s2">&quot;mass-composition[viz,network]&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="using-masscomposition">
+<h3>Using MassComposition<a class="headerlink" href="#using-masscomposition" title="Permalink to this heading"></a></h3>
+<p>To use MassComposition, follow these steps:</p>
+<p>There are some basic requirements that the incoming DataFrame must meet.  We’ll use a sample DataFrame here.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">sample_data</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Create the object</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">df_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is then trivial to calculate the weight average aggregate of the dataset.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc</span><span class="o">.</span><span class="n">aggregate</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Multiple composition analytes can be viewed in a single interactive parallel coordinates plot.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obj_mc</span><span class="p">:</span> <span class="n">MassComposition</span> <span class="o">=</span> <span class="n">MassComposition</span><span class="p">(</span><span class="n">df_data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;DHID&#39;</span><span class="p">,</span> <span class="s1">&#39;interval_from&#39;</span><span class="p">,</span> <span class="s1">&#39;interval_to&#39;</span><span class="p">]),</span>
+                                          <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">:</span> <span class="n">Figure</span> <span class="o">=</span> <span class="n">obj_mc</span><span class="o">.</span><span class="n">plot_parallel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;Fe&#39;</span><span class="p">)</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+<p>Network visualisations and other plots are interactive.</p>
+<p>For full examples, see the <a class="reference internal" href="auto_examples/index.html"><span class="doc std std-doc">gallery</span></a>.</p>
+</section>
+<section id="contributing-to-masscomposition">
+<h3>Contributing to MassComposition<a class="headerlink" href="#contributing-to-masscomposition" title="Permalink to this heading"></a></h3>
+<p>To contribute to MassComposition, follow these steps:</p>
+<ol class="arabic simple">
+<li><p>Fork this repository.</p></li>
+<li><p>Create a branch: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">-b</span> <span class="pre">&lt;branch_name&gt;</span></code>.</p></li>
+<li><p>Make your changes and commit them: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'&lt;commit_message&gt;'</span></code></p></li>
+<li><p>Push to the original branch: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">mass-composition</span></code></p></li>
+<li><p>Create the pull request.</p></li>
+</ol>
+<p>Alternatively see the GitHub documentation on <a class="reference external" href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request">creating a pull request</a>.</p>
+</section>
+<section id="contributors">
+<h3>Contributors<a class="headerlink" href="#contributors" title="Permalink to this heading"></a></h3>
+<p>This project is still in its infancy, but I’m keen to work with contributors.</p>
+</section>
+<section id="contact">
+<h3>Contact<a class="headerlink" href="#contact" title="Permalink to this heading"></a></h3>
+<p>If you want to contact me you can reach me at <a class="reference external" href="mailto:your_email&#37;&#52;&#48;address&#46;com">your_email<span>&#64;</span>address<span>&#46;</span>com</a>.</p>
+</section>
+<section id="license">
+<h3>License<a class="headerlink" href="#license" title="Permalink to this heading"></a></h3>
+<p>This project uses the following license: <a class="reference internal" href="license/license.html"><span class="doc std std-doc">MIT</span></a>.</p>
+</section>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage/installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+elphick.mass\_composition.utils.sklearn.PandasPipeline
+======================================================
+
+.. currentmodule:: elphick.mass_composition.utils.sklearn
+
+.. autoclass:: PandasPipeline
+   :members:
+   :special-members: __add__, __mul__
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PandasPipeline.__init__
+      ~PandasPipeline.decision_function
+      ~PandasPipeline.fit
+      ~PandasPipeline.fit_predict
+      ~PandasPipeline.fit_transform
+      ~PandasPipeline.from_pipeline
+      ~PandasPipeline.get_feature_names_out
+      ~PandasPipeline.get_metadata_routing
+      ~PandasPipeline.get_params
+      ~PandasPipeline.inverse_transform
+      ~PandasPipeline.predict
+      ~PandasPipeline.predict_log_proba
+      ~PandasPipeline.predict_proba
+      ~PandasPipeline.score
+      ~PandasPipeline.score_samples
+      ~PandasPipeline.set_output
+      ~PandasPipeline.set_params
+      ~PandasPipeline.set_score_request
+      ~PandasPipeline.transform
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PandasPipeline.classes_
+      ~PandasPipeline.feature_names_in_
+      ~PandasPipeline.n_features_in_
+      ~PandasPipeline.named_steps
+      ~PandasPipeline.steps
+   
+   

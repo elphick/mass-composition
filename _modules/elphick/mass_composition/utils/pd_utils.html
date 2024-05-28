@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elphick.mass_composition.utils.pd_utils &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">elphick.mass_composition.utils.pd_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for elphick.mass_composition.utils.pd_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Pandas utils</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">pandas.core.dtypes.common</span> <span class="kn">import</span> <span class="n">is_float_dtype</span>
+
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils</span> <span class="kn">import</span> <span class="n">solve_mass_moisture</span>
+<span class="kn">from</span> <span class="nn">elphick.mass_composition.utils.size</span> <span class="kn">import</span> <span class="n">mean_size</span>
+
+
+<div class="viewcode-block" id="column_prefixes"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.utils.pd_utils.column_prefixes.html#elphick.mass_composition.utils.pd_utils.column_prefixes">[docs]</a><span class="k">def</span> <span class="nf">column_prefixes</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">prefix</span><span class="p">:</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span> <span class="k">if</span> <span class="n">prefix</span> <span class="o">==</span> <span class="n">col</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="n">col</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]))}</span></div>
+
+
+<div class="viewcode-block" id="column_prefix_counts"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.utils.pd_utils.column_prefix_counts.html#elphick.mass_composition.utils.pd_utils.column_prefix_counts">[docs]</a><span class="k">def</span> <span class="nf">column_prefix_counts</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_prefixes</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="mass_to_composition"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.utils.pd_utils.mass_to_composition.html#elphick.mass_composition.utils.pd_utils.mass_to_composition">[docs]</a><span class="k">def</span> <span class="nf">mass_to_composition</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                        <span class="n">mass_wet</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_wet&#39;</span><span class="p">,</span>
+                        <span class="n">mass_dry</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_dry&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a mass DataFrame to composition</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: The pd.DataFrame containing mass.  H2O if provided will be ignored.  All columns other than the</span>
+<span class="sd">         mass_wet and mass_dry are assumed to be `additive`, that is, dry mass weighting is valid.</span>
+<span class="sd">         Assumes composition is in %w/w units.</span>
+<span class="sd">        mass_wet: The wet mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.</span>
+<span class="sd">        mass_dry: The dry mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A pd.Dataframe containing mass (wet and dry mass) and composition</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">non_float_cols</span> <span class="o">=</span> <span class="n">_detect_non_float_columns</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">non_component_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">mass_wet</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">mass_dry</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s1">&#39;h2o&#39;</span><span class="p">,</span> <span class="s1">&#39;moisture&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">col</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span>
+                                                                                               <span class="n">non_float_cols</span><span class="p">]</span>
+
+    <span class="n">mass</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">mass_wet</span><span class="p">,</span> <span class="n">mass_dry</span><span class="p">]]</span>
+    <span class="n">component_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">non_component_cols</span><span class="p">]</span>
+    <span class="n">component_mass</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">component_cols</span><span class="p">]</span>
+    <span class="n">composition</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">component_mass</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">mass</span><span class="p">[</span><span class="n">mass_dry</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">100.0</span>
+    <span class="n">moisture</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="n">solve_mass_moisture</span><span class="p">(</span><span class="n">mass_wet</span><span class="o">=</span><span class="n">mass</span><span class="p">[</span><span class="n">mass_wet</span><span class="p">],</span> <span class="n">mass_dry</span><span class="o">=</span><span class="n">mass</span><span class="p">[</span><span class="n">mass_dry</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">mass</span><span class="p">,</span> <span class="n">moisture</span><span class="p">,</span> <span class="n">composition</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="composition_to_mass"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.utils.pd_utils.composition_to_mass.html#elphick.mass_composition.utils.pd_utils.composition_to_mass">[docs]</a><span class="k">def</span> <span class="nf">composition_to_mass</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                        <span class="n">mass_wet</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_wet&#39;</span><span class="p">,</span>
+                        <span class="n">mass_dry</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_dry&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a composition Dataframe to mass</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: The pd.DataFrame containing mass_wet, mass+_dry and composition columns.  H2O if provided will be dropped.</span>
+<span class="sd">          All columns other than the mass_wet and mass_dry are assumed to be `additive`, that is, dry mass weighting</span>
+<span class="sd">          is valid.  Assumes composition is in %w/w units.</span>
+<span class="sd">        mass_wet: The wet mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.</span>
+<span class="sd">        mass_dry: The dry mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A pd.Dataframe containing mass for all components</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">non_float_cols</span> <span class="o">=</span> <span class="n">_detect_non_float_columns</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">non_component_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">mass_wet</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">mass_dry</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s1">&#39;h2o&#39;</span><span class="p">,</span> <span class="s1">&#39;moisture&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">col</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span>
+                                                                                               <span class="n">non_float_cols</span><span class="p">]</span>
+
+    <span class="n">mass</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">mass_wet</span><span class="p">,</span> <span class="n">mass_dry</span><span class="p">]]</span>
+    <span class="n">component_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">non_component_cols</span><span class="p">]</span>
+    <span class="n">composition</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">component_cols</span><span class="p">]</span>
+    <span class="n">component_mass</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">composition</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">mass</span><span class="p">[</span><span class="n">mass_dry</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span>
+    <span class="n">moisture_mass</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">mass</span><span class="p">[</span><span class="n">mass_wet</span><span class="p">]</span> <span class="o">-</span> <span class="n">mass</span><span class="p">[</span><span class="n">mass_dry</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;H2O&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">mass</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">mass</span><span class="p">,</span> <span class="n">moisture_mass</span><span class="p">,</span> <span class="n">component_mass</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="weight_average"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.utils.pd_utils.weight_average.html#elphick.mass_composition.utils.pd_utils.weight_average">[docs]</a><span class="k">def</span> <span class="nf">weight_average</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                   <span class="n">mass_wet</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_wet&#39;</span><span class="p">,</span>
+                   <span class="n">mass_dry</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_dry&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weight Average a DataFrame containing mass-composition</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: The pd.DataFrame containing mass-composition.  H2O if provided will be ignored.  All columns other than the</span>
+<span class="sd">         mass_wet and mass_dry are assumed to be `additive`, that is, dry mass weighting is valid.</span>
+<span class="sd">         Assumes composition is in %w/w units.</span>
+<span class="sd">        mass_wet: The wet mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.</span>
+<span class="sd">        mass_dry: The dry mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A pd.Series containing the total mass and weight averaged composition.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">non_float_cols</span> <span class="o">=</span> <span class="n">_detect_non_float_columns</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="n">mass_sum</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">composition_to_mass</span><span class="p">,</span> <span class="n">mass_wet</span><span class="o">=</span><span class="n">mass_wet</span><span class="p">,</span> <span class="n">mass_dry</span><span class="o">=</span><span class="n">mass_dry</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+        <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">moisture</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="n">solve_mass_moisture</span><span class="p">(</span><span class="n">mass_wet</span><span class="o">=</span><span class="n">mass_sum</span><span class="p">[</span><span class="n">mass_wet</span><span class="p">],</span>
+                                              <span class="n">mass_dry</span><span class="o">=</span><span class="n">mass_sum</span><span class="p">[</span><span class="n">mass_dry</span><span class="p">])</span>
+    <span class="n">component_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span>
+                      <span class="n">col</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">mass_wet</span><span class="p">,</span> <span class="n">mass_dry</span><span class="p">,</span> <span class="s1">&#39;h2o&#39;</span><span class="p">,</span> <span class="s1">&#39;moisture&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">non_float_cols</span><span class="p">]</span>
+    <span class="n">weighted_composition</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="n">mass_sum</span><span class="p">[</span><span class="n">component_cols</span><span class="p">]</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">mass_sum</span><span class="p">[</span><span class="n">mass_dry</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">mass_sum</span><span class="p">[[</span><span class="n">mass_wet</span><span class="p">,</span> <span class="n">mass_dry</span><span class="p">]],</span> <span class="n">moisture</span><span class="p">,</span> <span class="n">weighted_composition</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="calculate_recovery"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.utils.pd_utils.calculate_recovery.html#elphick.mass_composition.utils.pd_utils.calculate_recovery">[docs]</a><span class="k">def</span> <span class="nf">calculate_recovery</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                       <span class="n">df_ref</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                       <span class="n">mass_wet</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_wet&#39;</span><span class="p">,</span>
+                       <span class="n">mass_dry</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_dry&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate recovery of mass-composition for two DataFrames</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: The pd.DataFrame containing mass-composition.  H2O if provided will be ignored.  All columns other than the</span>
+<span class="sd">         mass_wet and mass_dry are assumed to be `additive`, that is, dry mass weighting is valid.</span>
+<span class="sd">         Assumes composition is in %w/w units.</span>
+<span class="sd">        mass_wet: The wet mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.</span>
+<span class="sd">        mass_dry: The dry mass column, not optional.  Consider solve_mass_moisture prior to this call if needed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A pd.Series containing the total mass and weight averaged composition.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">composition_to_mass</span><span class="p">,</span> <span class="n">mass_wet</span><span class="o">=</span><span class="n">mass_wet</span><span class="p">,</span> <span class="n">mass_dry</span><span class="o">=</span><span class="n">mass_dry</span><span class="p">)</span> <span class="o">/</span> <span class="n">df_ref</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span>
+        <span class="n">composition_to_mass</span><span class="p">,</span> <span class="n">mass_wet</span><span class="o">=</span><span class="n">mass_wet</span><span class="p">,</span> <span class="n">mass_dry</span><span class="o">=</span><span class="n">mass_dry</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="calculate_partition"><a class="viewcode-back" href="../../../../api/_autosummary/elphick.mass_composition.utils.pd_utils.calculate_partition.html#elphick.mass_composition.utils.pd_utils.calculate_partition">[docs]</a><span class="k">def</span> <span class="nf">calculate_partition</span><span class="p">(</span><span class="n">df_feed</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                        <span class="n">df_ref</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                        <span class="n">col_mass_dry</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mass_dry&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the partition curve from two streams</span>
+
+<span class="sd">    Applicable to the one dimensional case only.  The PN is bounded [0, 1].</span>
+<span class="sd">    The interval mean for size is the geometric mean, otherwise the arithmetic mean.</span>
+<span class="sd">    The interval mean is named `da`, which can be interpreted as `diameter-average` or `density-average`.</span>
+<span class="sd">    TODO: consider a generalised name, fraction-average -&gt; fa?</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df_feed: The pd.DataFrame containing mass-composition representing the fractionated feed.</span>
+<span class="sd">        df_ref: The pd.DataFrame containing mass-composition representing the fractionated reference stream.</span>
+<span class="sd">        col_mass_dry: The dry mass column, not optional.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A pd.DataFrame containing the partition data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">df_ref</span><span class="p">[[</span><span class="n">col_mass_dry</span><span class="p">]]</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">df_feed</span><span class="p">[[</span><span class="n">col_mass_dry</span><span class="p">]])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col_mass_dry</span><span class="p">:</span> <span class="s1">&#39;PN&#39;</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">df_ref</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s1">&#39;da&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">mean_size</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s1">&#39;da&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">mid</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<span class="k">def</span> <span class="nf">_detect_non_float_columns</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="n">_logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="p">)</span>
+    <span class="n">non_float_cols</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_float_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following columns are not float columns and will be ignored: </span><span class="si">{</span><span class="n">non_float_cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">non_float_cols</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

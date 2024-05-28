@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elphick.mass_composition.stream.Stream &mdash; mass-composition  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="elphick.mass_composition.flowsheet" href="elphick.mass_composition.flowsheet.html" />
+    <link rel="prev" title="elphick.mass_composition.stream" href="elphick.mass_composition.stream.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            mass-composition
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#xarray-gallery">Xarray Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datasets/datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary/glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mass_composition.html">elphick.mass_composition.mass_composition</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="elphick.mass_composition.stream.html">elphick.mass_composition.stream</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">elphick.mass_composition.stream.Stream</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elphick.mass_composition.stream.Stream"><code class="docutils literal notranslate"><span class="pre">Stream</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.flowsheet.html">elphick.mass_composition.flowsheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mc_node.html">elphick.mass_composition.mc_node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.mc_xarray.html">elphick.mass_composition.mc_xarray</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.datasets.html">elphick.mass_composition.datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elphick.mass_composition.utils.html">elphick.mass_composition.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license/license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mass-composition</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="elphick.mass_composition.stream.html">elphick.mass_composition.stream</a></li>
+      <li class="breadcrumb-item active">elphick.mass_composition.stream.Stream</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/_autosummary/elphick.mass_composition.stream.Stream.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="elphick-mass-composition-stream-stream">
+<h1>elphick.mass_composition.stream.Stream<a class="headerlink" href="#elphick-mass-composition-stream-stream" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="elphick.mass_composition.stream.Stream">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elphick.mass_composition.stream.</span></span><span class="sig-name descname"><span class="pre">Stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mc</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/stream.html#Stream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.stream.Stream" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.stream.Stream.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mc</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/stream.html#Stream.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.stream.Stream.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mc</strong> (<a class="reference internal" href="elphick.mass_composition.mass_composition.MassComposition.html#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a>) – MassComposition object to be used as a stream.</p></li>
+<li><p><strong>**kwargs</strong> – The key word arguments for the Mass Composition object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream.__init__" title="elphick.mass_composition.stream.Stream.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(mc, **kwargs)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">type mc<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="elphick.mass_composition.mass_composition.MassComposition.html#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream.add" title="elphick.mass_composition.stream.Stream.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a>(other[, name])</p></td>
+<td><p>Adds the stream to another stream or a tuple of streams.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aggregate</span></code>([group_var, group_bins, ...])</p></td>
+<td><p>Calculate the weight average.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">binned_mass_composition</span></code>(cutoff_var, bin_width)</p></td>
+<td><p>A.K.A &quot;The Grade-Tonnage&quot; curve.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_partition</span></code>(ref)</p></td>
+<td><p>Calculate the partition of the ref stream relative to self</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare</span></code>(other[, comparisons, ...])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">constrain</span></code>([clip_mass, clip_composition, ...])</p></td>
+<td><p>Constrain the mass-composition</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">div</span></code>(other[, name])</p></td>
+<td><p>Divide two objects</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_mass_composition</span></code>(mc, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_xarray</span></code>(ds[, name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_common_prefix</span></code>(columns)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_constraint_bounds</span></code>(constraints)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ideal_incremental_composition</span></code>([discard_from])</p></td>
+<td><p>Incrementally separate a fractionated sample.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ideal_incremental_recovery</span></code>([discard_from, ...])</p></td>
+<td><p>Incrementally separate a fractionated sample.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ideal_incremental_separation</span></code>([discard_from])</p></td>
+<td><p>Incrementally separate a fractionated sample.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_amenability</span></code>(target_analyte[, ...])</p></td>
+<td><p>The yield-recovery plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_bins</span></code>(variables, cutoff_var, bin_width)</p></td>
+<td><p>Plot &quot;The Grade-Tonnage&quot; curve.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_comparison</span></code>(other[, color, ...])</p></td>
+<td><p>Create an interactive parallel plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_grade_recovery</span></code>(target_analyte[, ...])</p></td>
+<td><p>The grade-recovery plot.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_intervals</span></code>(variables[, cumulative, ...])</p></td>
+<td><p>Plot &quot;The Grade-Tonnage&quot; curve.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_parallel</span></code>([color, vars_include, ...])</p></td>
+<td><p>Create an interactive parallel plot</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_ternary</span></code>(variables[, color, title])</p></td>
+<td><p>Plot a ternary diagram</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code>(queries)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="elphick.mass_composition.mass_composition.MassComposition.html#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename</span></code>(new_name)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="elphick.mass_composition.mass_composition.MassComposition.html#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample_1d</span></code>(interval_edges[, precision, ...])</p></td>
+<td><p>Resample a 1D fractional dim/index</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_child_node</span></code>(child)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="elphick.mass_composition.mass_composition.MassComposition.html#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_data</span></code>(data[, constraints])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_parent_node</span></code>(parent)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="elphick.mass_composition.mass_composition.MassComposition.html#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_stream_nodes</span></code>(nodes)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="elphick.mass_composition.mass_composition.MassComposition.html#elphick.mass_composition.mass_composition.MassComposition" title="elphick.mass_composition.mass_composition.MassComposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">MassComposition</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream.split" title="elphick.mass_composition.stream.Stream.split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split</span></code></a>(fraction[, name_1, name_2])</p></td>
+<td><p>Splits the stream into two streams.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream.split_by_estimator" title="elphick.mass_composition.stream.Stream.split_by_estimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_by_estimator</span></code></a>(estimator[, name_1, ...])</p></td>
+<td><p>Split an object using a sklearn estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream.split_by_function" title="elphick.mass_composition.stream.Stream.split_by_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_by_function</span></code></a>(split_function[, name_1, ...])</p></td>
+<td><p>Split an object using a function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream.split_by_partition" title="elphick.mass_composition.stream.Stream.split_by_partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_by_partition</span></code></a>(partition_definition[, ...])</p></td>
+<td><p>Partition the object along a given dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream.sub" title="elphick.mass_composition.stream.Stream.sub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sub</span></code></a>(other[, name])</p></td>
+<td><p>Subtract two streams</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code>()</p></td>
+<td><p>Returns the mc compliant xr.Dataset</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_data</span></code>(values)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">destination_node</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">source_node</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.stream.Stream.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/stream.html#Stream.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.stream.Stream.add" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the stream to another stream or a tuple of streams.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#elphick.mass_composition.stream.Stream" title="elphick.mass_composition.stream.Stream"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code></a>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference internal" href="#elphick.mass_composition.stream.Stream" title="elphick.mass_composition.stream.Stream"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code></a>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]]) – The other stream, or a tuple of other streams</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the new stream.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream" title="elphick.mass_composition.stream.Stream"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A Stream object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.stream.Stream.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fraction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/stream.html#Stream.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.stream.Stream.split" title="Permalink to this definition"></a></dt>
+<dd><p>Splits the stream into two streams.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fraction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The fraction of the stream to be assigned to the first stream.</p></li>
+<li><p><strong>name_1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the first stream.</p></li>
+<li><p><strong>name_2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the second stream.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[Stream, Stream]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple of two Stream objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.stream.Stream.split_by_estimator">
+<span class="sig-name descname"><span class="pre">split_by_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_prefix_mismatch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_recovery_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_recovery_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/stream.html#Stream.split_by_estimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.stream.Stream.split_by_estimator" title="Permalink to this definition"></a></dt>
+<dd><p>Split an object using a sklearn estimator.</p>
+<p>This method applies the function to self, resulting in two new objects. The object returned with name_1
+is the result of the estimator.predict() method.  The object returned with name_2 is the complement.</p>
+<p>See also: split, split_by_function, split_by_partition</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimator</strong> (<em>sklearn.base.BaseEstimator</em>) – Any sklearn estimator that transforms the dataframe from a MassComposition object into a new
+dataframe with values representing a new (output) stream using the predict method.  The returned
+dataframe structure must be identical to the input dataframe.</p></li>
+<li><p><strong>name_1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the stream created by the estimator.</p></li>
+<li><p><strong>name_2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the complement stream created by the split, which is calculated automatically.
+extra_features: Optional additional features to pass to the estimator as features.</p></li>
+<li><p><strong>allow_prefix_mismatch</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, allow feature names to be different and log an info message. If False,
+raise an error when feature names are different.</p></li>
+<li><p><strong>mass_recovery_column</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – If provided, this indicates that the model has estimated mass recovery, not mass
+explicitly.  This will execute a transformation of the predicted <cite>dry</cite> mass recovery to dry mass.</p></li>
+<li><p><strong>mass_recovery_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The maximum mass recovery value, used to scale the mass recovery to mass.  Only
+applicable if mass_recovery_column is provided.  Should be either 1.0 or 100.0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[Stream, Stream]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of two Stream objects, the first the output of the estimator, the other the complement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.stream.Stream.split_by_function">
+<span class="sig-name descname"><span class="pre">split_by_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">split_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/stream.html#Stream.split_by_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.stream.Stream.split_by_function" title="Permalink to this definition"></a></dt>
+<dd><p>Split an object using a function.</p>
+<p>This method applies the function to self, resulting in two new objects. The object returned with name_1
+is the result of the function.  The object returned with name_2 is the complement.</p>
+<p>See also: split, split_by_estimator, split_by_partition</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>split_function</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – Any function that transforms the dataframe from a MassComposition object into a new
+dataframe with values representing a new (output) stream.  The returned dataframe structure must be
+identical to the input dataframe.</p></li>
+<li><p><strong>name_1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the stream created by the function</p></li>
+<li><p><strong>name_2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the complement stream created by the split, which is calculated automatically.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[Stream, Stream]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A generator of two Streams,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.stream.Stream.split_by_partition">
+<span class="sig-name descname"><span class="pre">split_by_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_definition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/stream.html#Stream.split_by_partition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.stream.Stream.split_by_partition" title="Permalink to this definition"></a></dt>
+<dd><p>Partition the object along a given dimension.</p>
+<p>This method applies the defined separation resulting in two new objects.</p>
+<p>See also: split, split_by_function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>partition_definition</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – A partition function that defines the efficiency of separation along a dimension</p></li>
+<li><p><strong>name_1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the reference stream created by the split</p></li>
+<li><p><strong>name_2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The name of the complement stream created by the split</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[Stream, Stream]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of two datasets, the first with the mass fraction specified, the other the complement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elphick.mass_composition.stream.Stream.sub">
+<span class="sig-name descname"><span class="pre">sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/elphick/mass_composition/stream.html#Stream.sub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elphick.mass_composition.stream.Stream.sub" title="Permalink to this definition"></a></dt>
+<dd><p>Subtract two streams</p>
+<p>Subtracts other from self, with optional name of the returned object
+:type other: <a class="reference internal" href="#elphick.mass_composition.stream.Stream" title="elphick.mass_composition.stream.Stream"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code></a>
+:param other: stream to subtract from self
+:type name: <code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]
+:param name: name of the returned stream</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#elphick.mass_composition.stream.Stream" title="elphick.mass_composition.stream.Stream"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="elphick.mass_composition.stream.html" class="btn btn-neutral float-left" title="elphick.mass_composition.stream" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="elphick.mass_composition.flowsheet.html" class="btn btn-neutral float-right" title="elphick.mass_composition.flowsheet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Greg Elphick.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

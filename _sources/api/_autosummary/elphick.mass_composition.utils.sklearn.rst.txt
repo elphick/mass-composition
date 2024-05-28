@@ -1,0 +1,38 @@
+elphick.mass\_composition.utils.sklearn
+=======================================
+
+.. automodule:: elphick.mass_composition.utils.sklearn
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      extract_feature_names
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+   
+      PandasPipeline
+   
+   
+
+   
+   
+   
+
+
+

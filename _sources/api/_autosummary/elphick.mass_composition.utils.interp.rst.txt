@@ -1,0 +1,32 @@
+elphick.mass\_composition.utils.interp
+======================================
+
+.. automodule:: elphick.mass_composition.utils.interp
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   
+      interp_monotonic
+      mass_preserving_interp
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,6 @@
+elphick.mass\_composition.datasets.sample\_data.size\_distribution
+==================================================================
+
+.. currentmodule:: elphick.mass_composition.datasets.sample_data
+
+.. autofunction:: size_distribution

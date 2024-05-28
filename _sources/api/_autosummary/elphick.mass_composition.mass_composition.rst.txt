@@ -1,0 +1,30 @@
+﻿elphick.mass\_composition.mass\_composition
+===========================================
+
+.. automodule:: elphick.mass_composition.mass_composition
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+   
+      MassComposition
+   
+   
+
+   
+   
+   
+
+
+

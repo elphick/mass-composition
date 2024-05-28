@@ -1,0 +1,6 @@
+elphick.mass\_composition.datasets.datasets.load\_iron\_ore\_sample\_xyz\_a072391
+=================================================================================
+
+.. currentmodule:: elphick.mass_composition.datasets.datasets
+
+.. autofunction:: load_iron_ore_sample_xyz_a072391
